@@ -1,5 +1,5 @@
 # ⚡Foremost Parser
-![](./../resources/logos/fmparser.png)
+![](./resources/logos/fmparser.png)
 
 `fmparser` parses Foremost outputs and audit files 🗂️, extracts metadata 🔍, detects duplicates ⚡ and generates a detailed report 📊.
 

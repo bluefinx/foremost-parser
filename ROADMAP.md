@@ -1,6 +1,6 @@
 # Roadmap
 
-![](./../resources/logos/fmparser.png)
+![](./resources/logos/fmparser.png)
 
 ## Next Steps 🚀
 
