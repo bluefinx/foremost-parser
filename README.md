@@ -7,7 +7,7 @@
 
 🗂️ parses Foremost audit files<br>
 🔧 extracts Metadata for all files using **ExifTool** or Python as fallback<br>
-🔍 detects Duplicate files
+🔍 detects Duplicate files<br>
 ⚡ uses Batch processing for better performance<br>
 📊 generates a detailed report with overview for each file (*work in progress*)<br>
 🐳 is Platform independent thanks to **Docker Compose**<br>
