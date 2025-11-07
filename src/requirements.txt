@@ -1,0 +1,7 @@
+sqlalchemy>=2.0.34
+psycopg2-binary
+pyexiftool
+python-magic
+jinja2
+python-dateutil
+python-dotenv

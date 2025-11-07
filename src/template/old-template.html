@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ report.name }}</title>
+    <style>
+        html, body {
+            margin: 0;
+        }
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        h1 {
+            text-align: center;
+            font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .content {
+            width: 75%;
+            background-color: lightblue;
+            margin: 50px;
+        }
+        .foremostparser_details {
+            font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+            border: 2px solid gray;
+            width: 80%;
+            margin: 20px auto;
+            padding: 20px;
+        }
+        .image {
+            font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+            border: 2px solid gray;
+            width: 80%;
+            margin: 20px auto;
+            padding: 20px;
+        }
+        .image_details {
+            border: 2px solid gray;
+            width: 100%;
+            margin: 20px auto;
+            padding: 20px;
+        }
+        .foremost_files {
+            border: 2px solid gray;
+            width: 100%;
+            margin: 20px auto;
+            padding: 20px;
+        }
+        .file {
+            display: flex;
+            flex-direction: column;
+            width: 90%;
+        }
+        .horizontal {
+            display: flex;
+        }
+        .file_details {
+            flex: 0 0 75%;
+            width: 50%;
+        }
+        .file_content {
+            flex: 0 0 25%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 50%;
+            padding: 20px;
+        }
+        .file_content img {
+            max-width: 80%;
+            height: auto;
+        }
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+        }
+        .inner_row {
+            display: flex;
+            margin-bottom: 10px;
+        }
+        .key {
+            width: 200px;
+            font-weight: bold;
+        }
+        .inner_key {
+            width: 100px;
+        }
+        .value {
+            word-wrap: break-word;
+        }
+        .inner_value {
+            word-wrap: break-word;
+        }
+    </style>
+</head>
+<body>
+    <div class="content">
+        <h1>Foremost Report: {{ report.name }}</h1>
+        <div class="foremostparser_details">
+            <h2>Foremost-parser Details</h2>
+            <div class="outer_flexbox">
+                <div class="row">
+                    <div class="key">Foremost-parser start:</div>
+                    <div class="value">{{ report.foremostparser_start }}</div>
+                </div>
+                <div class="row">
+                    <div class="key">Foremost version:</div>
+                    <div class="value">{{ report.foremost_version }}</div>
+                </div>
+                <div class="row">
+                    <div class="key">Exiftool version:</div>
+                    <div class="value">{{ report.exiftool_version }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="image">
+            <div class="image_details">
+                <h2>Image Details</h2>
+                <div class="outer_flexbox">
+                    <div class="row">
+                        <div class="key">Foremost scan start:</div>
+                        <div class="value">{{ report.foremost_scan_start }}</div>
+                    </div>
+                    <div class="row">
+                        <div class="key">Foremost scan end:</div>
+                        <div class="value">{{ report.foremost_scan_end }}</div>
+                    </div>
+                    <div class="row">
+                        <div class="key">Size in bytes:</div>
+                        <div class="value">{{ report.image_size }}</div>
+                    </div>
+                    <div class="row">
+                        <div class="key">Files total:</div>
+                        <div class="value">{{ report.foremost_files_total }}</div>
+                    </div>
+                    <div class="row">
+                        <div class="key">Files individual:</div>
+                        <div class="inner_flexbox">
+                            {% for type, amount in report.foremost_files_individual.items() %}
+                            <div class="inner_row">
+                                <div class="inner_key">{{ type }}:</div>
+                                <div class="inner_value">{{ amount }}</div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="foremost_files">
+                <h2>Files Found</h2>
+                {% for file in report.image_files %}
+                <div class="file">
+                    <div class="horizontal">
+                        <div class="file_details">
+                            <div class="outer_flexbox">
+                                <div class="row">
+                                    <div class="key">File name:</div>
+                                    <div class="value">{{ file.file_name }}</div>
+                                </div>
+                                <div class="row">
+                                    <div class="key">File type:</div>
+                                    <div class="value">{{ file.file_type }}</div>
+                                </div>
+                                <div class="row">
+                                    <div class="key">File extension:</div>
+                                    <div class="value">{{ file.file_extension }}</div>
+                                </div>
+                                <div class="row">
+                                    <div class="key">File mime:</div>
+                                    <div class="value">{{ file.file_mime }}</div>
+                                </div>
+                                <div class="row">
+                                    <div class="key">File size in bytes:</div>
+                                    <div class="value">{{ file.file_size }}</div>
+                                </div>
+                                <div class="row">
+                                    <div class="key">File offset:</div>
+                                    <div class="value">{{ file.file_offset }}</div>
+                                </div>
+                                <div class="row">
+                                    <div class="key">Last modified:</div>
+                                    <div class="value">{{ file.timestamp_mod }}</div>
+                                </div>
+                                <div class="row">
+                                    <div class="key">Last accessed:</div>
+                                    <div class="value">{{ file.timestamp_acc }}</div>
+                                </div>
+                                <div class="row">
+                                    <div class="key">Creation Date:</div>
+                                    <div class="value">{{ file.timestamp_cre }}</div>
+                                </div>
+                                <div class="row">
+                                    <div class="key">Last inode change:</div>
+                                    <div class="value">{{ file.timestamp_ino }}</div>
+                                </div>
+                                <div class="row">
+                                    <div class="key">Metadata extracted with exiftool:</div>
+                                    <div class="value">{{ file.is_exiftool }}</div>
+                                </div>
+                                <div class="row">
+                                    <div class="key">Duplicate with:</div>
+                                    <div class="inner_flexbox">
+                                        {% for duplicate in file.duplicates %}
+                                        <div class="inner_row">
+                                            <div class="inner_key">File:</div>
+                                            <div class="inner_value">{{ duplicate[0] }} ({{ duplicate[1] }})</div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="key">Foremost comment:</div>
+                                    <div class="value">{{ file.foremost_comment }}</div>
+                                </div>
+                                {% for type, amount in file.more_metadata.items() %}
+                                <div class="inner_row">
+                                    <div class="inner_key">{{ type }}:</div>
+                                    <div class="inner_value">{{ amount }}</div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="file_content">
+                            <img src="{{ file.file_path }}" alt=" {{ file.file_name }}">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="key">File hash:</div>
+                        <div class="value">{{ file.file_hash }}</div>
+                    </div>                   
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+  </body>
+</html>
+

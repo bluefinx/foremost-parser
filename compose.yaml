@@ -1,0 +1,66 @@
+services:
+  # this needs to run, so the dirs /files and /output have writeable permissions
+  # the UID is set in Dockerfile for Python container
+  init:
+    image: busybox
+    volumes:
+      - files-data:/files
+      - ${OUTPUT_PATH}:/output
+    command: ["sh", "-c", "chown 10001:10001 /files /output"]
+    entrypoint: ""
+  # backend container with python
+  backend:
+    build:
+      context: ./src
+      dockerfile: Dockerfile
+    # depends on database container, start after database
+    depends_on:
+      - db
+      - init
+    # set database parameters for backend
+    environment:
+      - POSTGRES_DB=foremostparser-db
+      - POSTGRES_USER=foremostparser
+      - POSTGRES_PASSWORD_FILE=/run/secrets/db-password
+      - POSTGRES_HOST=db
+      - INPUT_PATH=/data
+      - OUTPUT_PATH=/output
+      - FILES_PATH=/files
+      - OVERWRITE
+      - FLUSH
+      - REGENERATE
+    # use password.txt for database password
+    secrets:
+      - db-password
+    # mount the path provided at startup as read only volume
+    volumes:
+      - "${INPUT_PATH}:/data:ro" 
+      - "${OUTPUT_PATH}:/output"
+      - files-data:/files
+
+  # database service with PostgreSQL
+  db:
+    image: postgres
+    # always restart container when stopped or Docker is restarted
+    restart: always
+    # use password.txt for database password
+    secrets:
+      - db-password
+    # uses "db-data", mount in container under given path
+    volumes:
+      - db-data:/var/lib/postgresql
+    # set database parameters
+    environment:
+      - POSTGRES_DB=foremostparser-db
+      - POSTGRES_USER=foremostparser
+      - POSTGRES_PASSWORD_FILE=/run/secrets/db-password
+
+# creates persistent volume "db-data"    
+volumes:
+  db-data:
+  files-data:
+
+# set password file
+secrets:
+  db-password:
+    file: ./db/password.txt
