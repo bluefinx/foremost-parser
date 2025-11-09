@@ -1,16 +1,47 @@
-# fmparser - Copyright (c) 2025 bluefinx
-# Licensed under the GNU General Public License v3.0
+"""
+indv_files.py
+
+This module provides functionality to process individual files from a Foremost output directory
+and store them in a database, along with optional copying of image files to a persistent output
+directory organised by file extension.
+
+Main features:
+- Extracts file metadata using ExifTool, with a Python fallback for problematic files.
+- Creates SQLAlchemy File objects with metadata suitable for database storage.
+- Computes SHA-256 hashes for each file.
+- Copies image files (jpg, jpeg, png, gif, webp, svg) to an output directory structured by extension.
+- Handles batch processing and per-file fallback for reliability.
+- Supports database insertion of File objects while gracefully handling exceptions.
+
+Key functions:
+- `extract_exiftool_data(files, file_paths, is_python)`:
+    Extracts metadata from a list of files using ExifTool in batches, with Python fallback.
+
+- `create_database_objects(subdir_files, image_id, audit_table, is_python)`:
+    Creates SQLAlchemy File objects from metadata and audit table information.
+
+- `hash_and_store(subdir, files, image_name, output_path)`:
+    Computes SHA-256 hashes and optionally copies image files to output directory organised by extension.
+
+- `parse_files(input_path, output_path, image_id, audit_table, image_name)`:
+    Iterates through all subdirectories of a Foremost output folder, extracts metadata,
+    creates File objects, computes hashes, copies image files, and stores data in the database.
+
+Notes:
+- Only files with extensions jpg, jpeg, png, gif, webp and svg are copied to the output directory and only if the CLI parameter is set.
+- Files are read in 4096-byte chunks for memory-efficient hashing and copying.
+- Tracks files that required Python-based metadata extraction.
+- Relies on helper modules: `magic` and `exiftool`.
+- Designed to handle large directories with many files while minimising the risk of crashes
+  due to problematic files or ExifTool failures.
+"""
 
 import os
-import shutil
 import magic
 import hashlib
 import sys
 import exiftool
 
-from datetime import datetime
-from dateutil import parser
-from dateutil.parser import ParserError
 from pathlib import Path
 from exiftool.exceptions import ExifToolExecuteError
 
@@ -27,10 +58,6 @@ from app.crud.file import insert_files
 # - file_offset
 # - file_path
 # - file_hash
-# - timestamp_mod
-# - timestamp_acc
-# - timestamp_cre
-# - timestamp_ino
 # - is_duplicate
 # - more_metadata
 
@@ -40,33 +67,43 @@ filename = "audit.txt"
 # run exiftool in batches to be able to isolate faulty files
 batch_size = 500
 
-# if exiftool could not be run for a file, store that file here
-is_python = set()
-
 #################################################
 # parse files
 #################################################
 
-# delete all files and dirs
-def delete_all_files(path):
-    if os.path.exists(path) and os.path.isdir(path):
-        for root, dirs, files in os.walk(path):
-            for file in files:
-                os.unlink(os.path.join(root, file))
-            for d in dirs:
-                shutil.rmtree(os.path.join(root, d))
-
-# delete all files for an image
-def delete_files_in_image(image_id, path):
-    dir_path = os.path.join(path, str(image_id))
-    if os.path.isdir(dir_path):
-        # my IDE suggested this so just going with this, sounds good
-        shutil.rmtree(dir_path)
-
 # run exiftool on the files to extract the metadata
-def extract_exiftool_data(files, file_paths):
+def extract_exiftool_data(files: list[Path], file_paths: list[str], is_python: set) -> tuple[dict, set]:
+    """
+    Extracts metadata from a list of files using ExifTool in batches, with a Python fallback for problematic files.
+
+    This function processes files in batches (default 500) to efficiently extract metadata. If a batch fails,
+    it retries each file individually with ExifTool. If a single file still fails, it extracts basic metadata
+    (filename, extension, MIME type, file type, file size) using Python and the `magic` library.
+
+    Args:
+        files (list[Path]): List of Path objects representing files to process.
+        file_paths (list[str]): List of file paths corresponding to `files`.
+        is_python (set): Set to store filenames for which Python fallback was used.
+
+    Returns:
+        tuple:
+            dict: Dictionary mapping each filename to a metadata dictionary. Each metadata dictionary may
+                  include keys like 'File:FileName', 'File:FileTypeExtension', 'File:FileType',
+                  'File:MIMEType', and 'File:FileSize'.
+            set: Updated `is_python` set with filenames that required Python fallback.
+
+    Notes:
+        - Relies on `exiftool.ExifToolHelper` and `magic.Magic`.
+        - Handles batch and individual ExifTool failures gracefully.
+    """
+
     # store the files of this subdir in a dict with "name":{subdict}
     subdir_files = {}
+
+    # initialize magic once for fallback
+    mime_yes = magic.Magic(mime=True)
+    mime_no = magic.Magic(mime=False)
+
     # run exiftool in batches
     ## based on https://stackoverflow.com/questions/41868890/how-to-loop-through-a-python-list-in-batch
     for i in range(0, len(file_paths), batch_size):
@@ -79,7 +116,7 @@ def extract_exiftool_data(files, file_paths):
         # if one file fails, exiftool fails for whole batch, so try to run it individually
         # and extract the faulty file
         except ExifToolExecuteError:
-            print(f"Could not run exiftool as batch. Trying individually.", file=sys.stderr)
+            print("Could not run exiftool as batch. Trying individually.")
             for filepath in batch:
                 try:
                     with exiftool.ExifToolHelper() as ex:
@@ -92,27 +129,40 @@ def extract_exiftool_data(files, file_paths):
                     # this is the faulty file, extract metadata with python instead
                     print(f"Could not run exiftool on file {Path(filepath).parts[-2:]}. "
                           f"Extracting metadata with Python.", file=sys.stderr)
-                    mime_yes = magic.Magic(mime=True)
-                    mime_no = magic.Magic(mime=False)
+
                     file_dict = {
                         "File:FileName": Path(filepath).name,
-                        # this is .bmp but exiftool return BMP so we need to change that
+                        # this is .bmp but exiftool returns BMP so we need to change that
                         "File:FileTypeExtension": Path(filepath).suffix.lstrip('.').upper(),
                         "File:FileType": mime_no.from_file(filepath),
                         "File:MIMEType": mime_yes.from_file(filepath),
-                        "File:FileSize": Path(filepath).stat().st_size,
-                        "File:FileModifyDate": Path(filepath).stat().st_mtime,
-                        "File:FileAccessDate": Path(filepath).stat().st_atime,
-                        # so apparently that is the Inode Change Timestamp on Linux and the Creation Date Timestamp on Windows
-                        # but that's why this file gets flagged as "no exiftool"
-                        "File:FileCreateDate": Path(filepath).stat().st_ctime,
+                        "File:FileSize": Path(filepath).stat().st_size
                     }
                     subdir_files[Path(filepath).name] = file_dict
                     is_python.add(Path(filepath).name)
-    return subdir_files
+    return subdir_files, is_python
 
 # create the file objects to store in the database
-def create_database_objects(subdir, subdir_files, image_id, table):
+def create_database_objects(subdir_files: dict, image_id: int, audit_table: dict, is_python: set) -> list[File]:
+    """
+    Creates SQLAlchemy File objects from extracted metadata to store in the database.
+
+    Args:
+        subdir_files (dict): Dictionary mapping filenames to metadata dictionaries
+                             (as returned by `extract_exiftool_data`).
+        image_id (int): ID of the parent Image record in the database.
+        audit_table (dict): Dictionary with additional file info (size, offset, comment)
+                            parsed from the foremost audit table.
+        is_python (set): Set of filenames for which metadata was extracted via Python fallback.
+
+    Returns:
+        list[File]: List of File ORM objects ready to be inserted into the database.
+
+    Notes:
+        - Marks `is_exiftool` False for files that used Python fallback, True otherwise.
+        - Strips metadata keys from `more_metadata` that are already stored in dedicated columns
+          to avoid redundancy.
+    """
     # create list of file objects
     files = []
     for key, value in subdir_files.items():
@@ -122,70 +172,21 @@ def create_database_objects(subdir, subdir_files, image_id, table):
         file.file_name = key
         file.file_type = value.get('File:FileType')
         file.file_extension = value.get('File:FileTypeExtension')
-        file.file_mime_type = value.get('File:MIMEType')
+        file.file_mime = value.get('File:MIMEType')
         file.file_size = value.get('File:FileSize')
-        file.file_offset = table[file.file_name].get('File Offset')
-        file.foremost_comment = table[file.file_name].get('Comment')
+
+        audit_info = audit_table.get(file.file_name, {})
+        file.file_offset = audit_info.get('File Offset')
+        file.foremost_comment = audit_info.get('Comment')
 
         if file.file_name in is_python:
             file.is_exiftool = False
         else:
             file.is_exiftool = True
 
-        # convert timestamps to write them to database
-        # according to documentation, exiftool timestamps are: 2022:03:03 17:47:11-08:00
-        # can convert with dateutil
-        # convert timestamp to needed format first
-        if file.is_exiftool:
-            try:
-                timestamp_mod = value.get('File:FileModifyDate')
-                timestamp_acc = value.get('File:FileAccessDate')
-                timestamp_cre = value.get('File:FileCreateDate')
-                timestamp_ino = value.get('File:FileInodeChangeDate')
-
-                if timestamp_mod is not None:
-                    timestamp_mod = timestamp_mod.replace(":", "-", 2)
-                    timestamp_mod = parser.parse(timestamp_mod)
-                    file.timestamp_mod = timestamp_mod
-                if timestamp_acc is not None:
-                    timestamp_acc = timestamp_acc.replace(":", "-", 2)
-                    timestamp_acc = parser.parse(timestamp_acc)
-                    file.timestamp_acc = timestamp_acc
-                if timestamp_cre is not None:
-                    timestamp_cre = timestamp_cre.replace(":", "-", 2)
-                    timestamp_cre = parser.parse(timestamp_cre)
-                if timestamp_ino is not None:
-                    timestamp_ino = timestamp_ino.replace(":", "-", 2)
-                    timestamp_ino = parser.parse(timestamp_ino)
-                    file.timestamp_ino = timestamp_ino
-
-            except AttributeError:
-                print(f"Could not convert Exiftool timestamps, skipping them.")
-            except ParserError:
-                print(f"Could not convert Exiftool timestamps, skipping them.")
-        # the timestamps were extracted with python
-        else:
-            try:
-                timestamp_mod = value.get('File:FileModifyDate')
-                if timestamp_mod is not None:
-                    file.timestamp_mod = datetime.fromtimestamp(timestamp_mod)
-                timestamp_acc = value.get('File:FileAccessDate')
-                if timestamp_acc is not None:
-                    file.timestamp_acc = datetime.fromtimestamp(timestamp_acc)
-                timestamp_cre = value.get('File:FileCreateDate')
-                if timestamp_cre is not None:
-                    file.timestamp_cre = datetime.fromtimestamp(timestamp_cre)
-                timestamp_ino = value.get('File:FileInodeChangeDate')
-                if timestamp_ino is not None:
-                    file.timestamp_ino = datetime.fromtimestamp(timestamp_ino)
-
-            except Exception as e:
-                print(f"Could not convert Python timestamps, skipping them: {e}")
-
-
         # drop all of the metadata in more_metadata that we already have in file.* or don't need
         exclude = ['File:FileTypeExtension',
-                   'SourceFile'
+                   'SourceFile',
                    'File:FileType',
                    'File:MIMEType',
                    'File:FileSize',
@@ -206,13 +207,38 @@ def create_database_objects(subdir, subdir_files, image_id, table):
     return files
 
 # create the hash and store the file in the Docker volume
-def hash_and_store(subdir, files, image_id, files_path):
-    # use SHA-256 hash function
-    sha256 = hashlib.sha256()
+def hash_and_store(subdir: Path, files: list[File], image_name: str, output_path: Path, copy_images: bool):
+    """
+    Computes SHA-256 hashes for a list of files and copies image files to an output directory
+    organised by file extension.
+
+    Each file in `files` will have its SHA-256 hash calculated and stored in `file.file_hash`.
+    If the file is an image (jpg, jpeg, png, gif, webp, svg), it is copied into a subdirectory
+    under `output_path` named after the image and grouped by its extension. The path to the copied
+    file is stored in `file.file_path`.
+
+    Args:
+        subdir (Path): Path to the folder containing the original files.
+        files (list[File]): List of File objects to process.
+        image_name (str): Name of the image, used to create the output subdirectory.
+        output_path (Path): Base path where image files will be copied.
+        copy_images (bool): Whether or not to copy image files into subdirectory under `output_path`.
+
+    Notes:
+        - Only files with extensions jpg, jpeg, png, gif, webp, svg are copied.
+        - Reads files in 4096-byte chunks to handle large files efficiently.
+        - Updates each File object with `file_hash` and `file_path`.
+    """
     # use 4096 byte chunks to read in file
     buffer = 4096
 
+    # image files that are copied to output directory
+    image_extensions = {"jpg", "jpeg", "png", "gif", "webp", "svg"}
+
     for file in files:
+        # use SHA-256 hash function
+        sha256 = hashlib.sha256()  # type: ignore[attr-defined]
+
         path = os.path.join(subdir.resolve(), file.file_name)
         with open(path, 'rb') as binary:
             while True:
@@ -222,31 +248,64 @@ def hash_and_store(subdir, files, image_id, files_path):
                 sha256.update(data)
             file.file_hash = sha256.hexdigest()
 
-            # store file in Docker container
-
-            ## TODO a thought for when the tool is extended: https://stackoverflow.com/questions/16344454/where-is-better-to-store-uploaded-files-in-db-as-blob-or-in-folder-with-restrict
-
-            # create, if not existing, image dir
-            image_dir = os.path.join(files_path, str(image_id))
-            os.makedirs(image_dir, exist_ok=True)
-            # create file path
-            file_path = os.path.join(image_dir, str(file.file_name))
-            file.file_path = file_path
-            # write file to /files
-            with open(file_path, 'wb') as f:
-                f.write(data)
+            # store images files (jpg, jpeg, png, gif, webp, svg) in output directory
+            if copy_images:
+                ext = file.file_extension.lower()
+                if ext in image_extensions:
+                    # create a dir for every extension
+                    ext_dir = os.path.join(output_path, image_name, str(ext))
+                    os.makedirs(ext_dir, exist_ok=True)
+                    # create file path
+                    output_file_path = os.path.join(ext_dir, str(file.file_name))
+                    file.file_path = str(output_file_path)
+                    with open(path, "rb") as src, open(output_file_path, "wb") as dst:
+                        while True:
+                            chunk = src.read(buffer)
+                            if not chunk:
+                                break
+                            dst.write(chunk)
+            else:
+                file.file_path = None
 
 # going through files per extension/subfolder because:
 # if exiftool raises exception, there is no metadata for any file
 # so running it on all files at once is not safe
 # but running it for every file individually takes ages
-# sort the sub folders for consistency
-def parse_files(path, image_id, table, files_path):
+def parse_files(input_path: Path, output_path: Path, image_id: int, audit_table: dict, image_name: str, copy_images: bool) -> bool:
+    """
+    Processes files in the Foremost output directory to extract metadata, create database objects,
+    compute hashes and copy image files to the output directory.
+
+    This function iterates over all subdirectories of `input_path` in sorted order for consistency. For each subdirectory:
+      1. Lists all files.
+      2. Extracts metadata using ExifTool in batches, falling back to Python methods for problematic files.
+      3. Creates SQLAlchemy File objects for the database.
+      4. Computes SHA-256 hashes and copies image files (jpg, jpeg, png, gif, webp, svg) to
+         `output_path/<image_name>/<extension>/`.
+      5. Inserts File objects into the database.
+
+    Args:
+        input_path (Path): Root path of the Foremost output directory containing files and subfolders.
+        output_path (Path): Base directory where image files will be copied by extension.
+        image_id (int): ID of the parent Image record in the database.
+        audit_table (dict): Dictionary containing additional file metadata parsed from `audit.txt`.
+        image_name (str): Name of the image, used to create the output subdirectory.
+        copy_images (bool): Whether or not to copy image files into subdirectory under `output_path`.
+
+    Returns:
+        bool: True if all files were processed successfully, False if an exception occurred.
+
+    Notes:
+        - Uses `extract_exiftool_data()`, `create_database_objects()`, `hash_and_store()` and `insert_files()`.
+        - If any database operation fails, the function raises an exception internally and returns False.
+        - Files are read in 4096-byte chunks for efficient hashing.
+        - The `is_python` set tracks files where Python fallback was used instead of ExifTool.
+    """
     # adding this in case someone else also tries to remove some files
     # while the app is actively parsing through them
     # does not help much but at least it's crashing nicely
     try:
-        for subdir in sorted(path.rglob('*')):
+        for subdir in sorted(input_path.rglob('*')):
             if subdir.is_dir():
 
                 print(f"Processing {subdir.name} files...")
@@ -255,12 +314,17 @@ def parse_files(path, image_id, table, files_path):
                 files = [file for file in subdir.glob('*') if file.is_file()]
                 file_paths = [str(file) for file in files]
 
+                # if exiftool could not be run for a file, store that file here
+                is_python = set()
+
                 # run exiftool and store data for files
-                subdir_files = extract_exiftool_data(files, file_paths)
+                subdir_files, is_python = extract_exiftool_data(files, file_paths, is_python)
+
                 # create file objects for database
-                file_objects = create_database_objects(subdir, subdir_files, image_id, table)
+                file_objects = create_database_objects(subdir_files, image_id, audit_table, is_python)
+
                 # create the hashes and write the files to the persistent volume
-                hash_and_store(subdir, file_objects, image_id, files_path)
+                hash_and_store(subdir, file_objects, image_name, output_path, copy_images)
 
                 session = connect_database()
                 if session is None:
@@ -270,11 +334,9 @@ def parse_files(path, image_id, table, files_path):
                 if insert_files(file_objects, session) < 0:
                     # this means, something went wrong with the database transaction
                     # stop now, image is corrupt
-                    return False
-
-            else: continue
+                    raise Exception("Something went wrong while inserting files")
 
         return True
     except Exception as e:
-        print(f"Something went wrong while parsing files: {e}")
+        print(f"Something went wrong while parsing files: {e}", file=sys.stderr)
         return False

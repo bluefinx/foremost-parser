@@ -11,6 +11,7 @@ License: GNU General Public License v3.0
 """
 
 from sqlalchemy import Column, Integer, CheckConstraint, ForeignKey
+from sqlalchemy.orm import relationship
 
 from app.models.base import Base
 
@@ -33,6 +34,19 @@ class Duplicate(Base):
     __table_args__ = (
         CheckConstraint('file_id < duplicate_id'),
     )
+
     id = Column(Integer, primary_key=True, autoincrement=True)
-    file_id = Column(Integer, ForeignKey('table_file.id', ondelete='CASCADE'))
-    duplicate_id = Column(Integer, ForeignKey('table_file.id', ondelete='CASCADE'))
+    file_id = Column(Integer, ForeignKey('table_file.id', ondelete='CASCADE'), nullable=False)
+    duplicate_id = Column(Integer, ForeignKey('table_file.id', ondelete='CASCADE'), nullable=False)
+
+    file = relationship(
+        "File",
+        foreign_keys=lambda: [Duplicate.file_id],
+        back_populates="duplicates"
+    )
+
+    duplicate = relationship(
+        "File",
+        foreign_keys=lambda: [Duplicate.duplicate_id],
+        back_populates="duplicate_of"
+    )

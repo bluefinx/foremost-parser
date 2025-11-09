@@ -20,16 +20,19 @@ OUTPUT_PROVIDED=false
 
 # show help for -h or --help
 help(){
-    echo "This tool reads in a foremost input dir, parses its content, stores it in a database and generates an HTML report in the output dir."
+    echo "This tool reads in a foremost input directory, parses its content"
+    echo "and generates an HTML report in the output directory."
+    echo ""
+    echo "NOTE: The foremost audit file must be named 'audit.txt'."
     echo ""
     echo "Usage: $0 [OPTIONS] -i <path_to_input> -o <path_to_output>"
     echo ""
     echo "Options:"
-    echo "  -h, --help          shows the help info"
+    echo "  -h, --help          shows this help information"
     echo "  -i, --input         the foremost input directory"
     echo "  -o, --output        the HTML report output directory"
     echo "  -f, --flush         deletes the docker persistent volumes before startup"
-    echo "  --with-images       includes image files in report (supported formats: jpg, jpeg, png, gif, webp, svg)"
+    echo "  --with-images       includes image files in the report (supported formats: jpg, jpeg, png, gif, webp, svg)"
     echo ""
 }
 
@@ -111,6 +114,12 @@ while [[ "$#" -gt 0 ]]; do
             ;;
     esac
 done
+
+# for now, make sure there is an audit.txt in the foremost folder.
+if [ ! -f "$INPUT_PATH/audit.txt" ]; then
+    echo "Error: audit.txt not found in input directory '$INPUT_PATH'!" >&2
+    exit 1
+fi
 
 # ask if .DS_Store files should be removed or kept
 echo "Do you want to remove .DS_Store files in the input folder? (y/n)"

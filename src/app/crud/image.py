@@ -13,13 +13,10 @@ import sys
 
 from typing import Optional
 
-from sqlalchemy import or_
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 
 from app.models.image import Image
-from app.models.file import File
-from app.models.duplicate import Duplicate
 
 ########################################################################
 ###################### WRITE ###########################################
@@ -94,39 +91,33 @@ def update_image_files_individual(image_id: int, result: dict, session: Session)
 
 # delete image
 # (WARN: make sure session is not none when calling)
-def delete_image(image: Image, session: Session) -> int:
+def delete_image(image_id: int, session: Session) -> int:
     """
-    Deletes an Image along with its associated Files and Duplicate entries.
+    Deletes an Image along with its associated Files and Duplicate entries via CASCADE.
 
     Args:
-        image (Image): The Image object to delete.
+        image_id (int): The ID of the Image object to delete.
         session (Session): SQLAlchemy session, must not be None.
 
-    Raises:
-        ValueError: If session is None.
-
     Returns:
-        int: 1 if successful, -1 if a database error occurred.
+        int: 1 if successful or -1 if a database error occurred.
 
     Notes:
         Commits after deletion. Rolls back in case of errors.
     """
     if session is None:
         raise ValueError("session cannot be None!")
+
     try:
-        # first, delete existing duplicate entries
-        files = session.query(File).filter(File.image_id == image.id).all()
-        for file in files:
-            session.query(Duplicate).filter(
-                or_(
-                    Duplicate.file_id == file.id,
-                    Duplicate.duplicate_id == file.id
-                )
-            ).delete(synchronize_session='fetch')
-        session.query(File).filter(File.image_id == image.id).delete(synchronize_session='fetch')
+        image = session.get(Image, image_id)
+        if image is None:
+            print(f"No image found with id {image_id}", file=sys.stderr)
+            return -1
+        # files and duplicates are automatically deleted through relationships and cascade
         session.delete(image)
         session.commit()
         return 1
+
     except SQLAlchemyError as e:
         session.rollback()
         print("Something went wrong while deleting image. Rolling back.", file=sys.stderr)

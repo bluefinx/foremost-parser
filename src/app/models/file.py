@@ -14,9 +14,10 @@ License: GNU General Public License v3.0
 
 from sqlalchemy import Column, Integer, String, BigInteger, JSON, Boolean
 from sqlalchemy import ForeignKey
-from sqlalchemy.orm import validates
+from sqlalchemy.orm import validates, relationship
 
 from app.models.base import Base
+from app.models.duplicate import Duplicate
 
 # database table file
 class File(Base):
@@ -32,9 +33,9 @@ class File(Base):
         file_mime (str | None): MIME type.
         file_size (int | None): Size of the file in bytes.
         file_offset (int | None): Offset within the source image.
-        file_path (str | None): Relative or absolute path.
+        file_path (str | None): File path in output directory.
         file_hash (str | None): Hash of the file contents.
-        is_exiftool (bool): Whether EXIFTool was run on this file.
+        is_exiftool (bool): Whether EXIFTool or Python was run on this file.
         is_duplicate (bool): Whether this file is marked as duplicate.
         foremost_comment (str | None): Optional comment from Foremost.
         more_metadata (dict | None): Additional JSON metadata.
@@ -46,7 +47,7 @@ class File(Base):
     __tablename__ = 'table_file'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    image_id = Column(Integer, ForeignKey('table_image.id'), nullable=False)
+    image_id = Column(Integer, ForeignKey('table_image.id', ondelete="CASCADE"), nullable=False)
     file_name = Column(String(255), nullable=False)
     file_type = Column(String(255))
     file_extension = Column(String(10))
@@ -59,6 +60,24 @@ class File(Base):
     is_duplicate = Column(Boolean, default=False)
     foremost_comment = Column(String(255))
     more_metadata = Column(JSON)
+
+    image = relationship("Image", back_populates="files")
+
+    duplicates = relationship(
+        "Duplicate",
+        foreign_keys=lambda: [Duplicate.file_id],
+        cascade="all, delete-orphan",
+        passive_deletes=True,
+        back_populates="file"
+    )
+
+    duplicate_of = relationship(
+        "Duplicate",
+        foreign_keys=lambda: [Duplicate.duplicate_id],
+        cascade="all, delete-orphan",
+        passive_deletes=True,
+        back_populates="duplicate"
+    )
 
     # make sure to cut too long data before storing
     @validates('file_name')

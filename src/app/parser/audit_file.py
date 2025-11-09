@@ -1,17 +1,42 @@
-# fmparser - Copyright (c) 2025 bluefinx
-# Licensed under the GNU General Public License v3.0
+"""
+audit_file.py
+
+Parses a Foremost `audit.txt` file to extract image metadata and detailed
+file-level information. The extracted data is stored in the database and
+returned as a structured dictionary for further processing.
+
+This module handles:
+- Reading the audit.txt from a Foremost output directory.
+- Extracting metadata (image name, size, timestamps, versions, etc.).
+- Parsing the internal audit table for per-file details.
+- Storing the parsed image entry in the database.
+
+Requirements:
+- The audit file must exist and be named exactly `audit.txt`.
+
+Functions:
+    get_exiftool_version(file): Reads ExifTool version metadata.
+    parse_individual_lines(file, image, audit_table): Extracts line-based metadata.
+    parse_audit_table(line, audit_table): Parses audit table rows.
+    parse_audit(input_path): Entry point to parse the audit file and store results.
+
+Author: bluefinx
+Copyright (c) 2025 bluefinx
+License: GNU General Public License v3.0
+"""
 
 import os
 import re
+import sys
 import exiftool
 
 from datetime import datetime
+from typing import Optional
+from pathlib import Path
 
 from app.db import connect_database
 from app.models.image import Image
-from app.crud.image import read_images, delete_image, insert_image
-
-from app.parser.indv_files import delete_files_in_image
+from app.crud.image import insert_image
 
 # Need the following for the database:
 # - image_name
@@ -31,7 +56,7 @@ filename = "audit.txt"
 #################################################
 
 # create raw strings to store the regex
-# search for "File: johndoe.dd"
+# search for "File: example.dd"
 image_name_regex = r"File:\s+(\S+)"
 # search for "Length: 5 GB (5762727936 bytes)"
 image_size_regex = r"Length:\s+\d+\s*\w+\s*\((\d+)\s*bytes\)"
@@ -46,32 +71,64 @@ foremost_files_total_regex = r"(\d+)\s+FILES EXTRACTED"
 
 #################################################
 # parse audit.txt
-# reads in the audit.txt file and extracts
-# relevant data
 #################################################
 
 # table flag for table parsing
 table_started = False
 
 # run exiftool to extract version
-def get_exiftool_version(file):
-    # run exiftool to get the version
-    ## based on https://sylikc.github.io/pyexiftool/examples.html
-    with exiftool.ExifToolHelper() as ex:
-        file_metadata = ex.get_metadata(file.name)
-        if not file_metadata:
-            print(f"Could not establish exiftool version.")
-            return None
-        else:
-            return str(file_metadata[0].get('ExifTool:ExifToolVersion'))
+## based on https://sylikc.github.io/pyexiftool/examples.html
+def get_exiftool_version(file) -> Optional[str]:
+    """
+    Extracts the ExifTool version for the given open file.
+
+    This function uses `pyexiftool.ExifToolHelper` to read metadata from
+    the file's path (via `file.name`) and extract the ExifTool version.
+    It returns the version string if found, otherwise `None`.
+
+    Args:
+        file: An open file object (e.g., from `open(path, 'r', encoding='utf-8')`).
+
+    Returns:
+        Optional[str]: The ExifTool version string, or None if unavailable.
+    """
+    if not file or not hasattr(file, "name"):
+        print("Invalid file object passed to get_exiftool_version().", file=sys.stderr)
+        return None
+
+    try:
+        with exiftool.ExifToolHelper() as ex:
+            metadata = ex.get_metadata(file.name)
+            if not metadata:
+                print("Could not establish ExifTool version.", file=sys.stderr)
+                return None
+            return str(metadata[0].get("ExifTool:ExifToolVersion"))
+    except Exception as e:
+        print(f"Error while extracting ExifTool version: {e}", file=sys.stderr)
+        return None
 
 # search audit file for specific information
-def parse_individual_lines(file, image, table):
+def parse_individual_lines(file, image, audit_table: dict) -> None:
+    """
+    Parses the audit.txt line by line to extract image-level metadata
+    and populate the audit table with file-specific data.
+
+    Args:
+        file: Opened audit.txt file object (text mode).
+        image: Image model instance where metadata (name, size, etc.) is stored.
+        audit_table (dict): Dictionary to store parsed file table entries.
+
+    Notes:
+        - Relies on several regex patterns (defined globally) to match metadata lines.
+        - Calls `parse_audit_table()` for table row parsing.
+        - Expects the audit file to be named exactly 'audit.txt'.
+    """
     for line in file:
-        # remove white spaces
+        # remove white spaces and skip empty lines
         line = line.strip()
-        # skip empty lines
-        if not line: continue
+        if not line:
+            continue
+
         # search for specific lines to extract information
         image_size_match = re.search(image_size_regex, line)
         foremost_version_match = re.search(foremost_version_regex, line)
@@ -79,7 +136,8 @@ def parse_individual_lines(file, image, table):
         foremost_scan_end_match = re.search(foremost_scan_end_regex, line)
         foremost_files_total_match = re.search(foremost_files_total_regex, line)
         image_name_match = re.search(image_name_regex, line)
-        # store information
+
+        # assign matched values to the image object
         if image_name_match:
             image.image_name = image_name_match.group(1)
         if image_size_match:
@@ -95,67 +153,100 @@ def parse_individual_lines(file, image, table):
         if foremost_files_total_match:
             image.foremost_files_total = foremost_files_total_match.group(1)
 
-        parse_audit_table(line, table)
+        # pass each line to the audit table parser
+        parse_audit_table(line, audit_table)
 
 # audit file has table with extra information about files
-def parse_audit_table(line, table):
+def parse_audit_table(line: str, audit_table: dict) -> None:
+    """
+    Parses a line from the audit.txt file to detect and extract rows from
+    the Foremost audit table (containing Num, Size, Offset, Comment, etc.).
+
+    Args:
+        line (str): A single line from the audit.txt file.
+        audit_table (dict): Dictionary where parsed table rows are stored.
+
+    Notes:
+        - Uses a global flag `table_started` to detect whether we're inside
+          the audit table section.
+        - Expected column order: Num, Name, Size, File Offset, Comment.
+        - Lines are split using two or more whitespaces or tabs.
+    """
     # use the global variable
     global table_started
 
-    # split the line into columns when at least 2 whitespaces or a tab (cause whatever they really use)
-    columns = re.split(r'\s{2,}|\t+', line)
-
-    # look for start of table in audit.txt
+    # detect table start
     if line.startswith('Num') and "Comment" in line:
         table_started = True
         return
 
-    # table is finished
+    # detect table end
     if line.startswith('Finish:'):
         table_started = False
 
-    # start reading in the table rows
-    # check if the line starts with a number and a ":"
-    if table_started and re.match(r'^\d+:', columns[0].strip()):
+    # only parse if we are inside the table
+    if not table_started:
+        return
 
-        # get name, size, offset and comment
-        if len(columns) > 1:
-            name = columns[1]
-        else:
-            name = None
-        if len(columns) > 2:
-            size = columns[2]
-        else:
-            size = None
-        if len(columns) > 3:
-            offset = columns[3]
-        else:
-            offset = None
-        if len(columns) > 4:
-            comment = columns[4]
-        else:
-            comment = None
+    # split line into columns (Num, Name, Size, Offset, Comment)
+    columns = re.split(r'\s{2,}|\t+', line)
 
-        table[name] = {
-            'Size': size,
-            'File Offset': offset,
-            'Comment': comment
+    # check if valid row (starts with a number and colon)
+    if not columns or not re.match(r"^\d+:", columns[0].strip()):
+        return
+
+    # safely extract columns
+    name = columns[1] if len(columns) > 1 else None
+    size = columns[2] if len(columns) > 2 else None
+    offset = columns[3] if len(columns) > 3 else None
+    comment = columns[4] if len(columns) > 4 else None
+
+    # store entry
+    if name:
+        audit_table[name] = {
+            "Size": size,
+            "File Offset": offset,
+            "Comment": comment,
         }
 
-# if OVERWRITE, try to overwrite the image
 # if no audit file, stop, this is not a foremost directory
-# TODO add parsing files for dirs without audit file
-def parse_audit(overwrite, input_path, files_path):
+def parse_audit(input_path: Path) -> tuple[int, Optional[dict], Optional[str]]:
+    """
+    Parses the Foremost audit file (`audit.txt`) in the given input directory.
+
+    This function performs the following:
+
+    1. Looks for a file named `audit.txt` in `input_path`.
+    2. Extracts ExifTool version metadata using `get_exiftool_version()`.
+    3. Parses individual metadata lines and the audit table using `parse_individual_lines()`.
+    4. Stores the parsed image record in the database via `insert_image()`.
+    5. Returns the new image ID, the populated audit table dictionary and the image name.
+
+    Args:
+        input_path (Path): Path to the Foremost output directory containing `audit.txt`.
+
+    Returns:
+        tuple[int, dict | None, str | None]:
+            - `(image_id, audit_table, image_name)` on success.
+            - `(-1, None, None)` if the file is missing or an error occurred.
+
+    Raises:
+        ValueError: If the database session could not be established.
+
+    Notes:
+        - The audit file **must** be named exactly `audit.txt`.
+        - Rolls back database operations and prints errors to `stderr` if exceptions occur.
+    """
+
     # image object to write to database
     image = Image()
 
     # audit table with additional file information
-    table = {}
+    audit_table = {}
 
     # set image creation date
     image.create_date = datetime.now()
 
-    # just your casual paranoid try-except
     try:
         # get audit file as read-only
         path = os.path.join(input_path, filename)
@@ -166,28 +257,17 @@ def parse_audit(overwrite, input_path, files_path):
                 image.exiftool_version = get_exiftool_version(file)
 
                 # get individual line information
-                # while also parsing table
-                parse_individual_lines(file, image, table)
+                # and parse table
+                parse_individual_lines(file, image, audit_table)
 
                 session = connect_database()
                 if session is None:
                     raise Exception("Could not connect to the database")
 
-                # if OVERWRITE, see if image already exists in database
-                if overwrite:
-                    images_list = read_images(session)
-                    for old_image in images_list:
-                        if old_image.image_name == image.image_name:
-                            print("Deleting previous image.")
-                            # first, delete any files in the persistent volume
-                            delete_files_in_image(old_image.id, files_path)
-                            # then, delete the rows from the database
-                            delete_image(old_image, session)
-
-                return insert_image(image, session), table
+                return insert_image(image, session), audit_table, image.image_name
         else:
-            print(f"Could not find audit file.")
-            return -1, None
+            print("Could not find audit file.", file=sys.stderr)
+            return -1, None, None
     except Exception as e:
-        print(f"Something went wrong parsing audit file: {e}")
-        return -1, None
+        print(f"Something went wrong parsing audit file: {e}", file=sys.stderr)
+        return -1, None, None

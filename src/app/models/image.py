@@ -13,7 +13,7 @@ License: GNU General Public License v3.0
 """
 
 from sqlalchemy import Column, Integer, String, TIMESTAMP, BigInteger, JSON
-from sqlalchemy.orm import validates
+from sqlalchemy.orm import validates, relationship
 
 from app.models.base import Base
 
@@ -50,6 +50,12 @@ class Image(Base):
     foremost_scan_end = Column(TIMESTAMP)
     foremost_files_total = Column(BigInteger)
     foremost_files_individual = Column(JSON)
+
+    files = relationship(
+        "File",
+        back_populates="image",
+        cascade="all, delete, delete-orphan",
+        passive_deletes=True)
 
     # make sure to cut too long data before storing
     @validates('image_name')

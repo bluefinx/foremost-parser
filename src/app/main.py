@@ -21,6 +21,7 @@ Version: 1.0.0
 
 import os
 import sys
+import shutil
 
 from dotenv import load_dotenv
 from pathlib import Path
@@ -30,7 +31,7 @@ from app.crud.image import delete_image, update_image_files_individual
 from app.crud.file import read_files_per_extension_for_image
 
 from app.parser.audit_file import parse_audit
-from app.parser.indv_files import parse_files, delete_files_in_image
+from app.parser.indv_files import parse_files
 from app.parser.duplicates import detect_duplicates
 from app.report.report import generate_report
 
@@ -40,6 +41,34 @@ def abort(error):
     """
     print(error, file=sys.stderr)
     sys.exit(1)
+
+def cleanup(image_id: int, image_name: str, output_path: Path):
+    """
+    Deletes potential database entries and output directory for a failed image parsing.
+
+    Args:
+        image_id (int): ID of the Image record in the database (if created).
+        image_name (str): Name of the image, used to locate the output folder.
+        output_path (Path): Base path where image output folders are stored.
+    """
+    print(f"Cleaning up after failed import of image...", file=sys.stderr)
+    try:
+        session = connect_database()
+        if session is None:
+            raise Exception("Could not connect to the database")
+
+        if image_id > 0:
+            # deletes image + associated files + duplicates
+            delete_image(image_id, session)
+
+        # delete the image directory in the output folder
+        if image_name and output_path:
+            dir_to_delete = output_path / image_name
+            if dir_to_delete.exists():
+                shutil.rmtree(dir_to_delete, ignore_errors=True)
+
+    except Exception as e:
+        print(f"File cleanup failed: {e}", file=sys.stderr)
 
 # entrypoint
 def main():
@@ -83,11 +112,11 @@ def main():
             # first, parse audit file
             # TODO add parsing for folders with no audit file
             print("Parsing audit file...")
-            image_id, table = parse_audit(INPUT_PATH)
+            image_id, audit_table, image_name = parse_audit(INPUT_PATH)
 
-            if image_id > 0 and table is not None:
+            if image_id > 0 and audit_table is not None:
                 print("Parsing files...")
-                if parse_files(INPUT_PATH, image_id, table, FILES_PATH):
+                if parse_files(INPUT_PATH, OUTPUT_PATH, image_id, audit_table, image_name, IMAGES):
                     # per file extension, count the number of files for overview in report
                     result = dict(read_files_per_extension_for_image(image_id, session))
                     update_image_files_individual(image_id, result, session)
@@ -96,15 +125,14 @@ def main():
                     detect_duplicates(session)
                     # generate the HTML report for this image
                     print("Generating report...")
-                    generate_report(image_id, REGENERATE, OUTPUT_PATH, FILES_PATH)
+                    #generate_report(image_id, OUTPUT_PATH)
                 else:
                     # something went wrong while parsing files, so clean up and exit
-                    delete_files_in_image(image_id, FILES_PATH)
-                    delete_image(image_id, session)
+                    cleanup(image_id, image_name, OUTPUT_PATH)
                     abort("Something went wrong while parsing files. Cleaning up and aborting.\n"
                           "Could not parse directory. Image discarded.")
             else:
-                # there is no parseable audit file, so we exit
+                # there is no parseable audit file, so we exit (no need to clean up)
                 sys.exit(1)
 
         except Exception as e:
