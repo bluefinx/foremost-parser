@@ -14,3 +14,5 @@
 - Add a steganography detector 🕵️‍♂️  
 - Support directories without an audit file 📁  
 - Enhance duplicate detection beyond hashes (e.g., content analysis) 🔗
+- Run in two modes: store data or parse-and-forget 🧠
+- Create reports in different formats 🗂️

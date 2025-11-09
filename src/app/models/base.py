@@ -1,7 +1,12 @@
-# fmparser - Copyright (c) 2025 bluefinx
-# Licensed under the GNU General Public License v3.0
+"""
+base.py
 
-# this file defines the SQLAlchemy base
+Provides the SQLAlchemy declarative base for defining ORM models.
+
+Author: bluefinx
+Copyright (c) 2025 bluefinx
+License: GNU General Public License v3.0
+"""
 
 from sqlalchemy.ext.declarative import declarative_base
 

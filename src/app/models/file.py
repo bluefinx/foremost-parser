@@ -1,9 +1,18 @@
-# fmparser - Copyright (c) 2025 bluefinx
-# Licensed under the GNU General Public License v3.0
+"""
+file.py
 
-# this file creates the File table
+Defines the ORM model for storing individual files extracted by Foremost.
 
-from sqlalchemy import Column, Integer, String, TIMESTAMP, BigInteger, JSON, Boolean
+Each file is associated with a forensic image and contains metadata such as size,
+hash, timestamps, MIME type and additional JSON metadata. Validation
+ensures that string fields do not exceed their maximum length.
+
+Author: bluefinx
+Copyright (c) 2025 bluefinx
+License: GNU General Public License v3.0
+"""
+
+from sqlalchemy import Column, Integer, String, BigInteger, JSON, Boolean
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import validates
 
@@ -11,6 +20,29 @@ from app.models.base import Base
 
 # database table file
 class File(Base):
+    """
+    Represents a single carved file in the database.
+
+    Attributes:
+        id (int): Primary key.
+        image_id (int): Foreign key linking to the parent image.
+        file_name (str): Name of the file.
+        file_type (str | None): Type of the file.
+        file_extension (str | None): File extension.
+        file_mime (str | None): MIME type.
+        file_size (int | None): Size of the file in bytes.
+        file_offset (int | None): Offset within the source image.
+        file_path (str | None): Relative or absolute path.
+        file_hash (str | None): Hash of the file contents.
+        is_exiftool (bool): Whether EXIFTool was run on this file.
+        is_duplicate (bool): Whether this file is marked as duplicate.
+        foremost_comment (str | None): Optional comment from Foremost.
+        more_metadata (dict | None): Additional JSON metadata.
+
+    Notes:
+        String fields are validated to ensure they do not exceed the
+        database column length. Excess characters are truncated automatically.
+    """
     __tablename__ = 'table_file'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -23,10 +55,6 @@ class File(Base):
     file_offset = Column(BigInteger)
     file_path = Column(String(255))
     file_hash = Column(String(64))
-    timestamp_mod = Column(TIMESTAMP(timezone=True))
-    timestamp_acc = Column(TIMESTAMP(timezone=True))
-    timestamp_cre = Column(TIMESTAMP(timezone=True))
-    timestamp_ino = Column(TIMESTAMP(timezone=True))
     is_exiftool = Column(Boolean, default=True)
     is_duplicate = Column(Boolean, default=False)
     foremost_comment = Column(String(255))
@@ -45,6 +73,12 @@ class File(Base):
             return value[:255]
         return value
 
+    @validates('file_extension')
+    def validate_file_extension(self, key, value):
+        if value and len(value) > 10:
+            return value[:10]
+        return value
+
     @validates('file_mime')
     def validate_file_mime(self, key, value):
         if value and len(value) > 50:
@@ -55,6 +89,12 @@ class File(Base):
     def validate_file_path(self, key, value):
         if value and len(value) > 255:
             return value[:255]
+        return value
+
+    @validates('file_hash')
+    def validate_file_hash(self, key, value):
+        if value and len(value) > 64:
+            return value[:64]
         return value
 
     @validates('foremost_comment')

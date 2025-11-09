@@ -25,10 +25,8 @@ services:
       - POSTGRES_HOST=db
       - INPUT_PATH=/data
       - OUTPUT_PATH=/output
-      - FILES_PATH=/files
-      - OVERWRITE
       - FLUSH
-      - REGENERATE
+      - IMAGES
     # use password.txt for database password
     secrets:
       - db-password
@@ -36,7 +34,6 @@ services:
     volumes:
       - "${INPUT_PATH}:/data:ro" 
       - "${OUTPUT_PATH}:/output"
-      - files-data:/files
 
   # database service with PostgreSQL
   db:
@@ -58,7 +55,6 @@ services:
 # creates persistent volume "db-data"    
 volumes:
   db-data:
-  files-data:
 
 # set password file
 secrets:

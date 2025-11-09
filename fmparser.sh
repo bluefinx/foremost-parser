@@ -28,9 +28,8 @@ help(){
     echo "  -h, --help          shows the help info"
     echo "  -i, --input         the foremost input directory"
     echo "  -o, --output        the HTML report output directory"
-    echo "  -w, --overwrite     overwrites existing image"
     echo "  -f, --flush         deletes the docker persistent volumes before startup"
-    echo "  -r, --regenerate    regenerates reports for all images"
+    echo "  --with-images       includes image files in report (supported formats: jpg, jpeg, png, gif, webp, svg)"
     echo ""
 }
 
@@ -98,16 +97,12 @@ while [[ "$#" -gt 0 ]]; do
             validate_output_path $2
             shift 2
             ;;
-        -w|--overwrite)
-            echo "OVERWRITE=true" >> .env
-            shift
-            ;;
         -f|--flush)
             flush_database
             shift
             ;;
-        -r|--regenerate)
-            echo "REGENERATE=true" >> .env
+        --with-images)
+            echo "IMAGES=true" >> .env
             shift
             ;;
         *)
