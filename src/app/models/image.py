@@ -16,11 +16,17 @@ from sqlalchemy import Column, Integer, String, TIMESTAMP, BigInteger, JSON
 from sqlalchemy.orm import validates, relationship
 
 from app.models.base import Base
+from app.models.duplicate import duplicate_group_image_association
 
 # database table image
 class Image(Base):
     """
     Represents a forensic image in the database.
+
+    This class stores all metadata related to a source image that was parsed
+    by Foremost, including file counts, timestamps, and tool versions. It also
+    manages relationships to carved files, their minimal hash entries, and any
+    duplicate groups associated with this image.
 
     Attributes:
         id (int): Primary key.
@@ -29,14 +35,25 @@ class Image(Base):
         create_date (datetime | None): Timestamp when the image was created.
         exiftool_version (str | None): Version of EXIFTool used.
         foremost_version (str | None): Version of Foremost used.
-        foremost_scan_start (datetime | None): Start timestamp of the scan.
-        foremost_scan_end (datetime | None): End timestamp of the scan.
+        foremost_scan_start (datetime | None): Start timestamp of the Foremost scan.
+        foremost_scan_end (datetime | None): End timestamp of the Foremost scan.
         foremost_files_total (int | None): Total number of files recovered by Foremost.
         foremost_files_individual (dict | None): Number of files per extension.
+        files (List[File]): All File objects carved from this image.
+            Cascade ensures that deleting an Image deletes its Files and
+            related DuplicateMember entries automatically.
+        hash_entries (List[FileHash]): Minimal hash entries for all Files,
+            used for efficient duplicate detection.
+        duplicate_groups (List[DuplicateGroup]): All DuplicateGroups that
+            contain files from this image. Managed via the
+            Many-to-Many association table `duplicate_group_image_association`.
 
     Notes:
-        String fields are validated to ensure they do not exceed the
-        database column length. Excess characters are truncated automatically.
+        - String fields are validated and truncated automatically to fit
+          database column lengths.
+        - Cascade settings ('all, delete, delete-orphan') ensure that removing
+          an Image will clean up all associated Files, hash entries, and
+          duplicate groups, keeping the database consistent.
     """
     __tablename__ = 'table_image'
 
@@ -56,6 +73,14 @@ class Image(Base):
         back_populates="image",
         cascade="all, delete, delete-orphan",
         passive_deletes=True)
+
+    hash_entries = relationship("FileHash", back_populates="image", cascade="all, delete-orphan")
+
+    duplicate_groups = relationship(
+        "DuplicateGroup",
+        secondary=duplicate_group_image_association,
+        back_populates="images"
+    )
 
     # make sure to cut too long data before storing
     @validates('image_name')

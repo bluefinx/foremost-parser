@@ -25,6 +25,7 @@ import shutil
 
 from dotenv import load_dotenv
 from pathlib import Path
+from datetime import datetime, timezone
 
 from app.db import create_database, connect_database
 from app.crud.image import delete_image, update_image_files_individual
@@ -33,7 +34,7 @@ from app.crud.file import read_files_per_extension_for_image
 from app.parser.audit_file import parse_audit
 from app.parser.indv_files import parse_files
 from app.parser.duplicates import detect_duplicates
-from app.report.report import generate_report
+from app.report.report import generate_report_data
 
 def abort(error):
     """
@@ -81,6 +82,7 @@ def main():
     """
 
     # starting foremost-parser
+    PARSING_START = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
 
     # first, read in the environment variables
     # if there is no valid path, set default path
@@ -89,6 +91,7 @@ def main():
     INPUT_PATH = os.getenv('INPUT_PATH', '/data')
     OUTPUT_PATH = os.getenv('OUTPUT_PATH', '/output')
     IMAGES = os.getenv('IMAGES', 'false').lower() == 'true'
+    CROSS_IMAGE = False
 
     # check if input path is valid path
     INPUT_PATH = Path(INPUT_PATH)
@@ -122,10 +125,10 @@ def main():
                     update_image_files_individual(image_id, result, session)
                     # search for duplicates and reference them
                     print("Starting duplicate detection...")
-                    detect_duplicates(session)
+                    detect_duplicates(session,image_id, CROSS_IMAGE)
                     # generate the HTML report for this image
                     print("Generating report...")
-                    #generate_report(image_id, OUTPUT_PATH)
+                    generate_report_data(INPUT_PATH, OUTPUT_PATH, IMAGES, CROSS_IMAGE, PARSING_START, image_id)
                 else:
                     # something went wrong while parsing files, so clean up and exit
                     cleanup(image_id, image_name, OUTPUT_PATH)

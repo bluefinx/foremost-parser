@@ -15,7 +15,7 @@ from sqlalchemy import func
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 
-from app.models.file import File
+from app.models.file import File, FileHash
 
 ########################################################################
 ###################### WRITE ###########################################
@@ -56,7 +56,8 @@ def insert_file(file: File, session: Session) -> int:
 # (WARN: make sure session is not none when calling)
 def insert_files(files: list[File], session: Session) -> int:
     """
-    Stores multiple File records in bulk.
+    Stores multiple File records in bulk and also creates corresponding
+    FileHash entries for duplicate detection.
 
     Args:
         files (list[File]): List of File objects to store.
@@ -69,12 +70,24 @@ def insert_files(files: list[File], session: Session) -> int:
         int: 1 if successful or -1 if a database error occurred.
 
     Notes:
-        Commits once after adding all files. Rolls back in case of errors.
+        - Commits once after adding all files and their hashes.
+        - Rolls back in case of errors.
+        - Automatically creates FileHash objects for each File.
     """
     if session is None:
         raise ValueError("session cannot be None!")
     try:
         session.add_all(files)
+        session.flush()
+
+        # create FileHash entries
+        file_hashes = [
+            FileHash(file_id=f.id, file_hash=f.file_hash, image_id=f.image_id)
+            for f in files if f.file_hash
+        ]
+        if file_hashes:
+            session.add_all(file_hashes)
+
         session.commit()
         return 1
     except SQLAlchemyError as e:
@@ -108,8 +121,7 @@ def read_files_for_image(image_id: int, session: Session) -> Optional[List[File]
     try:
         return session.query(File).filter(File.image_id == image_id).all() # type: ignore
     except SQLAlchemyError as e:
-        session.rollback()
-        print("Something went wrong while reading files for image. Rolling back.", file=sys.stderr)
+        print("Something went wrong while reading files for image.", file=sys.stderr)
         print(f"Detailed DB error: {e}", file=sys.stderr)
         return None
 
@@ -137,8 +149,7 @@ def read_files_per_extension_for_image(image_id: int, session: Session):
             .group_by(File.file_extension) \
             .all()
     except SQLAlchemyError as e:
-        session.rollback()
-        print("Something went wrong while reading files per extension for image. Rolling back.", file=sys.stderr)
+        print("Something went wrong while reading files per extension for image.", file=sys.stderr)
         print(f"Detailed DB error: {e}", file=sys.stderr)
         return None
 
@@ -164,7 +175,58 @@ def read_files_with_hash(session: Session) -> Optional[List[Tuple[int, str]]]:
         rows = session.query(File.id, File.file_hash).filter(File.file_hash != None).all()
         return [(row.id, row.file_hash) for row in rows]
     except SQLAlchemyError as e:
-        session.rollback()
-        print("Something went wrong while reading images with hashes. Rolling back.", file=sys.stderr)
+        print("Something went wrong while reading images with hashes.", file=sys.stderr)
         print(f"Detailed DB error: {e}", file=sys.stderr)
         return None
+
+# read the file hashes for a specific image
+def read_file_hashes_for_image(image_id: int, session: Session) -> List[FileHash]:
+    """
+    Retrieves all FileHash entries associated with a specific image.
+
+    This function queries the database for all minimal hash entries of files
+    that belong to the given image ID. These hashes are used for efficient
+    duplicate detection, either within the image or across multiple images.
+
+    Args:
+        image_id (int): ID of the image to fetch hashes for.
+        session (Session): SQLAlchemy session to use for the query.
+
+    Returns:
+        List[FileHash]: A list of FileHash objects associated with the image.
+            Returns an empty list if no hashes are found or if an error occurs.
+    """
+    if session is None:
+        raise ValueError("session cannot be None!")
+    try:
+        hashes = session.query(FileHash).filter(FileHash.image_id == image_id).all()
+        return hashes # type: ignore
+    except SQLAlchemyError as e:
+        print("Something went wrong while reading hashes for image.", file=sys.stderr)
+        print(f"Detailed DB error: {e}", file=sys.stderr)
+        return []
+
+# read all file hashes
+def read_file_hashes(session: Session) -> List[FileHash]:
+    """
+    Retrieves all FileHash entries in the database.
+
+    This function queries the database and returns all FileHash objects,
+    which represent minimal hash entries of all files. These hashes are
+    used for duplicate detection across images.
+
+    Args:
+        session (Session): SQLAlchemy session to use for the query.
+
+    Returns:
+        List[FileHash]: List of all FileHash objects in the database.
+            Returns an empty list if no entries are found or if an error occurs.
+    """
+    if session is None:
+        raise ValueError("session cannot be None!")
+    try:
+        return session.query(FileHash).all() # type: ignore
+    except SQLAlchemyError as e:
+        print("Something went wrong while reading hashes.", file=sys.stderr)
+        print(f"Detailed DB error: {e}", file=sys.stderr)
+        return []

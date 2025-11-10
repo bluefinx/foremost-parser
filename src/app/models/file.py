@@ -13,20 +13,24 @@ License: GNU General Public License v3.0
 """
 
 from sqlalchemy import Column, Integer, String, BigInteger, JSON, Boolean
-from sqlalchemy import ForeignKey
+from sqlalchemy import ForeignKey, Index, UniqueConstraint
 from sqlalchemy.orm import validates, relationship
 
 from app.models.base import Base
-from app.models.duplicate import Duplicate
 
 # database table file
 class File(Base):
     """
     Represents a single carved file in the database.
 
+    This class stores all metadata related to a file extracted by Foremost,
+    including hash, size, offsets, MIME type and optional Foremost comments.
+    It also links the file to its parent Image and to any duplicate groups
+    it belongs to.
+
     Attributes:
         id (int): Primary key.
-        image_id (int): Foreign key linking to the parent image.
+        image_id (int): Foreign key linking to the parent Image.
         file_name (str): Name of the file.
         file_type (str | None): Type of the file.
         file_extension (str | None): File extension.
@@ -35,14 +39,27 @@ class File(Base):
         file_offset (int | None): Offset within the source image.
         file_path (str | None): File path in output directory.
         file_hash (str | None): Hash of the file contents.
-        is_exiftool (bool): Whether EXIFTool or Python was run on this file.
+        is_exiftool (bool): Whether EXIFTool or Python fallback was used.
         is_duplicate (bool): Whether this file is marked as duplicate.
         foremost_comment (str | None): Optional comment from Foremost.
         more_metadata (dict | None): Additional JSON metadata.
+        image (Image): Relationship to the parent Image.
+        hash_entries (List[FileHash]): Minimal hash entries for efficient duplicate detection,
+            used for cross-image duplicate lookups.
+        duplicate_memberships (List[DuplicateMember]): Association entries linking
+            this file to its duplicate groups.
+        duplicate_groups (List[DuplicateGroup]): All DuplicateGroup objects this
+            file belongs to. viewonly=True ensures membership is managed via
+            DuplicateMember.
 
     Notes:
-        String fields are validated to ensure they do not exceed the
-        database column length. Excess characters are truncated automatically.
+        - String fields are validated and truncated automatically to fit
+          database column length.
+        - Duplicate groups allow efficient querying of all files that share
+          the same hash, potentially across multiple images.
+        - hash_entries allow fast cross-image duplicate detection without
+          loading full file metadata.
+        - Image relationship provides access to the parent image of this file.
     """
     __tablename__ = 'table_file'
 
@@ -63,20 +80,19 @@ class File(Base):
 
     image = relationship("Image", back_populates="files")
 
-    duplicates = relationship(
-        "Duplicate",
-        foreign_keys=lambda: [Duplicate.file_id],
-        cascade="all, delete-orphan",
-        passive_deletes=True,
-        back_populates="file"
+    hash_entries = relationship("FileHash", back_populates="file", cascade="all, delete-orphan")
+
+    duplicate_memberships = relationship(
+        "DuplicateMember",
+        back_populates="file",
+        cascade="all, delete-orphan"
     )
 
-    duplicate_of = relationship(
-        "Duplicate",
-        foreign_keys=lambda: [Duplicate.duplicate_id],
-        cascade="all, delete-orphan",
-        passive_deletes=True,
-        back_populates="duplicate"
+    duplicate_groups = relationship(
+        "DuplicateGroup",
+        secondary="table_duplicate_member",
+        back_populates="members_files",
+        viewonly=True
     )
 
     # make sure to cut too long data before storing
@@ -121,3 +137,45 @@ class File(Base):
         if value and len(value) > 255:
             return value[:255]
         return value
+
+class FileHash(Base):
+    """
+    Represents a minimal hash entry for a carved file, used for efficient
+    duplicate detection across one or multiple images.
+
+    This table stores only the file ID, its hash and the associated image ID,
+    allowing fast lookups when checking for duplicates. It is designed to be
+    memory-efficient and performant for cross-image duplicate searches.
+
+    Attributes:
+        id (int): Primary key.
+        file_id (int): Foreign key linking to the File object.
+        file_hash (str): Hash of the file contents.
+        image_id (int): Foreign key linking to the parent Image.
+        file (File): Relationship back to the File object.
+        image (Image): Relationship back to the Image object.
+
+    Notes:
+        - An index on `file_hash` is created for fast lookup.
+        - UniqueConstraint on `(file_id, file_hash)` prevents duplicate entries.
+        - Cascade deletes from File or Image ensure the hash entry is removed
+          when its associated file or image is deleted.
+        - This table is intended solely for duplicate detection and does not
+          store other file metadata.
+    """
+    __tablename__ = 'table_file_hash'
+
+    __table_args__ = (
+        # index for performative lookup
+        Index('ix_file_hash', 'file_hash'),
+        # only one file with same hash and ID can be stored
+        UniqueConstraint('file_id', 'file_hash'),
+    )
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    file_id = Column(Integer, ForeignKey('table_file.id', ondelete="CASCADE"))
+    file_hash = Column(String(64), nullable=False)
+    image_id = Column(Integer, ForeignKey('table_image.id', ondelete="CASCADE"))
+
+    file = relationship("File", back_populates="hash_entries")
+    image = relationship("Image", back_populates="hash_entries")

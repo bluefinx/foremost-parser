@@ -1,218 +1,208 @@
 # fmparser - Copyright (c) 2025 bluefinx
 # Licensed under the GNU General Public License v3.0
-
+import hashlib
 import os
+import ssl
+
+from pathlib import Path
+from datetime import datetime, timezone
+from collections import defaultdict
 
 from jinja2 import Environment, FileSystemLoader
 
 from app.db import connect_database
-from app.crud.image import read_images, read_image
-from app.crud.file import read_files_for_image
-from app.crud.duplicate import read_duplicates
+from app.crud.image import read_image
+from app.report.image_extensions_data import ImageExtensionsData
+from app.report.image_files_data import ImageFilesData
+from app.report.image_overview_data import ImageOverviewData
 
-# create the report file data, contains
-# - file_name
-# - file_type
-# - file_extension
-# - file_mime
-# - file_size
-# - file_offset
-# - timestamp_mod
-# - timestamp_acc
-# - timestamp_cre
-# - timestamp_ino
-# - is_exiftool
-# - duplicates (List of [(file name, image name), ...])
-# - foremost_comment
-# - more_metadata (Dict key:value)
-# - file_hash
-# - file_path (only for jpg, png, gif, bmp)
-class ReportFile:
-    def __init__(self, file_name, file_type, file_extension, file_mime, file_size, file_offset,
-                 timestamp_mod, timestamp_acc, timestamp_cre, timestamp_ino, is_exiftool, duplicates,
-                 foremost_comment, more_metadata, file_hash, file_path):
-        self.file_name = file_name
-        self.file_type = file_type
-        self.file_extension = file_extension
-        self.file_mime = file_mime
-        self.file_size = file_size
-        self.file_offset = file_offset
-        self.timestamp_mod = timestamp_mod
-        self.timestamp_acc = timestamp_acc
-        self.timestamp_cre = timestamp_cre
-        self.timestamp_ino = timestamp_ino
-        self.is_exiftool = is_exiftool
-        self.duplicates = duplicates
-        self.foremost_comment = foremost_comment
-        self.more_metadata = more_metadata
-        self.file_hash = file_hash
-        self.file_path = file_path
 
-# create the report data, contains:
-# - report name
-# - foremostparser_start
-# - foremost_version
-# - exiftool_version
-# - foremost_scan_start
-# - foremost_scan_end
-# - image_size
-# - foremost_files_total
-# - foremost_files_individual (Dict key:value)
-# - image_files (List of ReportFile Objects)
-class ReportData:
-    def __init__(self, report_name, foremostparser_start, foremost_version, exiftool_version, foremost_scan_start,
-                 foremost_scan_end, image_size, foremost_files_total, foremost_files_individual, image_files):
-        self.report_name = report_name
-        self.foremostparser_start = foremostparser_start
-        self.foremost_version = foremost_version
-        self.exiftool_version = exiftool_version
-        self.foremost_scan_start = foremost_scan_start
-        self.foremost_scan_end = foremost_scan_end
-        self.image_size = image_size
-        self.foremost_files_total = foremost_files_total
-        self.foremost_files_individual = foremost_files_individual
-        self.image_files = image_files
+# -----------------------------------------------------------------------------
+# REPORT CONTENT STRUCTURE
+# -----------------------------------------------------------------------------
+#
+# 1. IMAGE OVERVIEW PAGE
+#    - General metadata about the analysis
+#      • fmparser start and end time + parameters
+#      • foremost scan start and end time
+#      • foremost version
+#      • exiftool version
+#      • hash algorithm used (e.g. SHA-256)
+#    - Image information
+#      • input path
+#      • image name
+#      • image size
+#      • image creation date
+#    - Statistics
+#      • total number of extracted files
+#      • total size of all files
+#      • number of unique file extensions
+#      • distribution of file extensions (graph)
+#      • top 10 largest files
+#      • number of duplicate groups detected
+#    - Duplicate summary
+#      • per group: hash, number of files, linked images (if cross-image mode active)
+#    - Logs
+#      • error and warning messages
+#
+# 2. EXTENSION PAGES (ONE PER FILE TYPE)
+#    - File statistics per extension
+#      • number of files per extension
+#      • total size of all files
+#      • percentage of total extracted files
+#    - File list (sortable)
+#      • file name
+#      • file size
+#      • icons for:
+#         🧩 duplicate indicator
+#         🧠 metadata extracted (exiftool/python)
+#      • for images: embedded preview
+#      • size shown in human-readable format
+#
+# 3. FILE DETAIL PAGE
+#    - Basic file info
+#      • file name
+#      • file size
+#      • hash + algorithm
+#      • type and MIME type
+#      • offset (from foremost)
+#      • foremost comment
+#    - Metadata
+#      • extracted with exiftool/python
+#    - Duplicate info
+#      • duplicate group hash
+#      • list of duplicate files (names, images if applicable)
+#    - For images
+#      • embedded image preview
+#      • additional ExifTool metadata
+#
+# -----------------------------------------------------------------------------
 
-# this is the actual HTML report generation with Jinja2
-# reads in the template, creates the Jinja2 engine and renders the report
-# the report is then saved to the /files volume as well as the bind-mount provided by the user
-def render_report(report_data, image_id, output_path, files_path):
-    # read in the Jinja2 template
-    dir_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../template'))
-    env = Environment(loader=FileSystemLoader(dir_path))
-    template = env.get_template('template.html')
-
-    # fill in the template
-    output = template.render(report=report_data)
-
-    # store the template in /files as copy
-    # create, if not existing, report dir
-    report_dir = os.path.join(files_path, "report")
-    os.makedirs(report_dir, exist_ok=True)
-    # create path for image report
-    report_path = os.path.join(report_dir, str(image_id) + ".html")
-    # if file exists, overwrite content
-    with open(os.path.join(dir_path, report_path), 'w') as f:
-        f.write(output)
-
-    # store the template in the output folder provided by user
-    # create path for image report
-    report_path = os.path.join(output_path, "foremostparser" + str(report_data.report_name) + ".html")
-    # if file exists, overwrite content
-    with open(os.path.join(dir_path, report_path), 'w') as f:
-        f.write(output)
-        print(f"Report saved to {report_path}.")
-
-# takes in the current image and the regenerate flag
-# if regenerate, generate new reports for all images
-def generate_report(image_id, regenerate, output_path, files_path):
+def generate_report_data(
+        input_path: Path,
+        output_path: Path,
+        images: bool,
+        cross_image: bool,
+        parsing_start: str,
+        image_id: int
+):
     try:
         session = connect_database()
         if session is None:
             raise Exception("Could not connect to the database")
 
-        # first, check if flag is set
-        all_images = []
-        if regenerate:
-            all_images = read_images(session)
-        else:
-            all_images = read_images(session) if regenerate else [read_image(image_id, session)]
-        # create a separate report for every image
-        for image in all_images:
+        # read the database data
+        image = read_image(image_id, session)
+        if image is None:
+            raise Exception("Could not read the image. Aborting report!")
 
-            # read all files for image
-            report_files = read_files_for_image(image.id, session)
-            # for every file, get id to query duplicates
-            duplicate_files = []
-            if report_files is not None and len(report_files) > 0:
-                file_ids = [file.id for file in report_files if file.is_duplicate == True]
-                # is [(file, file)]
-                duplicate_files = []
-                if len(file_ids) > 0:
-                    duplicate_files = read_duplicates(file_ids, session)
+        ######################## calculate and gather data #################
 
-            report_name = image.image_name
-            foremostparser_start = image.create_date
-            foremost_version = image.foremost_version
-            exiftool_version = image.exiftool_version
-            foremost_scan_start = image.foremost_scan_start
-            foremost_scan_end = image.foremost_scan_end
-            image_size = image.image_size
-            foremost_files_total = image.foremost_files_total
-            foremost_files_individual = image.foremost_files_individual
+        # set the parsing end time
+        PARSING_END = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
 
-            image_files = []
-            for file in report_files:
-                file_name = file.file_name
-                file_type = file.file_type
-                file_extension = file.file_extension
-                file_mime = file.file_mime
-                file_size = file.file_size
-                file_offset = file.file_offset
-                timestamp_mod = file.timestamp_mod
-                timestamp_acc = file.timestamp_acc
-                timestamp_cre = file.timestamp_cre
-                timestamp_ino = file.timestamp_ino
-                is_exiftool = file.is_exiftool
-                foremost_comment = file.foremost_comment
-                more_metadata = file.more_metadata
-                file_hash = file.file_hash
+        # set the fmparser parameters
+        parameters = {
+            "input_path": input_path,
+            "output_path": output_path,
+            "images": images,
+            "cross_image": cross_image
+        }
 
-                file_path = None
-                if file_extension.lower() in {"jpg", "jpeg", "png", "gif", "bmp"}:
-                    file_path = file.file_path
+        # hash algorithm is always SHA256
+        hash_algorithm = f"SHA-256 (Python hashlib ({ssl.OPENSSL_VERSION}))"
 
-                duplicates = []
-                # for every duplicate file, get the image name
-                # want a list of [(file name, image name), ...]
-                if duplicate_files is not None and len(duplicate_files) > 0:
-                    for file_one, file_two in duplicate_files:
-                        #print(f"Duplicate file {file_one} and {file_two}")
-                        # TODO there is a bug here, when there's too many duplicates, the code crashes
-                        # TODO is probably a database issue because with less files it works fine
-                        if file_one.id == file.id:
-                            # file_two is the duplicate, get the image name for the duplicate file
-                            image_for_duplicate = read_image(file_two.image_id, session)
-                            if image_for_duplicate:
-                                duplicates.append((file_one.file_name, image_for_duplicate.image_name))
-                        elif file_two.id == file.id:
-                            # file_one is the duplicate, get the image name for the duplicate file
-                            image_for_duplicate = read_image(file_one.image_id, session)
-                            if image_for_duplicate:
-                                duplicates.append((file_one.file_name, image_for_duplicate.image_name))
+        # calculate total file size
+        total_file_size = sum(file.file_size for file in image.files)
+        top_ten_files = sorted(
+            image.files, key=lambda f: f.file_size, reverse=True
+        )[:10]
 
-                # create the ReportFile object and store it in image_files
-                report_file = ReportFile(file_name,
-                                         file_type,
-                                         file_extension,
-                                         file_mime,
-                                         file_size,
-                                         file_offset,
-                                         timestamp_mod,
-                                         timestamp_acc,
-                                         timestamp_cre,
-                                         timestamp_ino,
-                                         is_exiftool,
-                                         duplicates,
-                                         foremost_comment,
-                                         more_metadata,
-                                         file_hash,
-                                         file_path)
-                image_files.append(report_file)
+        # calculate extension distribution
+        total_files = sum(image.foremost_files_individual.values())
+        extension_distribution = {
+            ext: round((count / total_files) * 100)
+            for ext, count in image.foremost_files_individual.items()
+        }
 
-            # create the report object
-            report_data = ReportData(report_name,
-                                     foremostparser_start,
-                                     foremost_version,
-                                     exiftool_version,
-                                     foremost_scan_start,
-                                     foremost_scan_end,
-                                     image_size,
-                                     foremost_files_total,
-                                     foremost_files_individual,
-                                     image_files)
+        image_extensions_data_list = []
 
-            render_report(report_data, image.id, output_path, files_path)
+        files_by_extension = defaultdict(list)
+        # sort all files by extension
+        for file in image.files:
+            files_by_extension[file.file_extension].append(file)
+        # go through files per extension
+        for ext, files in files_by_extension.items():
+            number_files = len(files)
+            total_file_size = sum(file.file_size for file in files)
+            percentage_extraction = extension_distribution.get(ext, 0)
+
+            image_extensions_data = ImageExtensionsData(
+                number_files=number_files,
+                total_size_files=total_file_size,
+                percentage_extraction=percentage_extraction,
+                files=None
+            )
+
+            for file in files:
+
+                report_path = os.path.join(output_path, image.image_name, ext, file.file_name)
+
+                image_file_data = ImageFilesData(
+                    file_name=file.file_name,
+                    file_size=file.file_size,
+                    file_extension=file.file_extension,
+                    file_path=file.file_path,
+                    file_report_path=report_path,
+                    file_hash=file.file_hash,
+                    file_hash_algorithm=hash_algorithm,
+                    file_type=file.file_type,
+                    file_mime=file.file_mime,
+                    file_offset=file.file_offset,
+                    foremost_comment=file.foremost_comment,
+                    is_exiftool=file.is_exiftool,
+                )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        image_overview_data = ImageOverviewData(
+            parser_start=parsing_start,
+            parser_end=PARSING_END,
+            parser_parameters=parameters,
+            foremost_start=image.foremost_scan_start,
+            foremost_end=image.foremost_scan_end,
+            foremost_version=image.foremost_version,
+            exiftool_version=image.exiftool_version,
+            hash_algorithm=hash_algorithm,
+            input_path=input_path,
+            image_name=image.image_name,
+            image_size=image.image_size,
+            image_creation_date=image.create_date,
+            total_number_files=image.foremost_files_total,
+            total_size_files=total_file_size,
+            number_extensions=len(image.foremost_files_individual),
+            extension_distribution=extension_distribution,
+        )
+
+
     except Exception as e:
-        print(f"Something went wrong while creating report: {e}")
-        return False
+        print("Ohoh fehler.")

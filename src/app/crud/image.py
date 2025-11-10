@@ -17,6 +17,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 
 from app.models.image import Image
+from app.models.duplicate import DuplicateGroup, DuplicateMember
 
 ########################################################################
 ###################### WRITE ###########################################
@@ -103,6 +104,7 @@ def delete_image(image_id: int, session: Session) -> int:
         int: 1 if successful or -1 if a database error occurred.
 
     Notes:
+        Looks for empty duplicate groups and deletes them.
         Commits after deletion. Rolls back in case of errors.
     """
     if session is None:
@@ -115,6 +117,16 @@ def delete_image(image_id: int, session: Session) -> int:
             return -1
         # files and duplicates are automatically deleted through relationships and cascade
         session.delete(image)
+
+        # delete empty duplicate groups
+        empty_groups = session.query(DuplicateGroup) \
+            .outerjoin(DuplicateMember) \
+            .filter(DuplicateMember.file_id == None) \
+            .all()
+
+        for group in empty_groups:
+            session.delete(group)
+
         session.commit()
         return 1
 
@@ -149,8 +161,7 @@ def read_image(image_id: int, session: Session) -> Optional[Image]:
     try:
         return session.query(Image).filter(Image.id == image_id).first()
     except SQLAlchemyError as e:
-        session.rollback()
-        print("Something went wrong while reading image. Rolling back.", file=sys.stderr)
+        print("Something went wrong while reading image.", file=sys.stderr)
         print(f"Detailed DB error: {e}", file=sys.stderr)
         return None
 
@@ -174,7 +185,6 @@ def read_images(session: Session):
     try:
         return session.query(Image).all()
     except SQLAlchemyError as e:
-        session.rollback()
-        print("Something went wrong while reading images. Rolling back.", file=sys.stderr)
+        print("Something went wrong while reading images.", file=sys.stderr)
         print(f"Detailed DB error: {e}", file=sys.stderr)
         return None

@@ -14,9 +14,10 @@
 # clear environment variables
 > .env
 
-# set flag for path
+# set flags
 INPUT_PROVIDED=false
 OUTPUT_PROVIDED=false
+FLUSH=false
 
 # show help for -h or --help
 help(){
@@ -31,7 +32,7 @@ help(){
     echo "  -h, --help          shows this help information"
     echo "  -i, --input         the foremost input directory"
     echo "  -o, --output        the HTML report output directory"
-    echo "  -f, --flush         deletes the docker persistent volumes before startup"
+    echo "  -f, --flush         deletes the docker persistent volumes and output dir contents before startup"
     echo "  --with-images       includes image files in the report (supported formats: jpg, jpeg, png, gif, webp, svg)"
     echo ""
 }
@@ -56,6 +57,7 @@ validate_output_path(){
     # -n: String is not zero; -d: file exists and is a dir; make sure it starts with / (absolute) and make sure it's writeable
     if [ -n "$1" ] && [ -d "$1" ] && [[ "$1" =~ ^/ ]] && [ -w "$1" ]; then
         OUTPUT_PROVIDED=true
+        export OUTPUT_PATH="$1"
         echo "OUTPUT_PATH=\"$1\"" >> .env
     else
         echo "Please include a valid absolute path for the output folder that is writeable."
@@ -65,12 +67,19 @@ validate_output_path(){
 
 # so, long story short, deleting the data from the database with SQLAlchemy
 # IS A MESS and corrupted my auto increment, that's why it is done here. 
-flush_database(){
+flush_data(){
     if [ "$INPUT_PROVIDED" != "true" ] && [ "$OUTPUT_PROVIDED" != "true" ]; then
         echo "Please include valid absolute paths to the input and the output folders."
         exit 1
     else
+        # Docker data
         docker compose down -v
+
+        # output dir data
+        if [ -d "$OUTPUT_PATH" ]; then
+            echo "Clearing output folder: $OUTPUT_PATH"
+            rm -rf "${OUTPUT_PATH:?}/"*
+        fi
         echo "Database and files flushed."
     fi
 }
@@ -101,7 +110,7 @@ while [[ "$#" -gt 0 ]]; do
             shift 2
             ;;
         -f|--flush)
-            flush_database
+            FLUSH=true
             shift
             ;;
         --with-images)
@@ -119,6 +128,11 @@ done
 if [ ! -f "$INPUT_PATH/audit.txt" ]; then
     echo "Error: audit.txt not found in input directory '$INPUT_PATH'!" >&2
     exit 1
+fi
+
+# Flush only after parsing all paths
+if [ "$FLUSH" = true ]; then
+    flush_data
 fi
 
 # ask if .DS_Store files should be removed or kept
