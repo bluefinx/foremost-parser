@@ -34,7 +34,7 @@ from app.crud.file import read_files_per_extension_for_image
 from app.parser.audit_file import parse_audit
 from app.parser.indv_files import parse_files
 from app.parser.duplicates import detect_duplicates
-from app.report.report import generate_report_data
+from app.report.report_data import generate_report_data
 
 def abort(error):
     """
@@ -80,6 +80,10 @@ def main():
     parses the Foremost output (audit and files),
     checks for duplicates and generates the final report.
     """
+
+    # TODO check if audit file numbers and actual parsing numbers can be different safely
+    # TODO change file_path for image files to adapt to report structure -> make file_path and report_path relative
+    # TODO update roadmap + wiki + generate docs
 
     # starting foremost-parser
     PARSING_START = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")

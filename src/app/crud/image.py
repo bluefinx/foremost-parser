@@ -11,7 +11,7 @@ License: GNU General Public License v3.0
 
 import sys
 
-from typing import Optional
+from typing import Optional, List
 
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
@@ -33,18 +33,17 @@ def insert_image(image: Image, session: Session) -> int:
         image (Image): The Image object to store.
         session (Session): SQLAlchemy session, must not be None.
 
-    Raises:
-        ValueError: If session is None.
-
     Returns:
         int: The ID of the inserted Image or -1 if a database error occurred.
 
-    Notes:
-        Commits immediately after adding the Image. Rolls back in case of errors.
+    Raises:
+        ValueError: If session is None.
+        SQLAlchemyError: Logged to stderr and session rolled back on failure.
     """
-    if session is None:
-        raise ValueError("session cannot be None!")
     try:
+        if session is None:
+            raise ValueError("session cannot be None!")
+
         session.add(image)
         session.commit()
         return image.id
@@ -52,6 +51,11 @@ def insert_image(image: Image, session: Session) -> int:
         session.rollback()
         print("Something went wrong while storing image. Rolling back.", file=sys.stderr)
         print(f"Detailed DB error: {e}", file=sys.stderr)
+        return -1
+    except ValueError as e:
+        session.rollback()
+        print("Something went wrong while storing image. Rolling back.", file=sys.stderr)
+        print(f"Detailed Value error: {e}", file=sys.stderr)
         return -1
 
 # set the individual files for this image
@@ -65,18 +69,17 @@ def update_image_files_individual(image_id: int, result: dict, session: Session)
         result (dict): Dictionary containing per-extension file counts.
         session (Session): SQLAlchemy session, must not be None.
 
-    Raises:
-        ValueError: If session is None.
-
     Returns:
         int: 1 if successful, -1 if the Image does not exist or a DB error occurred.
 
-    Notes:
-        Commits after updating. Rolls back in case of errors.
+    Raises:
+        ValueError: If session is None.
+        SQLAlchemyError: Logged to stderr and session rolled back on failure.
     """
-    if session is None:
-        raise ValueError("session cannot be None!")
     try:
+        if session is None:
+            raise ValueError("session cannot be None!")
+
         image = session.query(Image).filter(Image.id == image_id).first()
         if image is not None:
             image.foremost_files_individual = result
@@ -88,6 +91,11 @@ def update_image_files_individual(image_id: int, result: dict, session: Session)
         session.rollback()
         print("Something went wrong while overwriting image. Rolling back.", file=sys.stderr)
         print(f"Detailed DB error: {e}", file=sys.stderr)
+        return -1
+    except ValueError as e:
+        session.rollback()
+        print("Something went wrong while overwriting image. Rolling back.", file=sys.stderr)
+        print(f"Detailed Value error: {e}", file=sys.stderr)
         return -1
 
 # delete image
@@ -103,14 +111,14 @@ def delete_image(image_id: int, session: Session) -> int:
     Returns:
         int: 1 if successful or -1 if a database error occurred.
 
-    Notes:
-        Looks for empty duplicate groups and deletes them.
-        Commits after deletion. Rolls back in case of errors.
+    Raises:
+        ValueError: If session is None.
+        SQLAlchemyError: Logged to stderr and session rolled back on failure.
     """
-    if session is None:
-        raise ValueError("session cannot be None!")
-
     try:
+        if session is None:
+            raise ValueError("session cannot be None!")
+
         image = session.get(Image, image_id)
         if image is None:
             print(f"No image found with id {image_id}", file=sys.stderr)
@@ -135,6 +143,11 @@ def delete_image(image_id: int, session: Session) -> int:
         print("Something went wrong while deleting image. Rolling back.", file=sys.stderr)
         print(f"Detailed DB error: {e}", file=sys.stderr)
         return -1
+    except ValueError as e:
+        session.rollback()
+        print("Something went wrong while deleting image. Rolling back.", file=sys.stderr)
+        print(f"Detailed Value error: {e}", file=sys.stderr)
+        return -1
 
 ########################################################################
 ###################### READ ############################################
@@ -150,41 +163,53 @@ def read_image(image_id: int, session: Session) -> Optional[Image]:
         image_id (int): ID of the Image.
         session (Session): SQLAlchemy session, must not be None.
 
+    Returns:
+        Optional[Image]: Image object if found, None if not found or a DB error occurred.
+
     Raises:
         ValueError: If session is None.
-
-    Returns:
-        Image | None: Image object if found, None if not found or a DB error occurred.
+        SQLAlchemyError: Logged to stderr if query fails.
     """
-    if session is None:
-        raise ValueError("session cannot be None!")
     try:
+        if session is None:
+            raise ValueError("session cannot be None!")
+
         return session.query(Image).filter(Image.id == image_id).first()
     except SQLAlchemyError as e:
         print("Something went wrong while reading image.", file=sys.stderr)
         print(f"Detailed DB error: {e}", file=sys.stderr)
         return None
+    except ValueError as e:
+        print("Something went wrong while reading image.", file=sys.stderr)
+        print(f"Detailed Value error: {e}", file=sys.stderr)
+        return None
 
 # read all images
 # (WARN: make sure session is not none when calling)
-def read_images(session: Session):
+def read_images(session: Session) -> Optional[List[Image]]:
     """
-   Reads all Images from the database.
+    Reads all Images from the database.
 
-   Args:
-       session (Session): SQLAlchemy session, must not be None.
+    Args:
+        session (Session): SQLAlchemy session, must not be None.
 
-   Raises:
-       ValueError: If session is None.
+    Returns:
+        Optional[List[Image]]: List of Image objects or None if a DB error occurred.
 
-   Returns:
-       list[Image] | None: List of Image objects or None if a DB error occurred.
-   """
-    if session is None:
-        raise ValueError("session cannot be None!")
+    Raises:
+        ValueError: If session is None.
+        SQLAlchemyError: Logged to stderr if query fails.
+    """
     try:
-        return session.query(Image).all()
+        if session is None:
+            raise ValueError("session cannot be None!")
+
+        return session.query(Image).all() #type: ignore
     except SQLAlchemyError as e:
         print("Something went wrong while reading images.", file=sys.stderr)
         print(f"Detailed DB error: {e}", file=sys.stderr)
+        return None
+    except ValueError as e:
+        print("Something went wrong while reading images.", file=sys.stderr)
+        print(f"Detailed Value error: {e}", file=sys.stderr)
         return None

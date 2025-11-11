@@ -47,13 +47,6 @@ class Image(Base):
         duplicate_groups (List[DuplicateGroup]): All DuplicateGroups that
             contain files from this image. Managed via the
             Many-to-Many association table `duplicate_group_image_association`.
-
-    Notes:
-        - String fields are validated and truncated automatically to fit
-          database column lengths.
-        - Cascade settings ('all, delete, delete-orphan') ensure that removing
-          an Image will clean up all associated Files, hash entries, and
-          duplicate groups, keeping the database consistent.
     """
     __tablename__ = 'table_image'
 

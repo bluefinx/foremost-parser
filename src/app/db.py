@@ -16,7 +16,9 @@ import os
 import time
 import sys
 
-from sqlalchemy import create_engine
+from typing import Optional
+
+from sqlalchemy import create_engine, Session
 from sqlalchemy.engine import URL
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import SQLAlchemyError
@@ -27,7 +29,7 @@ from app.models.base import Base
 PASSWORD_FILE_PATH = "/run/secrets/db-password"
 
 # create database URL for connection
-def create_database_url(db_password):
+def create_database_url(db_password) -> URL:
     """
     Creates a SQLAlchemy database URL for connecting to the PostgreSQL database.
 
@@ -35,7 +37,7 @@ def create_database_url(db_password):
         db_password (str): The database password.
 
     Returns:
-        sqlalchemy.engine.URL: A SQLAlchemy URL object configured for the Foremost-Parser database.
+        sqlalchemy.engine.URL: Configured SQLAlchemy URL object for the database.
     """
     return URL.create(
         drivername="postgresql+psycopg2",
@@ -51,7 +53,7 @@ def create_database_url(db_password):
 #################################################
 
 # connect to the database and create tables
-def create_database():
+def create_database() -> bool:
     """
     Connects to the PostgreSQL database and creates the required tables.
 
@@ -95,7 +97,7 @@ def create_database():
 #################################################
 
 # establish connection to database
-def connect_database():
+def connect_database() -> Optional[Session]:
     """
     Establishes a connection to the PostgreSQL database and returns a session.
 

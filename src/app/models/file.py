@@ -51,15 +51,6 @@ class File(Base):
         duplicate_groups (List[DuplicateGroup]): All DuplicateGroup objects this
             file belongs to. viewonly=True ensures membership is managed via
             DuplicateMember.
-
-    Notes:
-        - String fields are validated and truncated automatically to fit
-          database column length.
-        - Duplicate groups allow efficient querying of all files that share
-          the same hash, potentially across multiple images.
-        - hash_entries allow fast cross-image duplicate detection without
-          loading full file metadata.
-        - Image relationship provides access to the parent image of this file.
     """
     __tablename__ = 'table_file'
 
@@ -154,14 +145,6 @@ class FileHash(Base):
         image_id (int): Foreign key linking to the parent Image.
         file (File): Relationship back to the File object.
         image (Image): Relationship back to the Image object.
-
-    Notes:
-        - An index on `file_hash` is created for fast lookup.
-        - UniqueConstraint on `(file_id, file_hash)` prevents duplicate entries.
-        - Cascade deletes from File or Image ensure the hash entry is removed
-          when its associated file or image is deleted.
-        - This table is intended solely for duplicate detection and does not
-          store other file metadata.
     """
     __tablename__ = 'table_file_hash'
 
