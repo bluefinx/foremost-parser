@@ -186,6 +186,7 @@ def create_database_objects(subdir_files: dict, image_id: int, audit_table: dict
 
         # drop all of the metadata in more_metadata that we already have in file.* or don't need
         exclude = ['File:FileTypeExtension',
+                   'File:FilePermissions',
                    'SourceFile',
                    'File:FileType',
                    'File:MIMEType',
@@ -305,6 +306,7 @@ def parse_files(input_path: Path, output_path: Path, image_id: int, audit_table:
     # while the app is actively parsing through them
     # does not help much but at least it's crashing nicely
     try:
+        # TODO find non-extracted files
         for subdir in sorted(input_path.rglob('*')):
             if subdir.is_dir():
 

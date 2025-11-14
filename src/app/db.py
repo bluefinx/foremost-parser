@@ -18,9 +18,9 @@ import sys
 
 from typing import Optional
 
-from sqlalchemy import create_engine, Session
+from sqlalchemy import create_engine
 from sqlalchemy.engine import URL
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.exc import SQLAlchemyError
 
 from app.models.base import Base

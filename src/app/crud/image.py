@@ -58,46 +58,6 @@ def insert_image(image: Image, session: Session) -> int:
         print(f"Detailed Value error: {e}", file=sys.stderr)
         return -1
 
-# set the individual files for this image
-# (WARN: make sure session is not none when calling)
-def update_image_files_individual(image_id: int, result: dict, session: Session) -> int:
-    """
-    Updates the 'foremost_files_individual' JSON field for a given Image.
-
-    Args:
-        image_id (int): ID of the Image to update.
-        result (dict): Dictionary containing per-extension file counts.
-        session (Session): SQLAlchemy session, must not be None.
-
-    Returns:
-        int: 1 if successful, -1 if the Image does not exist or a DB error occurred.
-
-    Raises:
-        ValueError: If session is None.
-        SQLAlchemyError: Logged to stderr and session rolled back on failure.
-    """
-    try:
-        if session is None:
-            raise ValueError("session cannot be None!")
-
-        image = session.query(Image).filter(Image.id == image_id).first()
-        if image is not None:
-            image.foremost_files_individual = result
-            session.commit()
-            return 1
-        else:
-            return -1
-    except SQLAlchemyError as e:
-        session.rollback()
-        print("Something went wrong while overwriting image. Rolling back.", file=sys.stderr)
-        print(f"Detailed DB error: {e}", file=sys.stderr)
-        return -1
-    except ValueError as e:
-        session.rollback()
-        print("Something went wrong while overwriting image. Rolling back.", file=sys.stderr)
-        print(f"Detailed Value error: {e}", file=sys.stderr)
-        return -1
-
 # delete image
 # (WARN: make sure session is not none when calling)
 def delete_image(image_id: int, session: Session) -> int:

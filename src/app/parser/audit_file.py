@@ -57,9 +57,13 @@ filename = "audit.txt"
 
 # create raw strings to store the regex
 # search for "File: example.dd"
-image_name_regex = r"File:\s+(\S+)"
+image_name_regex = r"File:\s+(.+)"
 # search for "Length: 5 GB (5762727936 bytes)"
 image_size_regex = r"Length:\s+\d+\s*\w+\s*\((\d+)\s*bytes\)"
+# original Foremost output directory
+original_output_dir_regex = r"Output directory:\s+(.+)"
+# foremost invocation
+foremost_invocation_regex = r"Invocation:\s+(.+)"
 # search for "Foremost version 1.5.7 by Jesse Kornblum, Kris Kendall, and Nick Mikus"
 foremost_version_regex = r"Foremost version\s+([\d.]+)\s+by"
 # search for "Start: Fri Nov 29 16:24:35 2024"
@@ -131,6 +135,8 @@ def parse_individual_lines(file, image, audit_table: dict) -> None:
 
         # search for specific lines to extract information
         image_size_match = re.search(image_size_regex, line)
+        original_output_dir_match = re.search(original_output_dir_regex, line)
+        foremost_invocation_match = re.search(foremost_invocation_regex, line)
         foremost_version_match = re.search(foremost_version_regex, line)
         foremost_scan_start_match = re.search(foremost_scan_start_regex, line)
         foremost_scan_end_match = re.search(foremost_scan_end_regex, line)
@@ -142,6 +148,10 @@ def parse_individual_lines(file, image, audit_table: dict) -> None:
             image.image_name = image_name_match.group(1)
         if image_size_match:
             image.image_size = image_size_match.group(1)
+        if original_output_dir_match:
+            image.original_output_dir = original_output_dir_match.group(1)
+        if foremost_invocation_match:
+            image.foremost_invocation = foremost_invocation_match.group(1)
         if foremost_version_match:
             image.foremost_version = foremost_version_match.group(1)
         if foremost_scan_start_match:
@@ -243,9 +253,6 @@ def parse_audit(input_path: Path) -> tuple[int, Optional[dict], Optional[str]]:
 
     # audit table with additional file information
     audit_table = {}
-
-    # set image creation date
-    image.create_date = datetime.now()
 
     try:
         # get audit file as read-only

@@ -7,9 +7,9 @@
 # environment variables:
 # - INPUT_PATH
 # - OUTPUT_PATH
-# - OVERWRITE
 # - FLUSH
-# - REGENERATE
+# - REPORT
+# - WITH_IMAGES
 
 # clear environment variables
 > .env
@@ -21,8 +21,8 @@ FLUSH=false
 
 # show help for -h or --help
 help(){
-    echo "This tool reads in a foremost input directory, parses its content"
-    echo "and generates an HTML report in the output directory."
+    echo "This tool reads in a foremost input directory, parses its content and metadata"
+    echo "and generates a report in the output directory."
     echo ""
     echo "NOTE: The foremost audit file must be named 'audit.txt'."
     echo ""
@@ -30,9 +30,10 @@ help(){
     echo ""
     echo "Options:"
     echo "  -h, --help          shows this help information"
-    echo "  -i, --input         the foremost input directory"
-    echo "  -o, --output        the HTML report output directory"
-    echo "  -f, --flush         deletes the docker persistent volumes and output dir contents before startup"
+    echo "  -i, --input         the foremost input directory (absolute path)"
+    echo "  -o, --output        the report output directory (absolute path)"
+    echo "  -f, --flush         deletes the Docker persistent volumes and output directory contents before startup"
+    echo "  -r, --report        report format (supported formats: html, json) DEFAULT: html"
     echo "  --with-images       includes image files in the report (supported formats: jpg, jpeg, png, gif, webp, svg)"
     echo ""
 }
@@ -44,7 +45,7 @@ validate_input_path(){
     if [ -n "$1" ] && [ -d "$1" ] && [[ "$1" =~ ^/ ]]; then
         INPUT_PROVIDED=true
         export INPUT_PATH="$1"
-        echo "INPUT_PATH=\"$1\"" >> .env
+        echo "INPUT_PATH=$1" >> .env
     else
         echo "Please include a valid absolute path for the input folder."
         exit 1
@@ -58,7 +59,7 @@ validate_output_path(){
     if [ -n "$1" ] && [ -d "$1" ] && [[ "$1" =~ ^/ ]] && [ -w "$1" ]; then
         OUTPUT_PROVIDED=true
         export OUTPUT_PATH="$1"
-        echo "OUTPUT_PATH=\"$1\"" >> .env
+        echo "OUTPUT_PATH=$1" >> .env
     else
         echo "Please include a valid absolute path for the output folder that is writeable."
         exit 1
@@ -82,6 +83,23 @@ flush_data(){
         fi
         echo "Database and files flushed."
     fi
+}
+
+validate_report_format(){
+    local format="$1"
+    # allowed formats
+    local allowed=("html" "json")
+
+    # check if format is in allowed list
+    for f in "${allowed[@]}"; do
+        if [[ "$format" == "$f" ]]; then
+            echo "REPORT=$format" >> .env
+            return 0
+        fi
+    done
+
+    echo "Invalid report format: $format. Allowed formats are: ${allowed[*]}"
+    exit 1
 }
 
 # if input is -h or --help, show help and exit
@@ -112,6 +130,10 @@ while [[ "$#" -gt 0 ]]; do
         -f|--flush)
             FLUSH=true
             shift
+            ;;
+        -r|--report)
+            validate_report_format $2
+            shift 2
             ;;
         --with-images)
             echo "IMAGES=true" >> .env

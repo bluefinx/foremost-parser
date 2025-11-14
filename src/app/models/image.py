@@ -12,7 +12,7 @@ Copyright (c) 2025 bluefinx
 License: GNU General Public License v3.0
 """
 
-from sqlalchemy import Column, Integer, String, TIMESTAMP, BigInteger, JSON
+from sqlalchemy import Column, Integer, String, TIMESTAMP, BigInteger
 from sqlalchemy.orm import validates, relationship
 
 from app.models.base import Base
@@ -32,13 +32,12 @@ class Image(Base):
         id (int): Primary key.
         image_name (str | None): Name of the image.
         image_size (int | None): Size of the image in bytes.
-        create_date (datetime | None): Timestamp when the image was created.
         exiftool_version (str | None): Version of EXIFTool used.
+        original_output_dir (str | None): Original Foremost output directory.
         foremost_version (str | None): Version of Foremost used.
         foremost_scan_start (datetime | None): Start timestamp of the Foremost scan.
         foremost_scan_end (datetime | None): End timestamp of the Foremost scan.
         foremost_files_total (int | None): Total number of files recovered by Foremost.
-        foremost_files_individual (dict | None): Number of files per extension.
         files (List[File]): All File objects carved from this image.
             Cascade ensures that deleting an Image deletes its Files and
             related DuplicateMember entries automatically.
@@ -53,13 +52,13 @@ class Image(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     image_name = Column(String(255))
     image_size = Column(BigInteger)
-    create_date = Column(TIMESTAMP)
     exiftool_version = Column(String(50))
+    original_output_dir = Column(String(2048))
+    foremost_invocation = Column(String(2048))
     foremost_version = Column(String(50))
     foremost_scan_start = Column(TIMESTAMP)
     foremost_scan_end = Column(TIMESTAMP)
     foremost_files_total = Column(BigInteger)
-    foremost_files_individual = Column(JSON)
 
     files = relationship(
         "File",
@@ -86,6 +85,18 @@ class Image(Base):
     def validate_exiftool_version(self, key, value):
         if value and len(value) > 50:
             return value[:50]
+        return value
+
+    @validates('original_output_dir')
+    def validate_original_output_dir(self, key, value):
+        if value and len(value) > 2048:
+            return value[:2048]
+        return value
+
+    @validates('foremost_invocation')
+    def validate_foremost_invocation(self, key, value):
+        if value and len(value) > 2048:
+            return value[:2048]
         return value
 
     @validates('foremost_version')

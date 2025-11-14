@@ -11,7 +11,6 @@ import sys
 
 from typing import List, Tuple, Optional
 
-from sqlalchemy import func
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -133,41 +132,6 @@ def read_files_for_image(image_id: int, session: Session) -> Optional[List[File]
         return None
     except ValueError as e:
         print("Something went wrong while reading files for image.", file=sys.stderr)
-        print(f"Detailed Value error: {e}", file=sys.stderr)
-        return None
-
-# read the numbers of file per file_extension per image
-# (WARN: make sure session is not none when calling)
-def read_files_per_extension_for_image(image_id: int, session: Session) -> Optional[List[Tuple[int, str]]]:
-    """
-    Retrieves the number of files per file extension for a given image.
-
-    Args:
-        image_id (int): ID of the image.
-        session (Session): SQLAlchemy session, must not be None.
-
-    Returns:
-        Optional[List[Tuple[str, int]]]: List of tuples (file_extension, count), or None if an error occurred.
-
-    Raises:
-        ValueError: If session is None.
-        SQLAlchemyError: Logged to stderr if query fails.
-    """
-    try:
-        if session is None:
-            raise ValueError("session cannot be None!")
-
-        results = session.query(File.file_extension, func.count(File.id).label('file_count')) \
-            .filter(File.image_id == image_id) \
-            .group_by(File.file_extension) \
-            .all()
-        return [(row.file_extension, row.file_count) for row in results]
-    except SQLAlchemyError as e:
-        print("Something went wrong while reading files per extension for image.", file=sys.stderr)
-        print(f"Detailed DB error: {e}", file=sys.stderr)
-        return None
-    except ValueError as e:
-        print("Something went wrong while reading files per extension for image.", file=sys.stderr)
         print(f"Detailed Value error: {e}", file=sys.stderr)
         return None
 

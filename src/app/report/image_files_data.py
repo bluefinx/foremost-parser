@@ -74,3 +74,35 @@ class ImageFilesData:
         self.duplicate_group_hash = duplicate_group_hash
         self.duplicate_files = duplicate_files
         self.additional_metadata = additional_metadata
+
+    def to_dict(self) -> Dict[str, Any]:
+        """
+        Convert this ImageFilesData instance into a JSON-serializable dictionary.
+
+        This method ensures that all attributes — including nested objects such as
+        duplicate file entries and additional metadata — are converted into plain
+        Python types so they can be safely serialized to JSON.
+
+        Returns:
+            Dict[str, Any]: A JSON-compatible representation of this object. All
+            nested FileEntry objects are converted via their own to_dict() method.
+        """
+        return {
+            "file_name": self.file_name,
+            "file_size": self.file_size,
+            "file_extension": self.file_extension,
+            "file_path": self.file_path,
+            "file_report_path": self.file_report_path,
+            "file_hash": self.file_hash,
+            "file_hash_algorithm": self.file_hash_algorithm,
+            "file_type": self.file_type,
+            "file_mime": self.file_mime,
+            "file_offset": self.file_offset,
+            "foremost_comment": self.foremost_comment,
+            "is_exiftool": self.is_exiftool,
+            "duplicate_group_hash": self.duplicate_group_hash,
+            "duplicate_files": [
+                df.to_dict() for df in self.duplicate_files
+            ],
+            "additional_metadata": self.additional_metadata,
+        }

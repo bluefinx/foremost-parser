@@ -22,9 +22,10 @@ services:
       - POSTGRES_USER=foremostparser
       - POSTGRES_PASSWORD_FILE=/run/secrets/db-password
       - POSTGRES_HOST=db
-      - INPUT_PATH=/data
-      - OUTPUT_PATH=/output
+      - INPUT_PATH
+      - OUTPUT_PATH
       - FLUSH
+      - REPORT
       - IMAGES
     # use password.txt for database password
     secrets:

@@ -26,40 +26,18 @@ from app.models.duplicate import DuplicateGroup
 
 # after storing the files, compare the hashes to find duplicate files
 def detect_duplicates(session: Session, image_id: int, cross_image: bool):
-    """
-    Detects duplicate files based on SHA-256 hashes and stores duplicate information in the database.
-
-    This function analyses files extracted from a given image and optionally across all images
-    (if `cross_image=True`) to identify duplicates. It creates `DuplicateGroup` entries for
-    each unique hash that has multiple files and links them to the corresponding image(s).
-    It also creates `DuplicateMember` entries for each file in the group.
-
-    Args:
-        session (Session): SQLAlchemy session, must not be None.
-        image_id (int): ID of the image whose files should be checked for duplicates.
-        cross_image (bool): If True, compares files from this image against all files in the
-            database. If False, only compares files within this image.
-
-    Returns:
-        None
-
-    Notes:
-        - Uses `read_file_hashes_for_image()` to get all files for the given image.
-        - Uses `read_files_with_hash()` to fetch all stored file hashes if cross-image comparison is needed.
-        - For each hash that occurs in multiple files, a `DuplicateGroup` is created (if not existing)
-          and linked to the image.
-        - Each file is added as a `DuplicateMember` to its corresponding group.
-        - The function avoids O(n^2) comparisons by grouping files by hash.
-        - Cross-image duplicate detection is not yet implemented.
-    """
     try:
         if session is None:
             raise Exception("Could not connect to the database")
 
         # get the file hashes for this image
+        print("DEBUG: reading image_hashes…")
         image_hashes = read_file_hashes_for_image(image_id, session)
+        print("DEBUG: image_hashes: ", len(image_hashes))
         # get hashes for all files stored
+        print("DEBUG: reading all_hashes…")
         all_hashes = read_files_with_hash(session)
+        print("DEBUG: all_hashes: ", len(all_hashes))
 
         if not image_hashes or not all_hashes:
             print("No file hashes found, skipping duplicate detection.")
@@ -69,19 +47,24 @@ def detect_duplicates(session: Session, image_id: int, cross_image: bool):
         cross_image_counter = 0
 
         # if cross_image = False, only compare the hashes of this image
+        print("DEBUG: cross_image =", cross_image)
         if not cross_image:
 
             # group files by hash to avoid O(n^2) comparison
+            print("DEBUG: building hash_groups…")
             hash_groups = {}  # key: file_hash
             for file_hash in image_hashes:
                 # check if key already exists, add file to hash
-                hash_groups.setdefault(file_hash, []).append(file_hash.file_id)
+                hash_groups.setdefault(file_hash.file_hash, []).append(file_hash.file_id)
+
+            print("DEBUG: number of hash_groups =", len(hash_groups))
 
             for file_hash, file_ids in hash_groups.items():
                 # no duplicates for this hash
                 if len(file_ids) >= 2:
                     # check duplicate group already exists and is connected to image
                     exists, linked_to_image = check_duplicate_group_for_image(session, image_id, file_hash)
+
                     # create duplicate group and connect to image
                     if not exists:
                         insert_duplicate_group(DuplicateGroup(file_hash=file_hash), session)

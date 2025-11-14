@@ -1,7 +1,7 @@
 """
 report_data.py
 
-Contains functions to generate structured data for forensic image reports.
+Contains functions to generate structured data for Foremost outputs.
 Includes overview data, file-extension-level aggregation and file-level
 details for reporting.
 
@@ -22,10 +22,8 @@ License: GNU General Public License v3.0
 #      • exiftool version
 #      • hash algorithm used (e.g. SHA-256)
 #    - Image information
-#      • input path
 #      • image name
 #      • image size
-#      • image creation date
 #    - Statistics
 #      • total number of extracted files
 #      • total size of all files
@@ -42,7 +40,6 @@ License: GNU General Public License v3.0
 #    - File statistics per extension
 #      • number of files per extension
 #      • total size of all files
-#      • percentage of total extracted files
 #    - File list (sortable)
 #      • file name
 #      • file size
@@ -78,11 +75,10 @@ import sys
 from pathlib import Path
 from datetime import datetime, timezone
 from typing import List
+from enum import Enum
 from collections import defaultdict, Counter
 
 from sqlalchemy.orm import Session
-
-#from jinja2 import Environment, FileSystemLoader
 
 from app.db import connect_database
 from app.models.image import Image
@@ -92,6 +88,19 @@ from app.crud.duplicate import read_duplicate_group_by_file_id, read_duplicate_g
 from app.report.image_extensions_data import ImageExtensionsData
 from app.report.image_files_data import ImageFilesData
 from app.report.image_overview_data import ImageOverviewData, FileEntry, ImageEntry, DuplicateGroupData
+from app.report.report_json import generate_json_report
+
+
+class ReportFormat(Enum):
+    """
+    Enumeration of supported report formats.
+
+    Attributes:
+        HTML (str): Standard HTML report.
+        JSON (str): JSON formatted report.
+    """
+    HTML = "html"
+    JSON = "json"
 
 # generate the file path in the report
 def generate_file_report_path(output_path: Path, image_name: str, file_extension: str, file_name: str) -> str:
@@ -117,7 +126,10 @@ def generate_file_report_path(output_path: Path, image_name: str, file_extension
 # generate the image overview data for the report
 def generate_image_overview_data(
         input_path: Path,
+        host_input_path: str,
         output_path: Path,
+        host_output_path: str,
+        report: str,
         with_images: bool,
         cross_image: bool,
         parsing_start: str,
@@ -132,7 +144,10 @@ def generate_image_overview_data(
 
     Args:
         input_path (Path): Path to input image files.
+        host_input_path (str): Path to host input Foremost directory.
         output_path (Path): Output directory for the report.
+        host_output_path (str): Output directory for the host output report directory.
+        report (str): Report type (HTML, JSON).
         with_images (bool): Whether to include image previews.
         cross_image (bool): Whether cross-image duplicate detection is enabled.
         parsing_start (str): Timestamp when parsing started.
@@ -151,10 +166,11 @@ def generate_image_overview_data(
 
     # set the fmparser parameters
     parameters = {
-        "input_path": input_path,
-        "output_path": output_path,
+        "input_path": host_input_path,
+        "output_path": host_output_path,
+        "report": report,
         "with_images": with_images,
-        "cross_image": cross_image
+        #"cross_image": cross_image
     }
 
     # calculate total file size
@@ -166,20 +182,11 @@ def generate_image_overview_data(
     )[:10]
     top_ten_files = []
     for file in top_ten_files_objects:
-        top_ten_files.append(FileEntry(file.file_name, file.file_extension, generate_file_report_path(output_path, image.image_name, file.file_extension, file.file_name)))
+        top_ten_files.append(FileEntry(file.file_name, file.file_extension, file.file_size, generate_file_report_path(output_path, image.image_name, file.file_extension, file.file_name)))
 
     # number of different extensions
     extensions = [file.file_extension for file in image.files if file.file_extension]
-    extension_counts = Counter(extensions)
-
-    # calculate extension distribution
-    total_files = sum(image.foremost_files_individual.values()) if image.foremost_files_individual else 0
-    if total_files > 0:
-        extension_distribution = {
-            ext: round((count / total_files) * 100)
-            for ext, count in image.foremost_files_individual.items()
-        }
-    else: extension_distribution = {}
+    extension_counts: dict[str, int] = dict(Counter(extensions))
 
     # duplicate groups data
     duplicate_groups = read_duplicate_groups_for_image(session, image.id)
@@ -195,7 +202,7 @@ def generate_image_overview_data(
                     duplicate_files = []
                     if group_image.files:
                         for file in group_image.files:
-                            duplicate_files.append(FileEntry(file.file_name, file.file_extension, generate_file_report_path(output_path, group_image.image_name, file.file_extension, file.file_name)))
+                            duplicate_files.append(FileEntry(file.file_name, file.file_extension, file.file_size, generate_file_report_path(output_path, group_image.image_name, file.file_extension, file.file_name)))
                             file_count += 1
                     duplicate_images.append(ImageEntry(group_image.image_name, duplicate_files))
             duplicate_groups_data.append(DuplicateGroupData(group.file_hash, file_count, duplicate_images))
@@ -204,21 +211,20 @@ def generate_image_overview_data(
         parser_start=parsing_start,
         parser_end=PARSING_END,
         parser_parameters=parameters,
+        foremost_invocation=image.foremost_invocation,
         foremost_start=image.foremost_scan_start.strftime("%Y-%m-%d %H:%M:%S") if image.foremost_scan_start else "",
         foremost_end=image.foremost_scan_end.strftime("%Y-%m-%d %H:%M:%S") if image.foremost_scan_end else "",
         foremost_version=image.foremost_version,
         exiftool_version=image.exiftool_version,
         hash_algorithm=hash_algorithm,
-        input_path=str(input_path) if input_path else "",
+        original_output_dir=str(image.original_output_dir) if image.original_output_dir else "",
         image_name=image.image_name,
         image_size=image.image_size,
-        image_creation_date=image.create_date.strftime("%Y-%m-%d %H:%M:%S") if image.create_date else "",
         total_number_files_parsed=len(image.files) if image.files else 0,
         total_number_files_foremost=image.foremost_files_total,
         total_size_files=total_file_size,
         number_extensions_parsed=len(extension_counts) if extension_counts else 0,
-        number_extensions_foremost=len(image.foremost_files_individual) if image.foremost_files_individual else 0,
-        extension_distribution=extension_distribution,
+        extension_distribution=extension_counts,
         top_ten_files=top_ten_files,
         number_duplicate_groups=len(image.duplicate_groups) if image.duplicate_groups else 0,
         duplicate_groups=duplicate_groups_data,
@@ -269,15 +275,17 @@ def generate_image_extensions_data(image_overview_data: ImageOverviewData, image
             if duplicate_group:
                 files = duplicate_group.members_files
                 for f in files:
+                    if file.id == f.id:
+                        continue
                     file_path = generate_file_report_path(output_path, f.image.image_name, ext, f.file_name)
-                    duplicate_files.append(FileEntry(f.file_name, f.file_extension, file_path))
+                    duplicate_files.append(FileEntry(f.file_name, f.file_extension, f.file_size, file_path))
 
             files_per_extension.append(
                 ImageFilesData(
                     file_name=file.file_name,
                     file_size=file.file_size,
                     file_extension=file.file_extension,
-                    file_path=file.file_path or "",
+                    file_path=str(file.file_path) if file.file_path else "",
                     file_report_path=generate_file_report_path(output_path, image.image_name, file.file_extension, file.file_name),
                     file_hash=file.file_hash,
                     file_hash_algorithm=image_overview_data.hash_algorithm,
@@ -295,9 +303,9 @@ def generate_image_extensions_data(image_overview_data: ImageOverviewData, image
         # create extensions data object
         image_extensions_data_list.append(
             ImageExtensionsData(
+                extension=ext,
                 number_files=number_files,
                 total_size_files=total_file_size,
-                percentage_extraction=percentage_extraction,
                 files=files_per_extension
             )
         )
@@ -306,7 +314,10 @@ def generate_image_extensions_data(image_overview_data: ImageOverviewData, image
 
 def generate_report_data(
         input_path: Path,
+        host_input_path: str,
         output_path: Path,
+        host_output_path: str,
+        report: str,
         with_images: bool,
         cross_image: bool,
         parsing_start: str,
@@ -320,7 +331,10 @@ def generate_report_data(
 
     Args:
         input_path (Path): Input image directory.
+        host_input_path (str): Path to host input Foremost directory.
         output_path (Path): Output report directory.
+        host_output_path (str): Output directory for the host output report directory.
+        report (str): Report type (HTML, JSON).
         with_images (bool): Include image previews if True.
         cross_image (bool): Enable cross-image duplicate detection if True.
         parsing_start (str): Timestamp when parsing started.
@@ -344,8 +358,21 @@ def generate_report_data(
 
         ######################## calculate and gather data #################
 
-        image_overview_data = generate_image_overview_data(input_path, output_path, with_images, cross_image, parsing_start, image, session)
+        image_overview_data = generate_image_overview_data(input_path, host_input_path, output_path, host_output_path, report, with_images, cross_image, parsing_start, image, session)
         image_extensions_data = generate_image_extensions_data(image_overview_data, image, output_path, session)
+
+        report_path = Path(os.path.join(output_path, image.image_name))
+
+        try:
+            report_enum = ReportFormat(report.lower())
+
+            if report_enum == ReportFormat.JSON:
+                print("Generating JSON report...")
+                generate_json_report(image_overview_data, image_extensions_data, report_path)
+            else:
+                print(f"Invalid report format: {report}", file=sys.stderr)
+        except ValueError:
+            print(f"Invalid report format: {report}.", file=sys.stderr)
 
     except Exception as e:
         print("Something went wrong while generating report data.", file=sys.stderr)

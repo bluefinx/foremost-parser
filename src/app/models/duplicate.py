@@ -55,7 +55,7 @@ class DuplicateGroup(Base):
 
     __tablename__ = 'table_duplicate_group'
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     file_hash = Column(String(64), unique=True, nullable=False)
 
     members = relationship("DuplicateMember", back_populates="group")
@@ -88,7 +88,6 @@ class DuplicateMember(Base):
 
     __tablename__ = 'table_duplicate_member'
 
-    id = Column(Integer, primary_key=True)
     group_id = Column(Integer, ForeignKey("table_duplicate_group.id", ondelete="CASCADE"), primary_key=True)
     file_id = Column(Integer, ForeignKey("table_file.id", ondelete="CASCADE"), primary_key=True, unique=True)
 

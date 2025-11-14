@@ -28,14 +28,14 @@ from pathlib import Path
 from datetime import datetime, timezone
 
 from app.db import create_database, connect_database
-from app.crud.image import delete_image, update_image_files_individual
-from app.crud.file import read_files_per_extension_for_image
+from app.crud.image import delete_image
 
 from app.parser.audit_file import parse_audit
 from app.parser.indv_files import parse_files
 from app.parser.duplicates import detect_duplicates
 from app.report.report_data import generate_report_data
 
+# abort when error
 def abort(error):
     """
     Logs errors and exceptions and aborts the program.
@@ -43,6 +43,7 @@ def abort(error):
     print(error, file=sys.stderr)
     sys.exit(1)
 
+# clean up data when aborting
 def cleanup(image_id: int, image_name: str, output_path: Path):
     """
     Deletes potential database entries and output directory for a failed image parsing.
@@ -84,6 +85,9 @@ def main():
     # TODO check if audit file numbers and actual parsing numbers can be different safely
     # TODO change file_path for image files to adapt to report structure -> make file_path and report_path relative
     # TODO update roadmap + wiki + generate docs
+    # TODO clean cleanup
+    # TODO mismatch extension + name -> statistics/overview
+    # TODO duplicates/unique files per extension/total, top 10 duplicate groups
 
     # starting foremost-parser
     PARSING_START = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
@@ -92,8 +96,11 @@ def main():
     # if there is no valid path, set default path
     load_dotenv()
 
-    INPUT_PATH = os.getenv('INPUT_PATH', '/data')
-    OUTPUT_PATH = os.getenv('OUTPUT_PATH', '/output')
+    INPUT_PATH = "/data"
+    HOST_INPUT_PATH = os.getenv('INPUT_PATH', 'UNKNOWN')
+    OUTPUT_PATH = "/output"
+    HOST_OUTPUT_PATH = os.getenv('OUTPUT_PATH', 'UNKNOWN')
+    REPORT = os.getenv('REPORT', 'html')
     IMAGES = os.getenv('IMAGES', 'false').lower() == 'true'
     CROSS_IMAGE = False
 
@@ -124,15 +131,12 @@ def main():
             if image_id > 0 and audit_table is not None:
                 print("Parsing files...")
                 if parse_files(INPUT_PATH, OUTPUT_PATH, image_id, audit_table, image_name, IMAGES):
-                    # per file extension, count the number of files for overview in report
-                    result = dict(read_files_per_extension_for_image(image_id, session))
-                    update_image_files_individual(image_id, result, session)
                     # search for duplicates and reference them
                     print("Starting duplicate detection...")
                     detect_duplicates(session,image_id, CROSS_IMAGE)
                     # generate the HTML report for this image
-                    print("Generating report...")
-                    generate_report_data(INPUT_PATH, OUTPUT_PATH, IMAGES, CROSS_IMAGE, PARSING_START, image_id)
+                    print("Generating report data...")
+                    generate_report_data(INPUT_PATH, HOST_INPUT_PATH, OUTPUT_PATH, HOST_OUTPUT_PATH, REPORT, IMAGES, CROSS_IMAGE, PARSING_START, image_id)
                 else:
                     # something went wrong while parsing files, so clean up and exit
                     cleanup(image_id, image_name, OUTPUT_PATH)

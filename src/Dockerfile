@@ -22,6 +22,7 @@ RUN adduser \
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libmagic1 \
     exiftool \
+    libarchive-zip-perl \
     && rm -rf /var/lib/apt/lists/*
 # install requirements
 COPY requirements.txt /app/requirements.txt
