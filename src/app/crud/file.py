@@ -226,3 +226,43 @@ def read_file_hashes(session: Session) -> List[FileHash]:
         print("Something went wrong while reading hashes.", file=sys.stderr)
         print(f"Detailed Value error: {e}", file=sys.stderr)
         return []
+
+# read all files with extension mismatch for image
+def read_files_with_extension_mismatch_for_image(image_id: int, session: Session) -> List[File]:
+    """
+    Retrieve all files with an extension mismatch for a given image.
+
+    This function queries the database for all File records associated with
+    the specified image ID where the file extension in the filename does not
+    match the actual file type as determined by ExifTool.
+
+    Args:
+        image_id (int): The ID of the image to retrieve files for.
+        session (Session): An active SQLAlchemy session. Must not be None.
+
+    Returns:
+        List[File]: A list of File objects with extension mismatches. Returns
+        an empty list if an error occurs or if no files are found.
+
+    Raises:
+        ValueError: If the session is None.
+        SQLAlchemyError: If a database error occurs during the query.
+    """
+    try:
+        if session is None:
+            raise ValueError("session cannot be None!")
+
+        files = session.query(File).filter(
+            File.image_id == image_id,
+            File.file_extension_mismatch.is_(True)
+        ).all()
+        return files #type: ignore
+
+    except SQLAlchemyError as e:
+        print("Something went wrong while reading files with extension mismatch.", file=sys.stderr)
+        print(f"Detailed DB error: {e}", file=sys.stderr)
+        return []
+    except ValueError as e:
+        print("Something went wrong while reading files with extension mismatch.", file=sys.stderr)
+        print(f"Detailed Value error: {e}", file=sys.stderr)
+        return []

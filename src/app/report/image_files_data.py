@@ -28,6 +28,7 @@ class ImageFilesData:
         file_name (str): Name of the file.
         file_size (int): Size of the file in bytes.
         file_extension (str): File extension (e.g., 'jpg', 'txt').
+        file_extension_mismatch (bool): Whether the file extension of Foremost and Exiftool match
         file_path (str): Absolute path for image files; can be empty for non-image files.
         file_report_path (str): Relative link to the file's HTML report page.
         file_hash (str): Hash value of the file.
@@ -46,6 +47,7 @@ class ImageFilesData:
         file_name: str,
         file_size: int,
         file_extension: str,
+        file_extension_mismatch: bool,
         file_path: str,                  # for image files
         file_report_path: str,           # link within HTML report
         file_hash: str,
@@ -62,6 +64,7 @@ class ImageFilesData:
         self.file_name = file_name
         self.file_size = file_size
         self.file_extension = file_extension
+        self.file_extension_mismatch = file_extension_mismatch
         self.file_path = file_path
         self.file_report_path = file_report_path
         self.file_hash = file_hash
@@ -91,6 +94,7 @@ class ImageFilesData:
             "file_name": self.file_name,
             "file_size": self.file_size,
             "file_extension": self.file_extension,
+            "file_extension_mismatch": self.file_extension_mismatch,
             "file_path": self.file_path,
             "file_report_path": self.file_report_path,
             "file_hash": self.file_hash,

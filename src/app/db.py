@@ -49,7 +49,7 @@ def create_database_url(db_password) -> URL:
     )
 
 #################################################
-# create database
+# create/delete database
 #################################################
 
 # connect to the database and create tables
@@ -65,31 +65,36 @@ def create_database() -> bool:
         bool: True if the database was successfully created and tables were initialised,
               False if the password was not found or the connection failed.
     """
-    # read the password from the password file
-    with open(os.getenv("POSTGRES_PASSWORD_FILE", PASSWORD_FILE_PATH)) as file:
-        DB_PASSWORD = file.read().strip()
-    # check if the password is existing
-    if DB_PASSWORD:
-        # connect to database and create tables if not already existing
+    try:
+        # read the password from the password file
+        with open(os.getenv("POSTGRES_PASSWORD_FILE", PASSWORD_FILE_PATH)) as file:
+            DB_PASSWORD = file.read().strip()
+        # check if the password is existing
+        if DB_PASSWORD:
+            # connect to database and create tables if not already existing
 
-        ## TODO maybe find a more elegant fix
-        # wait for database to be ready
-        # this is a dirty solution but via compose.yaml was not working
-        # without the database complaining about not finding a user or database
-        while True:
-            print("Waiting for database...")
-            try:
-                DATABASE_URL = create_database_url(DB_PASSWORD)
-                engine = create_engine(DATABASE_URL)
-                with engine.connect():
-                    Base.metadata.create_all(engine)
-                    print(f"Database created.")
-                    return True
-            except SQLAlchemyError as e:
-                print(f"Database connection failed: {e} ", file=sys.stderr)
-                time.sleep(3)
-    else:
-        print("Password for database not found - could not connect.", file=sys.stderr)
+            DATABASE_URL = create_database_url(DB_PASSWORD)
+
+            ## TODO maybe find a more elegant fix
+            # wait for database to be ready
+            # this is a dirty solution but via compose.yaml was not working
+            # without the database complaining about not finding a user or database
+            while True:
+                try:
+                    print("Waiting for database...")
+                    engine = create_engine(DATABASE_URL)
+                    with engine.connect():
+                        Base.metadata.create_all(engine)
+                        print(f"Database created.")
+                        return True
+                except SQLAlchemyError as e:
+                    print(f"Database connection failed: {e} ", file=sys.stderr)
+                    time.sleep(3)
+        else:
+            print("Password for database not found - could not connect.", file=sys.stderr)
+            return False
+    except Exception as e:
+        print(f"Database connection failed: {e} ", file=sys.stderr)
         return False
 
 #################################################
@@ -109,22 +114,22 @@ def connect_database() -> Optional[Session]:
         sqlalchemy.orm.session.Session | None: A SQLAlchemy session object if the connection
         was successful, or None if the password was missing or the connection failed.
     """
-    # read the password from the password file
-    with open(os.getenv("POSTGRES_PASSWORD_FILE", PASSWORD_FILE_PATH)) as file:
-        DB_PASSWORD = file.read().strip()
-    # check if the password is existing
-    if DB_PASSWORD:
-        # connect to database
-        try:
+    try:
+        # read the password from the password file
+        with open(os.getenv("POSTGRES_PASSWORD_FILE", PASSWORD_FILE_PATH)) as file:
+            DB_PASSWORD = file.read().strip()
+        # check if the password is existing
+        if DB_PASSWORD:
+            # connect to database
             DATABASE_URL = create_database_url(DB_PASSWORD)
             # create database connection
             engine = create_engine(DATABASE_URL)
-            Session = sessionmaker(bind=engine)
-            session = Session()
+            SessionLocal = sessionmaker(bind=engine)
+            session = SessionLocal()
             return session
-        except SQLAlchemyError as e:
-            print(f"Database connection failed: {e} ", file=sys.stderr)
+        else:
+            print("Password for database not found - could not connect.", file=sys.stderr)
             return None
-    else:
-        print("Password for database not found - could not connect.", file=sys.stderr)
+    except Exception as e:
+        print(f"Database connection failed: {e} ", file=sys.stderr)
         return None

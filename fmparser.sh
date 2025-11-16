@@ -18,23 +18,26 @@
 INPUT_PROVIDED=false
 OUTPUT_PROVIDED=false
 FLUSH=false
+STORE=false
 
 # show help for -h or --help
 help(){
-    echo "This tool reads in a foremost input directory, parses its content and metadata"
-    echo "and generates a report in the output directory."
+    echo "This tool reads in a foremost input directory, parses its content and metadata and generates a report in the output directory."
+    echo ""
+    echo "If --store option is not included, all data is deleted from the database afterwards."
     echo ""
     echo "NOTE: The foremost audit file must be named 'audit.txt'."
     echo ""
     echo "Usage: $0 [OPTIONS] -i <path_to_input> -o <path_to_output>"
     echo ""
     echo "Options:"
-    echo "  -h, --help          shows this help information"
-    echo "  -i, --input         the foremost input directory (absolute path)"
-    echo "  -o, --output        the report output directory (absolute path)"
-    echo "  -f, --flush         deletes the Docker persistent volumes and output directory contents before startup"
-    echo "  -r, --report        report format (supported formats: html, json) DEFAULT: html"
-    echo "  --with-images       includes image files in the report (supported formats: jpg, jpeg, png, gif, webp, svg)"
+    echo "  -h, --help            Show this help message and exit"
+    echo "  -i, --input           Foremost input directory (absolute path) [required]"
+    echo "  -o, --output          Report output directory (absolute path) [required]"
+    echo "  -f, --flush           Delete Docker persistent volumes and output directory contents before startup"
+    echo "  -r, --report          Report format (supported: json) [default: json]"
+    echo "  -s, --store           Store all parsed images in the database [default: false]"
+    echo "  --with-images         Include image files in the report (jpg, jpeg, png, gif, webp, svg) [default: false]"
     echo ""
 }
 
@@ -135,6 +138,10 @@ while [[ "$#" -gt 0 ]]; do
             validate_report_format $2
             shift 2
             ;;
+        -s|--store)
+            STORE=true
+            shift
+            ;;
         --with-images)
             echo "IMAGES=true" >> .env
             shift
@@ -153,15 +160,18 @@ if [ ! -f "$INPUT_PATH/audit.txt" ]; then
 fi
 
 # Flush only after parsing all paths
-if [ "$FLUSH" = true ]; then
+if [ "$FLUSH" = "true" ]; then
     flush_data
 fi
 
 # ask if .DS_Store files should be removed or kept
-echo "Do you want to remove .DS_Store files in the input folder? (y/n)"
+echo "Do you want to remove .DS_Store files in the input folder? (Y/n)"
 read -r REMOVE_DS_STORE
 
-if [ "$REMOVE_DS_STORE" == "y" ]; then
+# default is "y"
+REMOVE_DS_STORE=${REMOVE_DS_STORE:-y}
+
+if [ "${REMOVE_DS_STORE,,}" = "y" ]; then
     echo "Removing all .DS_Store files in $INPUT_PATH ..."
     find "$INPUT_PATH" -name ".DS_Store" -type f -delete
     echo ".DS_Store files removed."
@@ -181,9 +191,15 @@ if [ ! -f "./db/password.txt" ]; then
 fi
 
 # the tool needs at least an input and output path, so now look if present
-if [ "$INPUT_PROVIDED" == "true" ] && [ "$OUTPUT_PROVIDED" == "true" ]; then
+if [ "$INPUT_PROVIDED" = "true" ] && [ "$OUTPUT_PROVIDED" = "true" ]; then
     echo "Starting Docker now..."
     docker compose run --build --rm backend
+
+    if [ "$STORE" = "false" ]; then
+        echo "Deleting Docker volumes."
+        docker compose down -v
+        echo "Cleanup finished."
+    fi
 else 
     echo "Please include valid absolute paths to the input and the output folders."
     exit 1

@@ -58,19 +58,19 @@ class DuplicateGroup(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     file_hash = Column(String(64), unique=True, nullable=False)
 
-    members = relationship("DuplicateMember", back_populates="group")
+    members = relationship("DuplicateMember", back_populates="group") # List[DuplicateMember]
     members_files = relationship(
         "File",
         secondary="table_duplicate_member",
         back_populates="duplicate_groups",
         viewonly=True
-    )
+    ) # List[File]
 
     images = relationship(
         "Image",
         secondary=duplicate_group_image_association,
         back_populates="duplicate_groups"
-    )
+    ) # List[Image]
 
 # database table duplicate member
 class DuplicateMember(Base):

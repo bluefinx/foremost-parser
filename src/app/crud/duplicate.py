@@ -155,7 +155,7 @@ def insert_duplicate_member(file_hash: str, image_id: int, file_id: int, session
 ########################################################################
 
 # read all duplicate groups
-def read_duplicate_groups(session: Session) -> list[DuplicateGroup]:
+def read_duplicate_groups(session: Session) -> List[DuplicateGroup]:
     """
     Retrieves all DuplicateGroups from the database.
 
@@ -223,7 +223,7 @@ def read_duplicate_group_for_image_and_hash(session: Session, file_hash: str, im
         return None
 
 # read duplicate groups for image
-def read_duplicate_groups_for_image(session: Session, image_id: int) -> Optional[List[DuplicateGroup]]:
+def read_duplicate_groups_for_image(session: Session, image_id: int) -> List[DuplicateGroup]:
     """
     Retrieves the DuplicateGroups for a specific image.
 
@@ -253,11 +253,11 @@ def read_duplicate_groups_for_image(session: Session, image_id: int) -> Optional
     except SQLAlchemyError as e:
         print("Something went wrong while reading duplicate group for image.", file=sys.stderr)
         print(f"Detailed DB error: {e}", file=sys.stderr)
-        return None
+        return []
     except ValueError as e:
         print("Something went wrong while reading duplicate group for image.", file=sys.stderr)
         print(f"Detailed Value error: {e}", file=sys.stderr)
-        return None
+        return []
 
 # is there already a duplicate group for this hash that is connected to this image
 def check_duplicate_group_for_image(session: Session, image_id: int, file_hash: str) -> tuple[bool, bool]:

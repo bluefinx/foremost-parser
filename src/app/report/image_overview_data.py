@@ -13,6 +13,7 @@ License: GNU General Public License v3.0
 from typing import List, Dict, Union
 from dataclasses import dataclass
 
+# File representation with specific file information
 @dataclass
 class FileEntry:
     """
@@ -21,6 +22,7 @@ class FileEntry:
     Attributes:
         file_name (str): The name of the file.
         file_extension (str): The file extension (e.g., 'jpg', 'txt').
+        file_size (int): The size of the file.
         report_path (str): The report path for the file (detail page).
     """
     file_name: str
@@ -28,7 +30,7 @@ class FileEntry:
     file_size: int
     report_path: str
 
-    def to_dict(self):
+    def to_dict(self) -> Dict[str, Union[str, int, List[Dict]]]:
         """
         Convert the FileEntry object into a JSON-serializable dict.
 
@@ -42,6 +44,7 @@ class FileEntry:
             "report_path": self.report_path
         }
 
+# Image representation with connected FileEntries
 @dataclass
 class ImageEntry:
     """
@@ -54,7 +57,7 @@ class ImageEntry:
     image_name: str
     image_files: List[FileEntry]
 
-    def to_dict(self):
+    def to_dict(self) -> Dict[str, Union[str, int, List[Dict]]]:
         """
         Convert the ImageEntry object into a JSON-serializable dict.
 
@@ -66,6 +69,7 @@ class ImageEntry:
             "image_files": [f.to_dict() for f in self.image_files]
         }
 
+# Duplicate Group representation with connected ImageEntries
 @dataclass
 class DuplicateGroupData:
     """
@@ -80,7 +84,7 @@ class DuplicateGroupData:
     file_count: int
     linked_images: List[ImageEntry]
 
-    def to_dict(self):
+    def to_dict(self) -> Dict[str, Union[str, int, List[Dict]]]:
         """
         Convert the duplicate group into a JSON-serializable dict.
 
@@ -93,6 +97,40 @@ class DuplicateGroupData:
             "linked_images": [img.to_dict() for img in self.linked_images]
         }
 
+# Extension representation with information for each extension
+@dataclass
+class ExtensionEntry:
+    """
+    Represents aggregated statistics for a specific file extension.
+
+    Attributes:
+        extension (str): The file extension (e.g., 'jpg', 'dll').
+        number_files (int): Total number of files with this extension.
+        number_duplicate_groups (int): Number of duplicate groups that contain files with this extension.
+        number_duplicate_files (int): Total number of files that are members of duplicate groups for this extension.
+    """
+    extension: str
+    number_files: int
+    number_duplicate_groups: int
+    number_duplicate_files: int
+
+    def to_dict(self) -> Dict[str, Union[str, int, List[Dict]]]:
+        """
+        Convert the ExtensionEntry instance into a dictionary.
+
+        Returns:
+            dict: A dictionary representation of the ExtensionEntry, with keys
+                  'extension', 'number_files', 'number_duplicate_groups', and
+                  'number_duplicate_files'.
+        """
+        return {
+            "extension": self.extension,
+            "number_files": self.number_files,
+            "number_duplicate_groups": self.number_duplicate_groups,
+            "number_duplicate_files": self.number_duplicate_files,
+        }
+
+# Overview report page data
 class ImageOverviewData:
     """
     Aggregated overview data for a forensic image analysis report.
@@ -116,10 +154,13 @@ class ImageOverviewData:
         total_number_files_foremost (int): Total number of files found by Foremost.
         total_size_files (int): Total size of all parsed files in bytes.
         number_extensions_parsed (int): Number of unique file extensions parsed.
-        extension_distribution (Dict[str, int]): Mapping of file extensions to file counts.
+        extension_distribution (Dict[str, ExtensionEntry]): Mapping of file extensions to file counts.
         top_ten_files (List[FileEntry]): List of the top 10 largest files.
+        files_extension_mismatch_count (int): Number of files with mismatched file extensions.
+        files_extension_mismatch (List[FileEntry]): List of files with mismatched file extensions.
         number_duplicate_groups (int): Total number of duplicate groups detected.
-        duplicate_groups (List[DuplicateGroupData]): List of duplicate groups with linked images and files.
+        number_duplicate_files (int): Total number of duplicate files detected.
+        top_ten_duplicate_groups (List[DuplicateGroupData]): List of top ten duplicate groups with linked images and files.
         logs (List[str]): List of error or warning messages encountered during processing.
     """
     def __init__(
@@ -138,12 +179,16 @@ class ImageOverviewData:
         image_size: int,
         total_number_files_parsed: int,
         total_number_files_foremost: int,
+        foremost_parsed_extra: dict,
         total_size_files: int,
         number_extensions_parsed: int,
-        extension_distribution: Dict[str, int],
+        extension_distribution: Dict[str, ExtensionEntry],
         top_ten_files: List[FileEntry],
+        files_extension_mismatch_count: int,
+        files_extension_mismatch: List[FileEntry],
         number_duplicate_groups: int,
-        duplicate_groups: List[DuplicateGroupData],
+        number_duplicate_files: int,
+        top_ten_duplicate_groups: List[DuplicateGroupData],
         logs: List[str]
     ):
         self.parser_start = parser_start
@@ -160,12 +205,16 @@ class ImageOverviewData:
         self.image_size = image_size
         self.total_number_files_parsed = total_number_files_parsed
         self.total_number_files_foremost = total_number_files_foremost
+        self.foremost_parsed_extra = foremost_parsed_extra
         self.total_size_files = total_size_files
         self.number_extensions_parsed = number_extensions_parsed
         self.extension_distribution = extension_distribution
         self.top_ten_files = top_ten_files
+        self.files_extension_mismatch_count = files_extension_mismatch_count
+        self.files_extension_mismatch = files_extension_mismatch
         self.number_duplicate_groups = number_duplicate_groups
-        self.duplicate_groups = duplicate_groups
+        self.number_duplicate_files = number_duplicate_files
+        self.top_ten_duplicate_groups = top_ten_duplicate_groups
         self.logs = logs
 
     def to_dict(self):
@@ -191,15 +240,23 @@ class ImageOverviewData:
             "image_size": self.image_size,
             "total_number_files_parsed": self.total_number_files_parsed,
             "total_number_files_foremost": self.total_number_files_foremost,
+            "foremost_parsed_extra": self.foremost_parsed_extra,
             "total_size_files": self.total_size_files,
             "number_extensions_parsed": self.number_extensions_parsed,
-            "extension_distribution": self.extension_distribution,
+            "extension_distribution": [
+                entry.to_dict() for entry in self.extension_distribution.values()
+            ] if self.extension_distribution else [],
             "top_ten_files": [
                 f.to_dict() for f in self.top_ten_files
             ] if self.top_ten_files else [],
-            "number_duplicate_groups": self.number_duplicate_groups,
-            "duplicate_groups": [
-                g.to_dict() for g in self.duplicate_groups
-            ] if self.duplicate_groups else [],
+            "files_extension_mismatch_count": self.files_extension_mismatch_count,
+            "files_extension_mismatch": [
+                f.to_dict() for f in self.files_extension_mismatch
+            ] if self.files_extension_mismatch else [],
+            "number_duplicate_hashes": self.number_duplicate_groups,
+            "number_duplicate_files": self.number_duplicate_files,
+            "top_ten_duplicate_groups": [
+                g.to_dict() for g in self.top_ten_duplicate_groups
+            ] if self.top_ten_duplicate_groups else [],
             "logs": self.logs,
         }

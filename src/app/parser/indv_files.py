@@ -43,6 +43,7 @@ import sys
 import exiftool
 
 from pathlib import Path
+from typing import Tuple, List
 from exiftool.exceptions import ExifToolExecuteError
 
 from app.db import connect_database
@@ -67,12 +68,22 @@ filename = "audit.txt"
 # run exiftool in batches to be able to isolate faulty files
 batch_size = 500
 
+# catch unnecessary extension mismatches
+EXT_ALIASES = {
+    "jpg": ["jpg", "jpeg"],
+    "jpeg": ["jpg", "jpeg"],
+    "tif": ["tif", "tiff"],
+    "tiff": ["tif", "tiff"],
+    "htm": ["htm", "html"],
+    "html": ["htm", "html"]
+}
+
 #################################################
 # parse files
 #################################################
 
 # run exiftool on the files to extract the metadata
-def extract_exiftool_data(files: list[Path], file_paths: list[str], is_python: set) -> tuple[dict, set]:
+def extract_exiftool_data(files: list[Path], file_paths: list[str], is_python: set) -> Tuple[dict, set]:
     """
     Extracts metadata from a list of files using ExifTool in batches, with a Python fallback for problematic files.
 
@@ -143,7 +154,7 @@ def extract_exiftool_data(files: list[Path], file_paths: list[str], is_python: s
     return subdir_files, is_python
 
 # create the file objects to store in the database
-def create_database_objects(subdir_files: dict, image_id: int, audit_table: dict, is_python: set) -> list[File]:
+def create_database_objects(subdir_files: dict, image_id: int, audit_table: dict, is_python: set) -> Tuple[List[File], dict]:
     """
     Creates SQLAlchemy File objects from extracted metadata to store in the database.
 
@@ -156,7 +167,9 @@ def create_database_objects(subdir_files: dict, image_id: int, audit_table: dict
         is_python (set): Set of filenames for which metadata was extracted via Python fallback.
 
     Returns:
-        list[File]: List of File ORM objects ready to be inserted into the database.
+        tuple:
+            list[File]: List of File ORM objects ready to be inserted into the database.
+            dict: the audit_table dict after all parsed files were dropped.
 
     Notes:
         - Marks `is_exiftool` False for files that used Python fallback, True otherwise.
@@ -175,10 +188,18 @@ def create_database_objects(subdir_files: dict, image_id: int, audit_table: dict
         file.file_mime = value.get('File:MIMEType')
         file.file_size = value.get('File:FileSize')
 
-        audit_info = audit_table.get(file.file_name, {})
+        # check whether the file extension in the name and that by Exiftool match
+        name_ext = Path(file.file_name).suffix.lower().lstrip(".")
+        exif_ext = (file.file_extension or "").lower().lstrip(".")
+        valid_extensions = EXT_ALIASES.get(exif_ext, [exif_ext])
+        file.file_extension_mismatch = name_ext not in valid_extensions
+
+        # extract audit table info
+        audit_info = audit_table.pop(file.file_name, {})
         file.file_offset = audit_info.get('File Offset')
         file.foremost_comment = audit_info.get('Comment')
 
+        # extracted with Exiftool or Python
         if file.file_name in is_python:
             file.is_exiftool = False
         else:
@@ -205,7 +226,7 @@ def create_database_objects(subdir_files: dict, image_id: int, audit_table: dict
             file.more_metadata.pop(pop, None)
 
         files.append(file)
-    return files
+    return files, audit_table
 
 # create the hash and store the file in the Docker volume
 def hash_and_store(subdir: Path, files: list[File], image_name: str, output_path: Path, copy_images: bool):
@@ -272,7 +293,7 @@ def hash_and_store(subdir: Path, files: list[File], image_name: str, output_path
 # if exiftool raises exception, there is no metadata for any file
 # so running it on all files at once is not safe
 # but running it for every file individually takes ages
-def parse_files(input_path: Path, output_path: Path, image_id: int, audit_table: dict, image_name: str, copy_images: bool) -> bool:
+def parse_files(input_path: Path, output_path: Path, image_id: int, audit_table: dict, image_name: str, copy_images: bool) -> Tuple[bool, dict]:
     """
     Processes files in the Foremost output directory to extract metadata, create database objects,
     compute hashes and copy image files to the output directory.
@@ -294,7 +315,9 @@ def parse_files(input_path: Path, output_path: Path, image_id: int, audit_table:
         copy_images (bool): Whether or not to copy image files into subdirectory under `output_path`.
 
     Returns:
-        bool: True if all files were processed successfully, False if an exception occurred.
+        tuple:
+            bool: True if all files were processed successfully, False if an exception occurred.
+            dict: the audit_table dict after all parsed files were dropped or {}.
 
     Notes:
         - Uses `extract_exiftool_data()`, `create_database_objects()`, `hash_and_store()` and `insert_files()`.
@@ -306,7 +329,7 @@ def parse_files(input_path: Path, output_path: Path, image_id: int, audit_table:
     # while the app is actively parsing through them
     # does not help much but at least it's crashing nicely
     try:
-        # TODO find non-extracted files
+        audit_table: dict = {}
         for subdir in sorted(input_path.rglob('*')):
             if subdir.is_dir():
 
@@ -323,7 +346,7 @@ def parse_files(input_path: Path, output_path: Path, image_id: int, audit_table:
                 subdir_files, is_python = extract_exiftool_data(files, file_paths, is_python)
 
                 # create file objects for database
-                file_objects = create_database_objects(subdir_files, image_id, audit_table, is_python)
+                file_objects, audit_table = create_database_objects(subdir_files, image_id, audit_table, is_python)
 
                 # create the hashes and write the files to the persistent volume
                 hash_and_store(subdir, file_objects, image_name, output_path, copy_images)
@@ -338,7 +361,7 @@ def parse_files(input_path: Path, output_path: Path, image_id: int, audit_table:
                     # stop now, image is corrupt
                     raise Exception("Something went wrong while inserting files")
 
-        return True
+        return True, audit_table
     except Exception as e:
         print(f"Something went wrong while parsing files: {e}", file=sys.stderr)
-        return False
+        return False, {}

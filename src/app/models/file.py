@@ -34,6 +34,8 @@ class File(Base):
         file_name (str): Name of the file.
         file_type (str | None): Type of the file.
         file_extension (str | None): File extension.
+        file_extension_mismatch (bool | None): Whether the file extension found by Foremost
+            and that by Exiftool are the same.
         file_mime (str | None): MIME type.
         file_size (int | None): Size of the file in bytes.
         file_offset (int | None): Offset within the source image.
@@ -59,6 +61,7 @@ class File(Base):
     file_name = Column(String(255), nullable=False)
     file_type = Column(String(255))
     file_extension = Column(String(10))
+    file_extension_mismatch = Column(Boolean, default=False)
     file_mime = Column(String(50))
     file_size = Column(BigInteger)
     file_offset = Column(BigInteger)
