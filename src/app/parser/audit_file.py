@@ -14,12 +14,6 @@ This module handles:
 Requirements:
 - The audit file must exist and be named exactly `audit.txt`.
 
-Functions:
-    get_exiftool_version(file): Reads ExifTool version metadata.
-    parse_individual_lines(file, image, audit_table): Extracts line-based metadata.
-    parse_audit_table(line, audit_table): Parses audit table rows.
-    parse_audit(input_path): Entry point to parse the audit file and store results.
-
 Author: bluefinx
 Copyright (c) 2025 bluefinx
 License: GNU General Public License v3.0

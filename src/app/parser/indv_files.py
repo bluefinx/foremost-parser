@@ -13,27 +13,10 @@ Main features:
 - Handles batch processing and per-file fallback for reliability.
 - Supports database insertion of File objects while gracefully handling exceptions.
 
-Key functions:
-- `extract_exiftool_data(files, file_paths, is_python)`:
-    Extracts metadata from a list of files using ExifTool in batches, with Python fallback.
-
-- `create_database_objects(subdir_files, image_id, audit_table, is_python)`:
-    Creates SQLAlchemy File objects from metadata and audit table information.
-
-- `hash_and_store(subdir, files, image_name, output_path)`:
-    Computes SHA-256 hashes and optionally copies image files to output directory organised by extension.
-
-- `parse_files(input_path, output_path, image_id, audit_table, image_name)`:
-    Iterates through all subdirectories of a Foremost output folder, extracts metadata,
-    creates File objects, computes hashes, copies image files, and stores data in the database.
-
 Notes:
 - Only files with extensions jpg, jpeg, png, gif, webp and svg are copied to the output directory and only if the CLI parameter is set.
 - Files are read in 4096-byte chunks for memory-efficient hashing and copying.
-- Tracks files that required Python-based metadata extraction.
 - Relies on helper modules: `magic` and `exiftool`.
-- Designed to handle large directories with many files while minimising the risk of crashes
-  due to problematic files or ExifTool failures.
 """
 
 import os
@@ -85,7 +68,8 @@ EXT_ALIASES = {
 # run exiftool on the files to extract the metadata
 def extract_exiftool_data(files: list[Path], file_paths: list[str], is_python: set) -> Tuple[dict, set]:
     """
-    Extracts metadata from a list of files using ExifTool in batches, with a Python fallback for problematic files.
+    Extracts metadata from a list of files using ExifTool in batches, with a Python fallback
+    for problematic files.
 
     This function processes files in batches (default 500) to efficiently extract metadata. If a batch fails,
     it retries each file individually with ExifTool. If a single file still fails, it extracts basic metadata
@@ -97,15 +81,10 @@ def extract_exiftool_data(files: list[Path], file_paths: list[str], is_python: s
         is_python (set): Set to store filenames for which Python fallback was used.
 
     Returns:
-        tuple:
-            dict: Dictionary mapping each filename to a metadata dictionary. Each metadata dictionary may
-                  include keys like 'File:FileName', 'File:FileTypeExtension', 'File:FileType',
-                  'File:MIMEType', and 'File:FileSize'.
+        tuple[dict, set]:
+            dict: Mapping each filename to a metadata dictionary. Each dictionary may include keys like
+                  'File:FileName', 'File:FileTypeExtension', 'File:FileType', 'File:MIMEType', 'File:FileSize'.
             set: Updated `is_python` set with filenames that required Python fallback.
-
-    Notes:
-        - Relies on `exiftool.ExifToolHelper` and `magic.Magic`.
-        - Handles batch and individual ExifTool failures gracefully.
     """
 
     # store the files of this subdir in a dict with "name":{subdict}
@@ -158,6 +137,9 @@ def create_database_objects(subdir_files: dict, image_id: int, audit_table: dict
     """
     Creates SQLAlchemy File objects from extracted metadata to store in the database.
 
+    This function marks `is_exiftool` False for files that used Python fallback, True otherwise,
+    and strips metadata keys from `more_metadata` that are already stored in dedicated columns to avoid redundancy.
+
     Args:
         subdir_files (dict): Dictionary mapping filenames to metadata dictionaries
                              (as returned by `extract_exiftool_data`).
@@ -167,14 +149,9 @@ def create_database_objects(subdir_files: dict, image_id: int, audit_table: dict
         is_python (set): Set of filenames for which metadata was extracted via Python fallback.
 
     Returns:
-        tuple:
-            list[File]: List of File ORM objects ready to be inserted into the database.
-            dict: the audit_table dict after all parsed files were dropped.
-
-    Notes:
-        - Marks `is_exiftool` False for files that used Python fallback, True otherwise.
-        - Strips metadata keys from `more_metadata` that are already stored in dedicated columns
-          to avoid redundancy.
+        tuple[list, dict]:
+            list: List of File ORM objects ready to be inserted into the database.
+            dict: The audit_table dict after all parsed files were dropped.
     """
     # create list of file objects
     files = []
@@ -245,11 +222,6 @@ def hash_and_store(subdir: Path, files: list[File], image_name: str, output_path
         image_name (str): Name of the image, used to create the output subdirectory.
         output_path (Path): Base path where image files will be copied.
         copy_images (bool): Whether or not to copy image files into subdirectory under `output_path`.
-
-    Notes:
-        - Only files with extensions jpg, jpeg, png, gif, webp, svg are copied.
-        - Reads files in 4096-byte chunks to handle large files efficiently.
-        - Updates each File object with `file_hash` and `file_path`.
     """
     # use 4096 byte chunks to read in file
     buffer = 4096
@@ -318,12 +290,6 @@ def parse_files(input_path: Path, output_path: Path, image_id: int, audit_table:
         tuple:
             bool: True if all files were processed successfully, False if an exception occurred.
             dict: the audit_table dict after all parsed files were dropped or {}.
-
-    Notes:
-        - Uses `extract_exiftool_data()`, `create_database_objects()`, `hash_and_store()` and `insert_files()`.
-        - If any database operation fails, the function raises an exception internally and returns False.
-        - Files are read in 4096-byte chunks for efficient hashing.
-        - The `is_python` set tracks files where Python fallback was used instead of ExifTool.
     """
     # adding this in case someone else also tries to remove some files
     # while the app is actively parsing through them
