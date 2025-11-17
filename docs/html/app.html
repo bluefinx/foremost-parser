@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Package app/ &#8212; Foremost Parser v1.0.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=27fed22d" />
+    <script src="_static/documentation_options.js?v=76e2d817"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Package app.crud" href="app.crud.html" />
+    <link rel="prev" title="Foremost Parser documentation" href="index.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="package-app">
+<h1>Package app/<a class="headerlink" href="#package-app" title="Link to this heading">¶</a></h1>
+<section id="module-app.main">
+<span id="app-main"></span><h2>app.main<a class="headerlink" href="#module-app.main" title="Link to this heading">¶</a></h2>
+<p>main.py</p>
+<p>Entry point for Foremost-Parser.</p>
+<p>This tool parses Foremost output folders and generates a detailed report.</p>
+<dl class="simple">
+<dt>Features:</dt><dd><ul class="simple">
+<li><p>Loads and verifies environment variables</p></li>
+<li><p>Creates or connects to the database</p></li>
+<li><p>Parses the Foremost audit file</p></li>
+<li><p>Parses individual recovered files</p></li>
+<li><p>Detects duplicates</p></li>
+<li><p>Generates a comprehensive report</p></li>
+</ul>
+</dd>
+</dl>
+<p>Author: bluefinx
+Copyright (c) 2025 bluefinx
+License: GNU General Public License v3.0
+Version: 1.0.0</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="app.main.abort">
+<span class="sig-prename descclassname"><span class="pre">app.main.</span></span><span class="sig-name descname"><span class="pre">abort</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">error</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.main.abort" title="Link to this definition">¶</a></dt>
+<dd><p>Logs errors and exceptions and aborts the program.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>error</strong> (<em>str</em>) – Exception raised if an error occurred.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.main.cleanup">
+<span class="sig-prename descclassname"><span class="pre">app.main.</span></span><span class="sig-name descname"><span class="pre">cleanup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.main.cleanup" title="Link to this definition">¶</a></dt>
+<dd><p>Deletes potential database entries and output directory for a failed image parsing.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>image_id</strong> (<em>int</em>) – ID of the Image record in the database (if created).</p></li>
+<li><p><strong>image_name</strong> (<em>str</em>) – Name of the image, used to locate the output folder.</p></li>
+<li><p><strong>output_path</strong> (<em>Path</em>) – Base path where image output folders are stored.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.main.main">
+<span class="sig-prename descclassname"><span class="pre">app.main.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#app.main.main" title="Link to this definition">¶</a></dt>
+<dd><p>Main entry function for Foremost-Parser.</p>
+<p>Loads environment variables, connects to the database,
+parses the Foremost output (audit and files),
+checks for duplicates and generates the final report.</p>
+</dd></dl>
+
+</section>
+<section id="module-app.db">
+<span id="app-db"></span><h2>app.db<a class="headerlink" href="#module-app.db" title="Link to this heading">¶</a></h2>
+<p>db.py</p>
+<p>Handles database initialisation and connections for Foremost-Parser.</p>
+<dl class="simple">
+<dt>Functions:</dt><dd><p>create_database_url(): Create the database URL for connection.
+create_database(): Creates the database if it does not exist.
+connect_database(): Connects to the database and returns a session object.</p>
+</dd>
+</dl>
+<p>Author: bluefinx
+Copyright (c) 2025 bluefinx
+License: GNU General Public License v3.0</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="app.db.connect_database">
+<span class="sig-prename descclassname"><span class="pre">app.db.</span></span><span class="sig-name descname"><span class="pre">connect_database</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#app.db.connect_database" title="Link to this definition">¶</a></dt>
+<dd><p>Establishes a connection to the PostgreSQL database and returns a session.</p>
+<p>Reads the database password from the password file specified in the
+environment variable POSTGRES_PASSWORD_FILE or the default PASSWORD_FILE_PATH.
+If the password is found, attempts to connect to the database and create a session.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A SQLAlchemy session object if the connection
+was successful or None if the password was missing or the connection failed.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>sqlalchemy.orm.session.Session | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.db.create_database">
+<span class="sig-prename descclassname"><span class="pre">app.db.</span></span><span class="sig-name descname"><span class="pre">create_database</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#app.db.create_database" title="Link to this definition">¶</a></dt>
+<dd><p>Connects to the PostgreSQL database and creates the required tables.</p>
+<p>Reads the database password from the password file specified in the
+environment variable POSTGRES_PASSWORD_FILE or the default PASSWORD_FILE_PATH.
+Attempts to connect repeatedly until the database is ready, then creates all tables.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><dl class="simple">
+<dt>True if the database was successfully created and tables were initialised,</dt><dd><p>False if the password was not found or the connection failed.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.db.create_database_url">
+<span class="sig-prename descclassname"><span class="pre">app.db.</span></span><span class="sig-name descname"><span class="pre">create_database_url</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db_password</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.db.create_database_url" title="Link to this definition">¶</a></dt>
+<dd><p>Creates a SQLAlchemy database URL for connecting to the PostgreSQL database.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>db_password</strong> (<em>str</em>) – The database password.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Configured SQLAlchemy URL object for the database.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>sqlalchemy.engine.URL</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="subdirectories">
+<h2>Subdirectories<a class="headerlink" href="#subdirectories" title="Link to this heading">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="app.crud.html">Package app.crud</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="app.crud.html#module-app.crud.duplicate">app.crud.duplicate</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="app.crud.html#app.crud.duplicate.check_duplicate_group_for_image"><code class="docutils literal notranslate"><span class="pre">check_duplicate_group_for_image()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.crud.html#app.crud.duplicate.insert_duplicate_group"><code class="docutils literal notranslate"><span class="pre">insert_duplicate_group()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.crud.html#app.crud.duplicate.insert_duplicate_member"><code class="docutils literal notranslate"><span class="pre">insert_duplicate_member()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.crud.html#app.crud.duplicate.link_duplicate_group_to_image"><code class="docutils literal notranslate"><span class="pre">link_duplicate_group_to_image()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.crud.html#app.crud.duplicate.read_duplicate_group_by_file_id"><code class="docutils literal notranslate"><span class="pre">read_duplicate_group_by_file_id()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.crud.html#app.crud.duplicate.read_duplicate_group_for_image_and_hash"><code class="docutils literal notranslate"><span class="pre">read_duplicate_group_for_image_and_hash()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.crud.html#app.crud.duplicate.read_duplicate_groups"><code class="docutils literal notranslate"><span class="pre">read_duplicate_groups()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.crud.html#app.crud.duplicate.read_duplicate_groups_for_image"><code class="docutils literal notranslate"><span class="pre">read_duplicate_groups_for_image()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="app.crud.html#module-app.crud.file">app.crud.file</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="app.crud.html#app.crud.file.insert_file"><code class="docutils literal notranslate"><span class="pre">insert_file()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.crud.html#app.crud.file.insert_files"><code class="docutils literal notranslate"><span class="pre">insert_files()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.crud.html#app.crud.file.read_file_hashes"><code class="docutils literal notranslate"><span class="pre">read_file_hashes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.crud.html#app.crud.file.read_file_hashes_for_image"><code class="docutils literal notranslate"><span class="pre">read_file_hashes_for_image()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.crud.html#app.crud.file.read_files_for_image"><code class="docutils literal notranslate"><span class="pre">read_files_for_image()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.crud.html#app.crud.file.read_files_with_extension_mismatch_for_image"><code class="docutils literal notranslate"><span class="pre">read_files_with_extension_mismatch_for_image()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.crud.html#app.crud.file.read_files_with_hash"><code class="docutils literal notranslate"><span class="pre">read_files_with_hash()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="app.crud.html#module-app.crud.image">app.crud.image</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="app.crud.html#app.crud.image.delete_image"><code class="docutils literal notranslate"><span class="pre">delete_image()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.crud.html#app.crud.image.insert_image"><code class="docutils literal notranslate"><span class="pre">insert_image()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.crud.html#app.crud.image.read_image"><code class="docutils literal notranslate"><span class="pre">read_image()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.crud.html#app.crud.image.read_images"><code class="docutils literal notranslate"><span class="pre">read_images()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="app.models.html">Package app.models</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="app.models.html#module-app.models.base">app.models.base</a></li>
+<li class="toctree-l2"><a class="reference internal" href="app.models.html#module-app.models.duplicate">app.models.duplicate</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="app.models.html#app.models.duplicate.DuplicateGroup"><code class="docutils literal notranslate"><span class="pre">DuplicateGroup</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.duplicate.DuplicateGroup.id"><code class="docutils literal notranslate"><span class="pre">DuplicateGroup.id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.duplicate.DuplicateGroup.file_hash"><code class="docutils literal notranslate"><span class="pre">DuplicateGroup.file_hash</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.duplicate.DuplicateGroup.members"><code class="docutils literal notranslate"><span class="pre">DuplicateGroup.members</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.duplicate.DuplicateGroup.members_files"><code class="docutils literal notranslate"><span class="pre">DuplicateGroup.members_files</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.duplicate.DuplicateGroup.images"><code class="docutils literal notranslate"><span class="pre">DuplicateGroup.images</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#id0"><code class="docutils literal notranslate"><span class="pre">DuplicateGroup.file_hash</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#id1"><code class="docutils literal notranslate"><span class="pre">DuplicateGroup.id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#id2"><code class="docutils literal notranslate"><span class="pre">DuplicateGroup.images</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#id3"><code class="docutils literal notranslate"><span class="pre">DuplicateGroup.members</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#id4"><code class="docutils literal notranslate"><span class="pre">DuplicateGroup.members_files</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="app.models.html#app.models.duplicate.DuplicateMember"><code class="docutils literal notranslate"><span class="pre">DuplicateMember</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.duplicate.DuplicateMember.group_id"><code class="docutils literal notranslate"><span class="pre">DuplicateMember.group_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.duplicate.DuplicateMember.file_id"><code class="docutils literal notranslate"><span class="pre">DuplicateMember.file_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.duplicate.DuplicateMember.group"><code class="docutils literal notranslate"><span class="pre">DuplicateMember.group</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.duplicate.DuplicateMember.file"><code class="docutils literal notranslate"><span class="pre">DuplicateMember.file</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#id5"><code class="docutils literal notranslate"><span class="pre">DuplicateMember.file</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#id6"><code class="docutils literal notranslate"><span class="pre">DuplicateMember.file_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#id7"><code class="docutils literal notranslate"><span class="pre">DuplicateMember.group</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#id8"><code class="docutils literal notranslate"><span class="pre">DuplicateMember.group_id</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="app.models.html#module-app.models.file">app.models.file</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="app.models.html#app.models.file.File"><code class="docutils literal notranslate"><span class="pre">File</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.file.File.id"><code class="docutils literal notranslate"><span class="pre">File.id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.file.File.image_id"><code class="docutils literal notranslate"><span class="pre">File.image_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.file.File.file_name"><code class="docutils literal notranslate"><span class="pre">File.file_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.file.File.file_type"><code class="docutils literal notranslate"><span class="pre">File.file_type</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.file.File.file_extension"><code class="docutils literal notranslate"><span class="pre">File.file_extension</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.file.File.file_extension_mismatch"><code class="docutils literal notranslate"><span class="pre">File.file_extension_mismatch</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.file.File.file_mime"><code class="docutils literal notranslate"><span class="pre">File.file_mime</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.file.File.file_size"><code class="docutils literal notranslate"><span class="pre">File.file_size</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.file.File.file_offset"><code class="docutils literal notranslate"><span class="pre">File.file_offset</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.file.File.file_path"><code class="docutils literal notranslate"><span class="pre">File.file_path</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.file.File.file_hash"><code class="docutils literal notranslate"><span class="pre">File.file_hash</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.file.File.is_exiftool"><code class="docutils literal notranslate"><span class="pre">File.is_exiftool</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.file.File.is_duplicate"><code class="docutils literal notranslate"><span class="pre">File.is_duplicate</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.file.File.foremost_comment"><code class="docutils literal notranslate"><span class="pre">File.foremost_comment</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.file.File.more_metadata"><code class="docutils literal notranslate"><span class="pre">File.more_metadata</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.file.File.image"><code class="docutils literal notranslate"><span class="pre">File.image</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.file.File.hash_entries"><code class="docutils literal notranslate"><span class="pre">File.hash_entries</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.file.File.duplicate_memberships"><code class="docutils literal notranslate"><span class="pre">File.duplicate_memberships</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.file.File.duplicate_groups"><code class="docutils literal notranslate"><span class="pre">File.duplicate_groups</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#id9"><code class="docutils literal notranslate"><span class="pre">File.duplicate_groups</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#id10"><code class="docutils literal notranslate"><span class="pre">File.duplicate_memberships</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#id11"><code class="docutils literal notranslate"><span class="pre">File.file_extension</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#id12"><code class="docutils literal notranslate"><span class="pre">File.file_extension_mismatch</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#id13"><code class="docutils literal notranslate"><span class="pre">File.file_hash</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#id14"><code class="docutils literal notranslate"><span class="pre">File.file_mime</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#id15"><code class="docutils literal notranslate"><span class="pre">File.file_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#id16"><code class="docutils literal notranslate"><span class="pre">File.file_offset</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#id17"><code class="docutils literal notranslate"><span class="pre">File.file_path</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#id18"><code class="docutils literal notranslate"><span class="pre">File.file_size</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#id19"><code class="docutils literal notranslate"><span class="pre">File.file_type</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#id20"><code class="docutils literal notranslate"><span class="pre">File.foremost_comment</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#id21"><code class="docutils literal notranslate"><span class="pre">File.hash_entries</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#id22"><code class="docutils literal notranslate"><span class="pre">File.id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#id23"><code class="docutils literal notranslate"><span class="pre">File.image</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#id24"><code class="docutils literal notranslate"><span class="pre">File.image_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#id25"><code class="docutils literal notranslate"><span class="pre">File.is_duplicate</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#id26"><code class="docutils literal notranslate"><span class="pre">File.is_exiftool</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#id27"><code class="docutils literal notranslate"><span class="pre">File.more_metadata</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.file.File.validate_file_extension"><code class="docutils literal notranslate"><span class="pre">File.validate_file_extension()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.file.File.validate_file_hash"><code class="docutils literal notranslate"><span class="pre">File.validate_file_hash()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.file.File.validate_file_mime"><code class="docutils literal notranslate"><span class="pre">File.validate_file_mime()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.file.File.validate_file_name"><code class="docutils literal notranslate"><span class="pre">File.validate_file_name()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.file.File.validate_file_path"><code class="docutils literal notranslate"><span class="pre">File.validate_file_path()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.file.File.validate_file_type"><code class="docutils literal notranslate"><span class="pre">File.validate_file_type()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.file.File.validate_foremost_comment"><code class="docutils literal notranslate"><span class="pre">File.validate_foremost_comment()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="app.models.html#app.models.file.FileHash"><code class="docutils literal notranslate"><span class="pre">FileHash</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.file.FileHash.id"><code class="docutils literal notranslate"><span class="pre">FileHash.id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.file.FileHash.file_id"><code class="docutils literal notranslate"><span class="pre">FileHash.file_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.file.FileHash.file_hash"><code class="docutils literal notranslate"><span class="pre">FileHash.file_hash</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.file.FileHash.image_id"><code class="docutils literal notranslate"><span class="pre">FileHash.image_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.file.FileHash.file"><code class="docutils literal notranslate"><span class="pre">FileHash.file</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.file.FileHash.image"><code class="docutils literal notranslate"><span class="pre">FileHash.image</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#id28"><code class="docutils literal notranslate"><span class="pre">FileHash.file</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#id29"><code class="docutils literal notranslate"><span class="pre">FileHash.file_hash</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#id30"><code class="docutils literal notranslate"><span class="pre">FileHash.file_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#id31"><code class="docutils literal notranslate"><span class="pre">FileHash.id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#id32"><code class="docutils literal notranslate"><span class="pre">FileHash.image</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#id33"><code class="docutils literal notranslate"><span class="pre">FileHash.image_id</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="app.models.html#module-app.models.image">app.models.image</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="app.models.html#app.models.image.Image"><code class="docutils literal notranslate"><span class="pre">Image</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.image.Image.id"><code class="docutils literal notranslate"><span class="pre">Image.id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.image.Image.image_name"><code class="docutils literal notranslate"><span class="pre">Image.image_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.image.Image.image_size"><code class="docutils literal notranslate"><span class="pre">Image.image_size</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.image.Image.exiftool_version"><code class="docutils literal notranslate"><span class="pre">Image.exiftool_version</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.image.Image.original_output_dir"><code class="docutils literal notranslate"><span class="pre">Image.original_output_dir</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.image.Image.foremost_version"><code class="docutils literal notranslate"><span class="pre">Image.foremost_version</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.image.Image.foremost_scan_start"><code class="docutils literal notranslate"><span class="pre">Image.foremost_scan_start</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.image.Image.foremost_scan_end"><code class="docutils literal notranslate"><span class="pre">Image.foremost_scan_end</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.image.Image.foremost_files_total"><code class="docutils literal notranslate"><span class="pre">Image.foremost_files_total</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.image.Image.files"><code class="docutils literal notranslate"><span class="pre">Image.files</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.image.Image.hash_entries"><code class="docutils literal notranslate"><span class="pre">Image.hash_entries</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.image.Image.duplicate_groups"><code class="docutils literal notranslate"><span class="pre">Image.duplicate_groups</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#id34"><code class="docutils literal notranslate"><span class="pre">Image.duplicate_groups</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#id35"><code class="docutils literal notranslate"><span class="pre">Image.exiftool_version</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#id36"><code class="docutils literal notranslate"><span class="pre">Image.files</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#id37"><code class="docutils literal notranslate"><span class="pre">Image.foremost_files_total</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.image.Image.foremost_invocation"><code class="docutils literal notranslate"><span class="pre">Image.foremost_invocation</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#id38"><code class="docutils literal notranslate"><span class="pre">Image.foremost_scan_end</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#id39"><code class="docutils literal notranslate"><span class="pre">Image.foremost_scan_start</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#id40"><code class="docutils literal notranslate"><span class="pre">Image.foremost_version</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#id41"><code class="docutils literal notranslate"><span class="pre">Image.hash_entries</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#id42"><code class="docutils literal notranslate"><span class="pre">Image.id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#id43"><code class="docutils literal notranslate"><span class="pre">Image.image_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#id44"><code class="docutils literal notranslate"><span class="pre">Image.image_size</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#id45"><code class="docutils literal notranslate"><span class="pre">Image.original_output_dir</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.image.Image.validate_exiftool_version"><code class="docutils literal notranslate"><span class="pre">Image.validate_exiftool_version()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.image.Image.validate_foremost_invocation"><code class="docutils literal notranslate"><span class="pre">Image.validate_foremost_invocation()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.image.Image.validate_foremost_version"><code class="docutils literal notranslate"><span class="pre">Image.validate_foremost_version()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.image.Image.validate_image_name"><code class="docutils literal notranslate"><span class="pre">Image.validate_image_name()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.models.html#app.models.image.Image.validate_original_output_dir"><code class="docutils literal notranslate"><span class="pre">Image.validate_original_output_dir()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="app.parser.html">Package app.parser</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="app.parser.html#module-app.parser.audit_file">app.parser.audit_file</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="app.parser.html#app.parser.audit_file.get_exiftool_version"><code class="docutils literal notranslate"><span class="pre">get_exiftool_version()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.parser.html#app.parser.audit_file.parse_audit"><code class="docutils literal notranslate"><span class="pre">parse_audit()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.parser.html#app.parser.audit_file.parse_audit_table"><code class="docutils literal notranslate"><span class="pre">parse_audit_table()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.parser.html#app.parser.audit_file.parse_individual_lines"><code class="docutils literal notranslate"><span class="pre">parse_individual_lines()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="app.parser.html#module-app.parser.duplicates">app.parser.duplicates</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="app.parser.html#app.parser.duplicates.detect_duplicates"><code class="docutils literal notranslate"><span class="pre">detect_duplicates()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="app.parser.html#module-app.parser.indv_files">app.parser.indv_files</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="app.parser.html#app.parser.indv_files.create_database_objects"><code class="docutils literal notranslate"><span class="pre">create_database_objects()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.parser.html#app.parser.indv_files.extract_exiftool_data"><code class="docutils literal notranslate"><span class="pre">extract_exiftool_data()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.parser.html#app.parser.indv_files.hash_and_store"><code class="docutils literal notranslate"><span class="pre">hash_and_store()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.parser.html#app.parser.indv_files.parse_files"><code class="docutils literal notranslate"><span class="pre">parse_files()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="app.report.html">Package app.report</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="app.report.html#module-app.report.image_extensions_data">app.report.image_extensions_data</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="app.report.html#app.report.image_extensions_data.ImageExtensionsData"><code class="docutils literal notranslate"><span class="pre">ImageExtensionsData</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="app.report.html#app.report.image_extensions_data.ImageExtensionsData.extension"><code class="docutils literal notranslate"><span class="pre">ImageExtensionsData.extension</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.report.html#app.report.image_extensions_data.ImageExtensionsData.number_files"><code class="docutils literal notranslate"><span class="pre">ImageExtensionsData.number_files</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.report.html#app.report.image_extensions_data.ImageExtensionsData.total_size_files"><code class="docutils literal notranslate"><span class="pre">ImageExtensionsData.total_size_files</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.report.html#app.report.image_extensions_data.ImageExtensionsData.files"><code class="docutils literal notranslate"><span class="pre">ImageExtensionsData.files</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.report.html#app.report.image_extensions_data.ImageExtensionsData.to_dict"><code class="docutils literal notranslate"><span class="pre">ImageExtensionsData.to_dict()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="app.report.html#module-app.report.image_files_data">app.report.image_files_data</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="app.report.html#app.report.image_files_data.ImageFilesData"><code class="docutils literal notranslate"><span class="pre">ImageFilesData</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="app.report.html#app.report.image_files_data.ImageFilesData.file_name"><code class="docutils literal notranslate"><span class="pre">ImageFilesData.file_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.report.html#app.report.image_files_data.ImageFilesData.file_size"><code class="docutils literal notranslate"><span class="pre">ImageFilesData.file_size</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.report.html#app.report.image_files_data.ImageFilesData.file_extension"><code class="docutils literal notranslate"><span class="pre">ImageFilesData.file_extension</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.report.html#app.report.image_files_data.ImageFilesData.file_extension_mismatch"><code class="docutils literal notranslate"><span class="pre">ImageFilesData.file_extension_mismatch</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.report.html#app.report.image_files_data.ImageFilesData.file_path"><code class="docutils literal notranslate"><span class="pre">ImageFilesData.file_path</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.report.html#app.report.image_files_data.ImageFilesData.file_report_path"><code class="docutils literal notranslate"><span class="pre">ImageFilesData.file_report_path</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.report.html#app.report.image_files_data.ImageFilesData.file_hash"><code class="docutils literal notranslate"><span class="pre">ImageFilesData.file_hash</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.report.html#app.report.image_files_data.ImageFilesData.file_hash_algorithm"><code class="docutils literal notranslate"><span class="pre">ImageFilesData.file_hash_algorithm</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.report.html#app.report.image_files_data.ImageFilesData.file_type"><code class="docutils literal notranslate"><span class="pre">ImageFilesData.file_type</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.report.html#app.report.image_files_data.ImageFilesData.file_mime"><code class="docutils literal notranslate"><span class="pre">ImageFilesData.file_mime</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.report.html#app.report.image_files_data.ImageFilesData.file_offset"><code class="docutils literal notranslate"><span class="pre">ImageFilesData.file_offset</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.report.html#app.report.image_files_data.ImageFilesData.foremost_comment"><code class="docutils literal notranslate"><span class="pre">ImageFilesData.foremost_comment</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.report.html#app.report.image_files_data.ImageFilesData.is_exiftool"><code class="docutils literal notranslate"><span class="pre">ImageFilesData.is_exiftool</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.report.html#app.report.image_files_data.ImageFilesData.duplicate_group_hash"><code class="docutils literal notranslate"><span class="pre">ImageFilesData.duplicate_group_hash</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.report.html#app.report.image_files_data.ImageFilesData.duplicate_files"><code class="docutils literal notranslate"><span class="pre">ImageFilesData.duplicate_files</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.report.html#app.report.image_files_data.ImageFilesData.additional_metadata"><code class="docutils literal notranslate"><span class="pre">ImageFilesData.additional_metadata</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.report.html#app.report.image_files_data.ImageFilesData.to_dict"><code class="docutils literal notranslate"><span class="pre">ImageFilesData.to_dict()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="app.report.html#module-app.report.image_overview_data">app.report.image_overview_data</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="app.report.html#app.report.image_overview_data.DuplicateGroupData"><code class="docutils literal notranslate"><span class="pre">DuplicateGroupData</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="app.report.html#app.report.image_overview_data.DuplicateGroupData.duplicate_hash"><code class="docutils literal notranslate"><span class="pre">DuplicateGroupData.duplicate_hash</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.report.html#app.report.image_overview_data.DuplicateGroupData.file_count"><code class="docutils literal notranslate"><span class="pre">DuplicateGroupData.file_count</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.report.html#app.report.image_overview_data.DuplicateGroupData.linked_images"><code class="docutils literal notranslate"><span class="pre">DuplicateGroupData.linked_images</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.report.html#id0"><code class="docutils literal notranslate"><span class="pre">DuplicateGroupData.duplicate_hash</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.report.html#id1"><code class="docutils literal notranslate"><span class="pre">DuplicateGroupData.file_count</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.report.html#id2"><code class="docutils literal notranslate"><span class="pre">DuplicateGroupData.linked_images</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.report.html#app.report.image_overview_data.DuplicateGroupData.to_dict"><code class="docutils literal notranslate"><span class="pre">DuplicateGroupData.to_dict()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="app.report.html#app.report.image_overview_data.ExtensionEntry"><code class="docutils literal notranslate"><span class="pre">ExtensionEntry</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="app.report.html#app.report.image_overview_data.ExtensionEntry.extension"><code class="docutils literal notranslate"><span class="pre">ExtensionEntry.extension</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.report.html#app.report.image_overview_data.ExtensionEntry.number_files"><code class="docutils literal notranslate"><span class="pre">ExtensionEntry.number_files</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.report.html#app.report.image_overview_data.ExtensionEntry.number_duplicate_groups"><code class="docutils literal notranslate"><span class="pre">ExtensionEntry.number_duplicate_groups</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.report.html#app.report.image_overview_data.ExtensionEntry.number_duplicate_files"><code class="docutils literal notranslate"><span class="pre">ExtensionEntry.number_duplicate_files</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.report.html#id3"><code class="docutils literal notranslate"><span class="pre">ExtensionEntry.extension</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.report.html#id4"><code class="docutils literal notranslate"><span class="pre">ExtensionEntry.number_duplicate_files</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.report.html#id5"><code class="docutils literal notranslate"><span class="pre">ExtensionEntry.number_duplicate_groups</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.report.html#id6"><code class="docutils literal notranslate"><span class="pre">ExtensionEntry.number_files</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.report.html#app.report.image_overview_data.ExtensionEntry.to_dict"><code class="docutils literal notranslate"><span class="pre">ExtensionEntry.to_dict()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="app.report.html#app.report.image_overview_data.FileEntry"><code class="docutils literal notranslate"><span class="pre">FileEntry</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="app.report.html#app.report.image_overview_data.FileEntry.file_name"><code class="docutils literal notranslate"><span class="pre">FileEntry.file_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.report.html#app.report.image_overview_data.FileEntry.file_extension"><code class="docutils literal notranslate"><span class="pre">FileEntry.file_extension</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.report.html#app.report.image_overview_data.FileEntry.file_size"><code class="docutils literal notranslate"><span class="pre">FileEntry.file_size</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.report.html#app.report.image_overview_data.FileEntry.report_path"><code class="docutils literal notranslate"><span class="pre">FileEntry.report_path</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.report.html#id7"><code class="docutils literal notranslate"><span class="pre">FileEntry.file_extension</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.report.html#id8"><code class="docutils literal notranslate"><span class="pre">FileEntry.file_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.report.html#id9"><code class="docutils literal notranslate"><span class="pre">FileEntry.file_size</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.report.html#id10"><code class="docutils literal notranslate"><span class="pre">FileEntry.report_path</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.report.html#app.report.image_overview_data.FileEntry.to_dict"><code class="docutils literal notranslate"><span class="pre">FileEntry.to_dict()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="app.report.html#app.report.image_overview_data.ImageEntry"><code class="docutils literal notranslate"><span class="pre">ImageEntry</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="app.report.html#app.report.image_overview_data.ImageEntry.image_name"><code class="docutils literal notranslate"><span class="pre">ImageEntry.image_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.report.html#app.report.image_overview_data.ImageEntry.image_files"><code class="docutils literal notranslate"><span class="pre">ImageEntry.image_files</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.report.html#id11"><code class="docutils literal notranslate"><span class="pre">ImageEntry.image_files</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.report.html#id12"><code class="docutils literal notranslate"><span class="pre">ImageEntry.image_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.report.html#app.report.image_overview_data.ImageEntry.to_dict"><code class="docutils literal notranslate"><span class="pre">ImageEntry.to_dict()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="app.report.html#app.report.image_overview_data.ImageOverviewData"><code class="docutils literal notranslate"><span class="pre">ImageOverviewData</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="app.report.html#app.report.image_overview_data.ImageOverviewData.parser_start"><code class="docutils literal notranslate"><span class="pre">ImageOverviewData.parser_start</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.report.html#app.report.image_overview_data.ImageOverviewData.parser_end"><code class="docutils literal notranslate"><span class="pre">ImageOverviewData.parser_end</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.report.html#app.report.image_overview_data.ImageOverviewData.parser_parameters"><code class="docutils literal notranslate"><span class="pre">ImageOverviewData.parser_parameters</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.report.html#app.report.image_overview_data.ImageOverviewData.foremost_invocation"><code class="docutils literal notranslate"><span class="pre">ImageOverviewData.foremost_invocation</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.report.html#app.report.image_overview_data.ImageOverviewData.foremost_start"><code class="docutils literal notranslate"><span class="pre">ImageOverviewData.foremost_start</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.report.html#app.report.image_overview_data.ImageOverviewData.foremost_end"><code class="docutils literal notranslate"><span class="pre">ImageOverviewData.foremost_end</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.report.html#app.report.image_overview_data.ImageOverviewData.foremost_version"><code class="docutils literal notranslate"><span class="pre">ImageOverviewData.foremost_version</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.report.html#app.report.image_overview_data.ImageOverviewData.exiftool_version"><code class="docutils literal notranslate"><span class="pre">ImageOverviewData.exiftool_version</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.report.html#app.report.image_overview_data.ImageOverviewData.hash_algorithm"><code class="docutils literal notranslate"><span class="pre">ImageOverviewData.hash_algorithm</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.report.html#app.report.image_overview_data.ImageOverviewData.original_output_dir"><code class="docutils literal notranslate"><span class="pre">ImageOverviewData.original_output_dir</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.report.html#app.report.image_overview_data.ImageOverviewData.image_name"><code class="docutils literal notranslate"><span class="pre">ImageOverviewData.image_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.report.html#app.report.image_overview_data.ImageOverviewData.image_size"><code class="docutils literal notranslate"><span class="pre">ImageOverviewData.image_size</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.report.html#app.report.image_overview_data.ImageOverviewData.total_number_files_parsed"><code class="docutils literal notranslate"><span class="pre">ImageOverviewData.total_number_files_parsed</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.report.html#app.report.image_overview_data.ImageOverviewData.total_number_files_foremost"><code class="docutils literal notranslate"><span class="pre">ImageOverviewData.total_number_files_foremost</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.report.html#app.report.image_overview_data.ImageOverviewData.total_size_files"><code class="docutils literal notranslate"><span class="pre">ImageOverviewData.total_size_files</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.report.html#app.report.image_overview_data.ImageOverviewData.number_extensions_parsed"><code class="docutils literal notranslate"><span class="pre">ImageOverviewData.number_extensions_parsed</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.report.html#app.report.image_overview_data.ImageOverviewData.extension_distribution"><code class="docutils literal notranslate"><span class="pre">ImageOverviewData.extension_distribution</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.report.html#app.report.image_overview_data.ImageOverviewData.top_ten_files"><code class="docutils literal notranslate"><span class="pre">ImageOverviewData.top_ten_files</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.report.html#app.report.image_overview_data.ImageOverviewData.files_extension_mismatch_count"><code class="docutils literal notranslate"><span class="pre">ImageOverviewData.files_extension_mismatch_count</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.report.html#app.report.image_overview_data.ImageOverviewData.files_extension_mismatch"><code class="docutils literal notranslate"><span class="pre">ImageOverviewData.files_extension_mismatch</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.report.html#app.report.image_overview_data.ImageOverviewData.number_duplicate_groups"><code class="docutils literal notranslate"><span class="pre">ImageOverviewData.number_duplicate_groups</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.report.html#app.report.image_overview_data.ImageOverviewData.number_duplicate_files"><code class="docutils literal notranslate"><span class="pre">ImageOverviewData.number_duplicate_files</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.report.html#app.report.image_overview_data.ImageOverviewData.top_ten_duplicate_groups"><code class="docutils literal notranslate"><span class="pre">ImageOverviewData.top_ten_duplicate_groups</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.report.html#app.report.image_overview_data.ImageOverviewData.logs"><code class="docutils literal notranslate"><span class="pre">ImageOverviewData.logs</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.report.html#app.report.image_overview_data.ImageOverviewData.to_dict"><code class="docutils literal notranslate"><span class="pre">ImageOverviewData.to_dict()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="app.report.html#module-app.report.report_data">app.report.report_data</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="app.report.html#app.report.report_data.ReportFormat"><code class="docutils literal notranslate"><span class="pre">ReportFormat</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="app.report.html#app.report.report_data.ReportFormat.HTML"><code class="docutils literal notranslate"><span class="pre">ReportFormat.HTML</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.report.html#app.report.report_data.ReportFormat.JSON"><code class="docutils literal notranslate"><span class="pre">ReportFormat.JSON</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.report.html#id13"><code class="docutils literal notranslate"><span class="pre">ReportFormat.HTML</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="app.report.html#id14"><code class="docutils literal notranslate"><span class="pre">ReportFormat.JSON</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="app.report.html#app.report.report_data.generate_file_report_path"><code class="docutils literal notranslate"><span class="pre">generate_file_report_path()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.report.html#app.report.report_data.generate_image_extensions_data"><code class="docutils literal notranslate"><span class="pre">generate_image_extensions_data()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.report.html#app.report.report_data.generate_image_overview_data"><code class="docutils literal notranslate"><span class="pre">generate_image_overview_data()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.report.html#app.report.report_data.generate_report_data"><code class="docutils literal notranslate"><span class="pre">generate_report_data()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="app.report.html#module-app.report.report_json">app.report.report_json</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="app.report.html#app.report.report_json.generate_json_report"><code class="docutils literal notranslate"><span class="pre">generate_json_report()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">Foremost Parser</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Package app/</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-app.main">app.main</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-app.db">app.db</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#subdirectories">Subdirectories</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="index.html" title="previous chapter">Foremost Parser documentation</a></li>
+      <li>Next: <a href="app.crud.html" title="next chapter">Package app.crud</a></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2025, BlueFinX.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="_sources/app.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Package app.parser &#8212; Foremost Parser v1.0.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=27fed22d" />
+    <script src="_static/documentation_options.js?v=76e2d817"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Package app.report" href="app.report.html" />
+    <link rel="prev" title="Package app.models" href="app.models.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="package-app-parser">
+<h1>Package app.parser<a class="headerlink" href="#package-app-parser" title="Link to this heading">¶</a></h1>
+<section id="module-app.parser.audit_file">
+<span id="app-parser-audit-file"></span><h2>app.parser.audit_file<a class="headerlink" href="#module-app.parser.audit_file" title="Link to this heading">¶</a></h2>
+<p>audit_file.py</p>
+<p>Parses a Foremost <cite>audit.txt</cite> file to extract image metadata and detailed
+file-level information. The extracted data is stored in the database and
+returned as a structured dictionary for further processing.</p>
+<p>This module handles:
+- Reading the audit.txt from a Foremost output directory.
+- Extracting metadata (image name, size, timestamps, versions, etc.).
+- Parsing the internal audit table for per-file details.
+- Storing the parsed image entry in the database.</p>
+<p>Requirements:
+- The audit file must exist and be named exactly <cite>audit.txt</cite>.</p>
+<p>Author: bluefinx
+Copyright (c) 2025 bluefinx
+License: GNU General Public License v3.0</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="app.parser.audit_file.get_exiftool_version">
+<span class="sig-prename descclassname"><span class="pre">app.parser.audit_file.</span></span><span class="sig-name descname"><span class="pre">get_exiftool_version</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.parser.audit_file.get_exiftool_version" title="Link to this definition">¶</a></dt>
+<dd><p>Extracts the ExifTool version for the given open file.</p>
+<p>This function uses <cite>pyexiftool.ExifToolHelper</cite> to read metadata from
+the file’s path (via <cite>file.name</cite>) and extract the ExifTool version.
+It returns the version string if found, otherwise <cite>None</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>file</strong> – An open file object (e.g., from <cite>open(path, ‘r’, encoding=’utf-8’)</cite>).</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The ExifTool version string, or None if unavailable.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Optional[str]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.parser.audit_file.parse_audit">
+<span class="sig-prename descclassname"><span class="pre">app.parser.audit_file.</span></span><span class="sig-name descname"><span class="pre">parse_audit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.parser.audit_file.parse_audit" title="Link to this definition">¶</a></dt>
+<dd><p>Parses the Foremost audit file (<cite>audit.txt</cite>) in the given input directory.</p>
+<dl class="simple">
+<dt>This function does the following:</dt><dd><ol class="arabic simple">
+<li><p>Looks for a file named <cite>audit.txt</cite> in <cite>input_path</cite>.</p></li>
+<li><p>Extracts ExifTool version metadata using <cite>get_exiftool_version()</cite>.</p></li>
+<li><p>Parses individual metadata lines and the audit table using <cite>parse_individual_lines()</cite>.</p></li>
+<li><p>Stores the parsed image record in the database via <cite>insert_image()</cite>.</p></li>
+<li><p>Returns the new image ID, the populated audit table dictionary, and the image name.</p></li>
+</ol>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>input_path</strong> (<em>Path</em>) – Path to the Foremost output directory containing <cite>audit.txt</cite>.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>A tuple containing:</dt><dd><p>image_id: int, the new image ID, or -1 if the file is missing or an error occurred.
+audit_table: dict | None, the parsed audit table, or None if failed.
+image_name: str | None, the image name, or None if failed.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple[int, dict | None, str | None]</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If the database session could not be established.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.parser.audit_file.parse_audit_table">
+<span class="sig-prename descclassname"><span class="pre">app.parser.audit_file.</span></span><span class="sig-name descname"><span class="pre">parse_audit_table</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">line</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">audit_table</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.parser.audit_file.parse_audit_table" title="Link to this definition">¶</a></dt>
+<dd><p>Parses a line from the audit.txt file to detect and extract rows from
+the Foremost audit table (containing Num, Size, Offset, Comment, etc.).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>line</strong> (<em>str</em>) – A single line from the audit.txt file.</p></li>
+<li><p><strong>audit_table</strong> (<em>dict</em>) – Dictionary where parsed table rows are stored.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.parser.audit_file.parse_individual_lines">
+<span class="sig-prename descclassname"><span class="pre">app.parser.audit_file.</span></span><span class="sig-name descname"><span class="pre">parse_individual_lines</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">audit_table</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.parser.audit_file.parse_individual_lines" title="Link to this definition">¶</a></dt>
+<dd><p>Parses the audit.txt line by line to extract image-level metadata
+and populate the audit table with file-specific data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>file</strong> – Opened audit.txt file object (text mode).</p></li>
+<li><p><strong>image</strong> – Image model instance where metadata (name, size, etc.) is stored.</p></li>
+<li><p><strong>audit_table</strong> (<em>dict</em>) – Dictionary to store parsed file table entries.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-app.parser.duplicates">
+<span id="app-parser-duplicates"></span><h2>app.parser.duplicates<a class="headerlink" href="#module-app.parser.duplicates" title="Link to this heading">¶</a></h2>
+<p>duplicates.py</p>
+<p>Provides functions to detect duplicate files based on their SHA-256 hashes
+and store the duplicate relationships in the database.</p>
+<p>The module handles:
+- Intra-image duplicate detection: compares files within the same image.
+- Cross-image duplicate detection (planned): compares files across all images.
+- Creation of DuplicateGroup entries for each hash shared by multiple files.
+- Linking DuplicateGroups to images via an association table.
+- Creation of DuplicateMember entries for each file in a group.</p>
+<p>Author: bluefinx
+Copyright (c) 2025 bluefinx
+License: GNU General Public License v3.0</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="app.parser.duplicates.detect_duplicates">
+<span class="sig-prename descclassname"><span class="pre">app.parser.duplicates.</span></span><span class="sig-name descname"><span class="pre">detect_duplicates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cross_image</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.parser.duplicates.detect_duplicates" title="Link to this definition">¶</a></dt>
+<dd><p>Detects duplicate files based on their hashes and stores them in the database.</p>
+<p>Compares file hashes to identify duplicates within a single image
+or, optionally, across multiple images. It creates duplicate groups and links
+files to these groups in the database.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>session</strong> (<em>Session</em>) – SQLAlchemy database session used to query and update records.</p></li>
+<li><p><strong>image_id</strong> (<em>int</em>) – ID of the image whose files should be checked for duplicates.</p></li>
+<li><p><strong>cross_image</strong> (<em>bool</em>) – If True, duplicates will be checked across all images;
+if False, only within the given image.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>Exception</strong> – If the database session is None or if an error occurs during duplicate detection.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-app.parser.indv_files">
+<span id="app-parser-indv-files"></span><h2>app.parser.indv_files<a class="headerlink" href="#module-app.parser.indv_files" title="Link to this heading">¶</a></h2>
+<p>indv_files.py</p>
+<p>This module provides functionality to process individual files from a Foremost output directory
+and store them in a database, along with optional copying of image files to a persistent output
+directory organised by file extension.</p>
+<p>Main features:
+- Extracts file metadata using ExifTool, with a Python fallback for problematic files.
+- Creates SQLAlchemy File objects with metadata suitable for database storage.
+- Computes SHA-256 hashes for each file.
+- Copies image files (jpg, jpeg, png, gif, webp, svg) to an output directory structured by extension.
+- Handles batch processing and per-file fallback for reliability.
+- Supports database insertion of File objects while gracefully handling exceptions.</p>
+<p>Notes:
+- Only files with extensions jpg, jpeg, png, gif, webp and svg are copied to the output directory and only if the CLI parameter is set.
+- Files are read in 4096-byte chunks for memory-efficient hashing and copying.
+- Relies on helper modules: <cite>magic</cite> and <cite>exiftool</cite>.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="app.parser.indv_files.create_database_objects">
+<span class="sig-prename descclassname"><span class="pre">app.parser.indv_files.</span></span><span class="sig-name descname"><span class="pre">create_database_objects</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subdir_files</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">audit_table</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_python</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.parser.indv_files.create_database_objects" title="Link to this definition">¶</a></dt>
+<dd><p>Creates SQLAlchemy File objects from extracted metadata to store in the database.</p>
+<p>This function marks <cite>is_exiftool</cite> False for files that used Python fallback, True otherwise,
+and strips metadata keys from <cite>more_metadata</cite> that are already stored in dedicated columns to avoid redundancy.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>subdir_files</strong> (<em>dict</em>) – Dictionary mapping filenames to metadata dictionaries
+(as returned by <cite>extract_exiftool_data</cite>).</p></li>
+<li><p><strong>image_id</strong> (<em>int</em>) – ID of the parent Image record in the database.</p></li>
+<li><p><strong>audit_table</strong> (<em>dict</em>) – Dictionary with additional file info (size, offset, comment)
+parsed from the foremost audit table.</p></li>
+<li><p><strong>is_python</strong> (<em>set</em>) – Set of filenames for which metadata was extracted via Python fallback.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>list: List of File ORM objects ready to be inserted into the database.
+dict: The audit_table dict after all parsed files were dropped.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple[list, dict]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.parser.indv_files.extract_exiftool_data">
+<span class="sig-prename descclassname"><span class="pre">app.parser.indv_files.</span></span><span class="sig-name descname"><span class="pre">extract_exiftool_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">files</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_paths</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_python</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.parser.indv_files.extract_exiftool_data" title="Link to this definition">¶</a></dt>
+<dd><p>Extracts metadata from a list of files using ExifTool in batches, with a Python fallback
+for problematic files.</p>
+<p>This function processes files in batches (default 500) to efficiently extract metadata. If a batch fails,
+it retries each file individually with ExifTool. If a single file still fails, it extracts basic metadata
+(filename, extension, MIME type, file type, file size) using Python and the <cite>magic</cite> library.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>files</strong> (<em>list</em><em>[</em><em>Path</em><em>]</em>) – List of Path objects representing files to process.</p></li>
+<li><p><strong>file_paths</strong> (<em>list</em><em>[</em><em>str</em><em>]</em>) – List of file paths corresponding to <cite>files</cite>.</p></li>
+<li><p><strong>is_python</strong> (<em>set</em>) – Set to store filenames for which Python fallback was used.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>dict: Mapping each filename to a metadata dictionary. Each dictionary may include keys like</dt><dd><p>’<a class="reference external" href="File:FileName">File:FileName</a>’, ‘<a class="reference external" href="File:FileTypeExtension">File:FileTypeExtension</a>’, ‘<a class="reference external" href="File:FileType">File:FileType</a>’, ‘<a class="reference external" href="File:MIMEType">File:MIMEType</a>’, ‘<a class="reference external" href="File:FileSize">File:FileSize</a>’.</p>
+</dd>
+</dl>
+<p>set: Updated <cite>is_python</cite> set with filenames that required Python fallback.</p>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple[dict, set]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.parser.indv_files.hash_and_store">
+<span class="sig-prename descclassname"><span class="pre">app.parser.indv_files.</span></span><span class="sig-name descname"><span class="pre">hash_and_store</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subdir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">files</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">copy_images</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.parser.indv_files.hash_and_store" title="Link to this definition">¶</a></dt>
+<dd><p>Computes SHA-256 hashes for a list of files and copies image files to an output directory
+organised by file extension.</p>
+<p>Each file in <cite>files</cite> will have its SHA-256 hash calculated and stored in <cite>file.file_hash</cite>.
+If the file is an image (jpg, jpeg, png, gif, webp, svg), it is copied into a subdirectory
+under <cite>output_path</cite> named after the image and grouped by its extension. The path to the copied
+file is stored in <cite>file.file_path</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>subdir</strong> (<em>Path</em>) – Path to the folder containing the original files.</p></li>
+<li><p><strong>files</strong> (<em>list</em><em>[</em><a class="reference internal" href="app.models.html#app.models.file.File" title="app.models.file.File"><em>File</em></a><em>]</em>) – List of File objects to process.</p></li>
+<li><p><strong>image_name</strong> (<em>str</em>) – Name of the image, used to create the output subdirectory.</p></li>
+<li><p><strong>output_path</strong> (<em>Path</em>) – Base path where image files will be copied.</p></li>
+<li><p><strong>copy_images</strong> (<em>bool</em>) – Whether or not to copy image files into subdirectory under <cite>output_path</cite>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.parser.indv_files.parse_files">
+<span class="sig-prename descclassname"><span class="pre">app.parser.indv_files.</span></span><span class="sig-name descname"><span class="pre">parse_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">audit_table</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">copy_images</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.parser.indv_files.parse_files" title="Link to this definition">¶</a></dt>
+<dd><p>Processes files in the Foremost output directory to extract metadata, create database objects,
+compute hashes and copy image files to the output directory.</p>
+<dl class="simple">
+<dt>This function iterates over all subdirectories of <cite>input_path</cite> in sorted order for consistency. For each subdirectory:</dt><dd><ol class="arabic simple">
+<li><p>Lists all files.</p></li>
+<li><p>Extracts metadata using ExifTool in batches, falling back to Python methods for problematic files.</p></li>
+<li><p>Creates SQLAlchemy File objects for the database.</p></li>
+<li><p>Computes SHA-256 hashes and copies image files (jpg, jpeg, png, gif, webp, svg) to
+<cite>output_path/&lt;image_name&gt;/&lt;extension&gt;/</cite>.</p></li>
+<li><p>Inserts File objects into the database.</p></li>
+</ol>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input_path</strong> (<em>Path</em>) – Root path of the Foremost output directory containing files and subfolders.</p></li>
+<li><p><strong>output_path</strong> (<em>Path</em>) – Base directory where image files will be copied by extension.</p></li>
+<li><p><strong>image_id</strong> (<em>int</em>) – ID of the parent Image record in the database.</p></li>
+<li><p><strong>audit_table</strong> (<em>dict</em>) – Dictionary containing additional file metadata parsed from <cite>audit.txt</cite>.</p></li>
+<li><p><strong>image_name</strong> (<em>str</em>) – Name of the image, used to create the output subdirectory.</p></li>
+<li><p><strong>copy_images</strong> (<em>bool</em>) – Whether or not to copy image files into subdirectory under <cite>output_path</cite>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>bool: True if all files were processed successfully, False if an exception occurred.
+dict: the audit_table dict after all parsed files were dropped or {}.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">Foremost Parser</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="app.html">Package app/</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="app.html#module-app.main">app.main</a></li>
+<li class="toctree-l2"><a class="reference internal" href="app.html#module-app.db">app.db</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="app.html#subdirectories">Subdirectories</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="app.html">Package app/</a><ul>
+      <li>Previous: <a href="app.models.html" title="previous chapter">Package app.models</a></li>
+      <li>Next: <a href="app.report.html" title="next chapter">Package app.report</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2025, BlueFinX.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="_sources/app.parser.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

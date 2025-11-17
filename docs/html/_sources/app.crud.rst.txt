@@ -1,0 +1,26 @@
+Package app.crud
+================
+
+app.crud.duplicate
+------------------
+
+.. automodule:: app.crud.duplicate
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+app.crud.file
+-------------
+
+.. automodule:: app.crud.file
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+app.crud.image
+---------------
+
+.. automodule:: app.crud.image
+   :members:
+   :show-inheritance:
+   :undoc-members:

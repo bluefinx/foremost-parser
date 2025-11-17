@@ -1,0 +1,29 @@
+Package app/
+============
+
+app.main
+--------
+
+.. automodule:: app.main
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+app.db
+------
+
+.. automodule:: app.db
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+Subdirectories
+--------------
+
+.. toctree::
+   :maxdepth: 4
+
+   app.crud
+   app.models
+   app.parser
+   app.report
