@@ -4,11 +4,10 @@
 
 ## Next Steps 🚀
 
-- Restructure the report for better aesthetics and overview 📊  
-- Include images in the report 🖼️  
-- Improve duplicate detection and fix database issues for large datasets 🔍  
+- Support HTML reports (with images included) 📊  
+- Implement logging 🪵
+- Implement cross-image duplicate detection 🔍
 - Test the tool with various test datasets 🧪  
-- Optimise batch processing and address ExifTool issues ⚡  
 
 ### Planned Features 🌟
 - Add a steganography detector 🕵️‍♂️  

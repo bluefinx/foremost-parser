@@ -4,6 +4,7 @@ db.py
 Handles database initialisation and connections for Foremost-Parser.
 
 Functions:
+    create_database_url(): Create the database URL for connection.
     create_database(): Creates the database if it does not exist.
     connect_database(): Connects to the database and returns a session object.
 
@@ -112,7 +113,7 @@ def connect_database() -> Optional[Session]:
 
     Returns:
         sqlalchemy.orm.session.Session | None: A SQLAlchemy session object if the connection
-        was successful, or None if the password was missing or the connection failed.
+        was successful or None if the password was missing or the connection failed.
     """
     try:
         # read the password from the password file

@@ -121,11 +121,6 @@ def parse_individual_lines(file, image, audit_table: dict) -> None:
         file: Opened audit.txt file object (text mode).
         image: Image model instance where metadata (name, size, etc.) is stored.
         audit_table (dict): Dictionary to store parsed file table entries.
-
-    Notes:
-        - Relies on several regex patterns (defined globally) to match metadata lines.
-        - Calls `parse_audit_table()` for table row parsing.
-        - Expects the audit file to be named exactly 'audit.txt'.
     """
     for line in file:
         # remove white spaces and skip empty lines
@@ -175,12 +170,6 @@ def parse_audit_table(line: str, audit_table: dict) -> None:
     Args:
         line (str): A single line from the audit.txt file.
         audit_table (dict): Dictionary where parsed table rows are stored.
-
-    Notes:
-        - Uses a global flag `table_started` to detect whether we're inside
-          the audit table section.
-        - Expected column order: Num, Name, Size, File Offset, Comment.
-        - Lines are split using two or more whitespaces or tabs.
     """
     # use the global variable
     global table_started
@@ -224,28 +213,24 @@ def parse_audit(input_path: Path) -> tuple[int, Optional[dict], Optional[str]]:
     """
     Parses the Foremost audit file (`audit.txt`) in the given input directory.
 
-    This function performs the following:
-
-    1. Looks for a file named `audit.txt` in `input_path`.
-    2. Extracts ExifTool version metadata using `get_exiftool_version()`.
-    3. Parses individual metadata lines and the audit table using `parse_individual_lines()`.
-    4. Stores the parsed image record in the database via `insert_image()`.
-    5. Returns the new image ID, the populated audit table dictionary and the image name.
+    This function does the following:
+      1. Looks for a file named `audit.txt` in `input_path`.
+      2. Extracts ExifTool version metadata using `get_exiftool_version()`.
+      3. Parses individual metadata lines and the audit table using `parse_individual_lines()`.
+      4. Stores the parsed image record in the database via `insert_image()`.
+      5. Returns the new image ID, the populated audit table dictionary, and the image name.
 
     Args:
         input_path (Path): Path to the Foremost output directory containing `audit.txt`.
 
     Returns:
-        tuple[int, dict | None, str | None]:
-            - `(image_id, audit_table, image_name)` on success.
-            - `(-1, None, None)` if the file is missing or an error occurred.
+        tuple[int, dict | None, str | None]: A tuple containing:
+            image_id: int, the new image ID, or -1 if the file is missing or an error occurred.
+            audit_table: dict | None, the parsed audit table, or None if failed.
+            image_name: str | None, the image name, or None if failed.
 
     Raises:
         ValueError: If the database session could not be established.
-
-    Notes:
-        - The audit file **must** be named exactly `audit.txt`.
-        - Rolls back database operations and prints errors to `stderr` if exceptions occur.
     """
 
     # image object to write to database

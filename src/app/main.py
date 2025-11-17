@@ -36,9 +36,12 @@ from app.parser.duplicates import detect_duplicates
 from app.report.report_data import generate_report_data, REPORT_FORMAT_JSON
 
 # abort when error
-def abort(error):
+def abort(error: str):
     """
     Logs errors and exceptions and aborts the program.
+
+    Args:
+        error (str): Exception raised if an error occurred.
     """
     print(error, file=sys.stderr)
     sys.exit(1)
