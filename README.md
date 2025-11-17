@@ -41,7 +41,7 @@ The `--help` command shows all available parameters and options.
 >
 > A PowerShell script is not yet available.
 
-For further information about the tool's architecture, see [Architecture](./ARCHITECTURE.MD) and the [docs](./docs/html/index.html).
+For further information about the tool's architecture, see [Architecture](./ARCHITECTURE.md) and the [docs](./docs/html/index.html).
 
 ## License
 
