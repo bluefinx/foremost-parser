@@ -41,6 +41,8 @@ The `--help` command shows all available parameters and options.
 >
 > A PowerShell script is not yet available.
 
+For further information about the tool's architecture, see [Architecture](./ARCHITECTURE.MD) and the [docs](./docs/html/index.html).
+
 ## License
 
 This project is licensed under the GNU General Public License v3.0 (GPL-3.0) © 2025 bluefinx.
