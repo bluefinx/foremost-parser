@@ -4,7 +4,7 @@
 # it sets the environment variables for Docker Compose
 # and then starts Docker Compose
 
-# environment variables:
+# environment variables for Docker:
 # - INPUT_PATH
 # - OUTPUT_PATH
 # - FLUSH
@@ -22,11 +22,11 @@ STORE=false
 
 # show help for -h or --help
 help(){
-    echo "This tool reads in a foremost input directory, parses its content and metadata and generates a report in the output directory."
+    echo "This tool reads in a Foremost input directory, parses its content and metadata and generates a report in the output directory."
     echo ""
     echo "If --store option is not included, all data is deleted from the database afterwards."
     echo ""
-    echo "NOTE: The foremost audit file must be named 'audit.txt'."
+    echo "NOTE: The Foremost audit file must be named 'audit.txt'."
     echo ""
     echo "Usage: $0 [OPTIONS] -i <path_to_input> -o <path_to_output>"
     echo ""
@@ -34,7 +34,7 @@ help(){
     echo "  -h, --help            Show this help message and exit"
     echo "  -i, --input           Foremost input directory (absolute path) [required]"
     echo "  -o, --output          Report output directory (absolute path) [required]"
-    echo "  -f, --flush           Delete Docker persistent volumes and output directory contents before startup"
+    echo "  -f, --flush           Delete Docker persistent volumes and output directory contents before startup [default: false]"
     echo "  -r, --report          Report format (supported: json) [default: json]"
     echo "  -s, --store           Store all parsed images in the database [default: false]"
     echo "  --with-images         Include image files in the report (jpg, jpeg, png, gif, webp, svg) [default: false]"
@@ -44,8 +44,11 @@ help(){
 # validate the provided input path to make sure it exists and is a dir
 ## based on @jimmij's code from https://unix.stackexchange.com/questions/256434/check-if-shell-variable-contains-an-absolute-path
 validate_input_path(){
-    # -n: String is not zero; -d: file exists and is a dir; make sure it starts with / (absolute)
-    if [ -n "$1" ] && [ -d "$1" ] && [[ "$1" =~ ^/ ]]; then
+    # -n: String is not zero
+    # -d: file exists and is a directory
+    # -r: file is readable
+    # ^/: path starts with / (absolute)
+    if [ -n "$1" ] && [ -d "$1" ] && [ -r "$1" ] && [[ "$1" =~ ^/ ]]; then
         INPUT_PROVIDED=true
         export INPUT_PATH="$1"
         echo "INPUT_PATH=$1" >> .env
@@ -58,8 +61,12 @@ validate_input_path(){
 # validate the provided output path to make sure it exists and is a dir
 ## based on @jimmij's code from https://unix.stackexchange.com/questions/256434/check-if-shell-variable-contains-an-absolute-path
 validate_output_path(){
-    # -n: String is not zero; -d: file exists and is a dir; make sure it starts with / (absolute) and make sure it's writeable
-    if [ -n "$1" ] && [ -d "$1" ] && [[ "$1" =~ ^/ ]] && [ -w "$1" ]; then
+    # -n: String is not zero
+    # -d: file exists and is a directory
+    # -r: file is readable
+    # -w: file is writeable
+    # ^/: path starts with / (absolute)
+    if [ -n "$1" ] && [ -d "$1" ] && [ -r "$1" ] && [ -w "$1" ] && [[ "$1" =~ ^/ ]]; then
         OUTPUT_PROVIDED=true
         export OUTPUT_PATH="$1"
         echo "OUTPUT_PATH=$1" >> .env
@@ -88,10 +95,11 @@ flush_data(){
     fi
 }
 
+# validate the provided report format (python script sets json as default)
 validate_report_format(){
     local format="$1"
     # allowed formats
-    local allowed=("html" "json")
+    local allowed=("json")
 
     # check if format is in allowed list
     for f in "${allowed[@]}"; do
@@ -153,7 +161,7 @@ while [[ "$#" -gt 0 ]]; do
     esac
 done
 
-# for now, make sure there is an audit.txt in the foremost folder.
+# for now, make sure there is an audit.txt in the Foremost folder.
 if [ ! -f "$INPUT_PATH/audit.txt" ]; then
     echo "Error: audit.txt not found in input directory '$INPUT_PATH'!" >&2
     exit 1
@@ -165,18 +173,38 @@ if [ "$FLUSH" = "true" ]; then
 fi
 
 # ask if .DS_Store files should be removed or kept
-echo "Do you want to remove .DS_Store files in the input folder? (Y/n)"
-read -r REMOVE_DS_STORE
+# this is not done automatically in Python since there could be one on purpose 
+if [[ $(uname) == "Darwin" ]]; then
+    echo "Do you want to remove .DS_Store files in the input folder? (Y/n)"
+    read -r REMOVE_DS_STORE
 
-# default is "y"
-REMOVE_DS_STORE=${REMOVE_DS_STORE:-y}
+    # default is "y"
+    REMOVE_DS_STORE=${REMOVE_DS_STORE:-y}
 
-if [ "${REMOVE_DS_STORE,,}" = "y" ]; then
-    echo "Removing all .DS_Store files in $INPUT_PATH ..."
-    find "$INPUT_PATH" -name ".DS_Store" -type f -delete
-    echo ".DS_Store files removed."
-else
-    echo "Keeping .DS_Store files."
+    if [ "${REMOVE_DS_STORE,,}" = "y" ]; then
+
+        # first, check if dir is writeable
+        if [ ! -w "$INPUT_PATH" ]; then
+            echo "Warning: The folder '$INPUT_PATH' is not writeable."
+            echo "Do you want to continue anyway or abort? (C to continue / A to abort) [A]"
+
+            read -r CONTINUE_CHOICE
+            CONTINUE_CHOICE=${CONTINUE_CHOICE:-A}
+
+            if [[ "${CONTINUE_CHOICE,,}" == "a" ]]; then
+                echo "Aborting script."
+                exit 1
+            else
+                echo "Skipping .DS_Store removal and continuing..."
+            fi
+        else
+            echo "Removing all .DS_Store files in $INPUT_PATH ..."
+            find "$INPUT_PATH" -name ".DS_Store" -type f -exec rm -f {} +
+            echo ".DS_Store files removed."
+        fi
+    else
+        echo "Keeping .DS_Store files."
+    fi
 fi
 
 # create the password file for the db
