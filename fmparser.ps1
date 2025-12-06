@@ -13,9 +13,6 @@
 .SYNOPSIS
     Parses a Foremost directory and generates a report.
 .DESCRIPTION
-    Usage:
-        fmparser.ps1 [OPTIONS] -Input <path_to_input> -Output <path_to_output>
-
     This tool reads in a Foremost input directory, parses its content and metadata and generates a report in the output directory.
     If --store option is not included, all data is deleted from the database afterwards.
     NOTE: The Foremost audit file must be named 'audit.txt'.
