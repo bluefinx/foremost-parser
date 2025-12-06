@@ -19,6 +19,7 @@
     This tool reads in a Foremost input directory, parses its content and metadata and generates a report in the output directory.
     If --store option is not included, all data is deleted from the database afterwards.
     NOTE: The Foremost audit file must be named 'audit.txt'.
+    NOTE: This script only works with PowerShell 6 or 7 (PowerShell Core)
 .PARAMETER InputPath
     Foremost input directory (absolute path) [required]
 .PARAMETER OutputPath
@@ -33,9 +34,37 @@
     Include image files in the report (jpg, jpeg, png, gif, webp, svg) [default: false]
 #>
 
+param(
+    [Alias("i")]
+    [Parameter(Position=0,Mandatory=$true,HelpMessage="Foremost input directory (absolute path)")]
+    [ValidateNotNullOrEmpty()]
+    [string]$InputPath,
+
+    [Alias("o")]
+    [Parameter(Position=1,Mandatory=$true,HelpMessage="Report output directory (absolute path)")]
+    [ValidateNotNullOrEmpty()]
+    [string]$OutputPath,
+
+    [Alias("r")]
+    [Parameter(Mandatory=$false,HelpMessage="Report format (supported: json) [default: json]")]
+    [ValidateSet("json")]
+    [string]$Report = "json",
+    
+    [Alias("f")]
+    [Parameter(Mandatory=$false,HelpMessage="Delete Docker persistent volumes and output directory contents before startup")]
+    [switch]$Flush = $false,
+
+    [Alias("s")]
+    [Parameter(Mandatory=$false,HelpMessage="Store all parsed images in the database [default: false]")]
+    [switch]$Store = $false,
+
+    [Parameter(Mandatory=$false,HelpMessage="Include image files in the report (jpg, jpeg, png, gif, webp, svg) [default: false]")]
+    [switch]$WithImages = $false
+)
+
 # validate input and output directory provided by user
 # check if path is absolute and dir exists and is readable
-function Validate-PathParameters {
+function Test-PathParameters {
     param(
         [Parameter(Mandatory=$true)]
         [string]$Path,
@@ -65,49 +94,21 @@ function Validate-PathParameters {
     if ($IsOutput) {
         try {
             $tempFile = Join-Path -Path $Path -ChildPath ([System.IO.Path]::GetRandomFileName())
-            New-Item -Path $tempFile -ItemType File -Force -ErrorAction Stop
-            Remove-Item -Path $tempFile -Force
+            $null = New-Item -Path $tempFile -ItemType File -Force -ErrorAction Stop
+            $null = Remove-Item -Path $tempFile -Force
         } catch {
             throw "Path '$Path' is not writeable."
         }
     }
-    
-    return $true
 }
-
-param(
-    [Alias("i")]
-    [Parameter(Position=0,Mandatory=$true,HelpMessage="Foremost input directory (absolute path)")]
-    [ValidateNotNullOrEmpty()]
-    [ValidateScript({ Validate-PathParameters $_ -IsOutput $false })]
-    [string]$InputPath,
-
-    [Alias("o")]
-    [Parameter(Position=1,Mandatory=$true,HelpMessage="Report output directory (absolute path)")]
-    [ValidateNotNullOrEmpty()]
-    [ValidateScript({ Validate-PathParameters $_ -IsOutput $true })]
-    [string]$OutputPath,
-
-    [Alias("r")]
-    [Parameter(Mandatory=$false,HelpMessage="Report format (supported: json) [default: json]")]
-    [ValidateSet("json")]
-    [string]$Report = "json",
-    
-    [Alias("f")]
-    [Parameter(Mandatory=$false,HelpMessage="Delete Docker persistent volumes and output directory contents before startup")]
-    [switch]$Flush = $false,
-
-    [Alias("s")]
-    [Parameter(Mandatory=$false,HelpMessage="Store all parsed images in the database [default: false]")]
-    [switch]$Store = $false,
-
-    [Parameter(Mandatory=$false,HelpMessage="Include image files in the report (jpg, jpeg, png, gif, webp, svg) [default: false]")]
-    [switch]$WithImages = $false
-)
 
 # check that there are input and output paths
 if (-not $InputPath) { throw "Input parameter is required." }
 if (-not $OutputPath) { throw "Output parameter is required." }
+
+# validate the paths provided
+Test-PathParameters -Path $InputPath -IsOutput $false
+Test-PathParameters -Path $OutputPath -IsOutput $true
 
 # clear environment variables
 Set-Content -Path .env -Value ''
@@ -179,10 +180,10 @@ $fileName = "password.txt"
 
 # first, test if the dir for the file exists
 # if not, create it
-$dirPath = Join-Path -Path $InputPath -ChildPath $dirName
-if (-not (Test-Path $dirPath)) {
+$dirPath = Join-Path -Path $PSScriptRoot -ChildPath $dirName
+if (-not (Test-Path $dirPath -PathType Container)) {
     try {
-        New-Item -Path $dirPath -ItemType Directory -Force -ErrorAction Stop
+        $null = New-Item -Path $dirPath -ItemType Directory -Force -ErrorAction Stop
     }
     catch {
         throw "Could not create password file. Aborting."
@@ -195,26 +196,30 @@ $filePath = Join-Path -Path $dirPath -ChildPath $fileName
 if (-not (Test-Path $filePath)) {
     try {
         $response = Read-Host "No password file found. Please enter a password for the database:"
-        New-Item -Path $filePath -ItemType File -Force -ErrorAction Stop
+        $null = New-Item -Path $filePath -ItemType File -Force -ErrorAction Stop
         Set-Content -Path $filePath -Value $response
-        Write-Host "Password file creates at '$filePath'"
-
-        # set correct permissions (read/write)
-        $isWindows = $PSVersionTable.OS -match "Windows"
-        if ($isWindows) {
-            $acl = Get-Acl $filePath
-            $accessRule = New-Object System.Security.AccessControl.FileSystemAccessRule("$env:USERNAME", "Read,Write", "Allow")
-            $acl.SetAccessRule($accessRule)
-            Set-Acl -Path $filePath -AclObject $acl
-        }
-        else {
-            chmod 600 $filePath
-        }
-        Write-Host "Set access permissions for password file."
+        Write-Host "Password file created at '$filePath'"
     }
     catch {
         throw "Could not create password file. Aborting."
     }
+}
+
+# set correct permissions (read/write)
+try {
+    if ($isWindows) {
+        $acl = Get-Acl $filePath
+        $accessRule = New-Object System.Security.AccessControl.FileSystemAccessRule("$env:USERNAME", "Read,Write", "Allow")
+        $acl.SetAccessRule($accessRule)
+        Set-Acl -Path $filePath -AclObject $acl
+    }
+    else {
+        chmod 600 $filePath
+    }
+    Write-Host "Set access permissions for password file."
+}
+catch {
+    throw "Could not set access permissions for database password file."
 }
 
 # start the parser now
