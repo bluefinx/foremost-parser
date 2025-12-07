@@ -25,7 +25,7 @@ For detailed information, see the [Roadmap](ROADMAP.md).
 2. Download the `fmparser` repository
 3. Navigate to the `fmparser` directory
 
-### For Linux/Unix
+### For MacOS
 
 4. Make the main script executable:
 
@@ -41,9 +41,33 @@ chmod +x fmparser.sh
 
 The `--help` command shows all available parameters and options. 
 
+### For Linux
+
+4. Make the main script executable:
+
+```bash
+chmod +x fmparser.sh
+```
+
+5. Make the input folder readable for the Docker container
+
+```bash
+find [input-folder] -type d -exec chmod 555 {} \;
+find [input-folder] -type f -exec chmod 444 {} \;
+```
+
+6. Make sure the **output folder** is readable and writeable for the user running the script
+7. Run the tool via the shell script:
+
+```bash
+./fmparser.sh -i [input-folder] -o [output-folder]
+```
+
+The `--help` command shows all available parameters and options. 
+
 ### For PowerShell
 
-4. Make the PowerShell script *executable* or check the *execution policy*
+4. Make the PowerShell script **executable** (Linux/Unix) or check the **execution policy** (Windows)
 5. Run the tool via the PowerShell script:
 
 ```powershell

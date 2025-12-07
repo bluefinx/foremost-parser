@@ -219,8 +219,14 @@ if [ ! -f "./db/password.txt" ]; then
     echo "Password file created at ./db/password.txt"
 fi
 
-chown root:root ./db/password.txt
-chmod 600 ./db/password.txt
+# set permissions
+## Linux complicates everything and therefore, the password file needs to be less secure
+## so the Docker container can access it
+if [[ $(uname) == "Darwin" ]]; then
+    chmod 600 ./db/password.txt
+else
+    chmod 644 ./db/password.txt
+fi
 
 # the tool needs at least an input and output path, so now look if present
 if [ "$INPUT_PROVIDED" = "true" ] && [ "$OUTPUT_PROVIDED" = "true" ]; then
@@ -232,7 +238,7 @@ if [ "$INPUT_PROVIDED" = "true" ] && [ "$OUTPUT_PROVIDED" = "true" ]; then
         docker compose down -v
         echo "Cleanup finished."
     fi
-else 
+else
     echo "Please include valid absolute paths to the input and the output folders."
     exit 1
 fi

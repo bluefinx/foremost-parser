@@ -192,9 +192,12 @@ if (-not (Test-Path $dirPath -PathType Container)) {
 $filePath = Join-Path -Path $dirPath -ChildPath $fileName
 if (-not (Test-Path $filePath)) {
     try {
-        $response = Read-Host "No password file found. Please enter a password for the database:"
-        $null = New-Item -Path $filePath -ItemType File -Force -ErrorAction Stop
-        Set-Content -Path $filePath -Value $response
+        $response = Read-Host "No password file found. Please enter a password for the database:" -AsSecureString
+        $ptr = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($response)
+        $plainTextResponse = [System.Runtime.InteropServices.Marshal]::PtrToStringBSTR($ptr)
+        [System.Runtime.InteropServices.Marshal]::ZeroFreeBSTR($ptr)
+
+        $plainTextResponse | Out-File -FilePath $filePath -Encoding UTF8 -Force
         Write-Host "Password file created at '$filePath'"
     }
     catch {
