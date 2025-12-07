@@ -211,15 +211,16 @@ fi
 
 # create the password file for the db
 if [ ! -f "./db/password.txt" ]; then
-    echo "No password file found. Please enter a password for the database:"
+    printf "No password file found. Please enter a password for the database:"
     read -s DB_PASSWORD
     echo ""
     mkdir -p ./db
     echo "$DB_PASSWORD" > ./db/password.txt
-    chown root:root password.txt
-    chmod 600 ./db/password.txt
     echo "Password file created at ./db/password.txt"
 fi
+
+chown root:root ./db/password.txt
+chmod 600 ./db/password.txt
 
 # the tool needs at least an input and output path, so now look if present
 if [ "$INPUT_PROVIDED" = "true" ] && [ "$OUTPUT_PROVIDED" = "true" ]; then
