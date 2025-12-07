@@ -161,7 +161,7 @@ def create_database_objects(subdir_files: dict, image_id: int, audit_table: dict
         file.image_id = image_id
         file.file_name = key
         file.file_type = value.get('File:FileType')
-        file.file_extension = value.get('File:FileTypeExtension')
+        file.file_extension = value.get('File:FileTypeExtension').upper()
         file.file_mime = value.get('File:MIMEType')
         file.file_size = value.get('File:FileSize')
 
@@ -247,7 +247,7 @@ def hash_and_store(subdir: Path, files: list[File], image_name: str, output_path
                 ext = file.file_extension.lower()
                 if ext in image_extensions:
                     # create a dir for every extension
-                    ext_dir = os.path.join(output_path, image_name, str(ext))
+                    ext_dir = os.path.join(output_path, image_name, str(ext).upper())
                     os.makedirs(ext_dir, exist_ok=True)
                     # create file path
                     output_file_path = os.path.join(ext_dir, str(file.file_name))
