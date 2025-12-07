@@ -54,7 +54,9 @@ def generate_json_report(image_overview_data: ImageOverviewData, image_extension
 
         # per extension, one JSON file
         for image_extension in image_extensions_data:
-            file_path = os.path.join(report_path, f"{image_extension.extension}.json")
+            ext_dir = os.path.join(report_path, image_extension.extension)
+            os.makedirs(ext_dir, exist_ok=True)
+            file_path = os.path.join(ext_dir, f"{image_extension.extension}.json")
             with open(file_path, "w", encoding="utf-8") as f:
                 json.dump(image_extension.to_dict(), f, indent=4)
 
