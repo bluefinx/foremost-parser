@@ -175,23 +175,25 @@ fi
 # ask if .DS_Store files should be removed or kept
 # this is not done automatically in Python since there could be one on purpose 
 if [[ $(uname) == "Darwin" ]]; then
-    echo "Do you want to remove .DS_Store files in the input folder? (Y/n)"
+    printf "Do you want to remove .DS_Store files in the input folder? (Y/n)"
     read -r REMOVE_DS_STORE
 
     # default is "y"
     REMOVE_DS_STORE=${REMOVE_DS_STORE:-y}
+    REMOVE_DS_STORE=$(echo "$REMOVE_DS_STORE" | tr -d '\r\n' | tr '[:upper:]' '[:lower:]')
 
-    if [ "${REMOVE_DS_STORE,,}" = "y" ]; then
+    if [[ "$REMOVE_DS_STORE" = "y" ]]; then
 
         # first, check if dir is writeable
         if [ ! -w "$INPUT_PATH" ]; then
-            echo "Warning: The folder '$INPUT_PATH' is not writeable."
-            echo "Do you want to continue anyway or abort? (C to continue / A to abort) [A]"
+            printf "Warning: The folder '%s' is not writeable.\n" "$INPUT_PATH"
+            printf "Do you want to continue anyway or abort? (C to continue / A to abort) [A]"
 
             read -r CONTINUE_CHOICE
             CONTINUE_CHOICE=${CONTINUE_CHOICE:-A}
+            CONTINUE_CHOICE=$(echo "$CONTINUE_CHOICE" | tr -d '\r\n' | tr '[:upper:]' '[:lower:]')
 
-            if [[ "${CONTINUE_CHOICE,,}" == "a" ]]; then
+            if [[ "$CONTINUE_CHOICE" == "a" ]]; then
                 echo "Aborting script."
                 exit 1
             else
@@ -214,6 +216,7 @@ if [ ! -f "./db/password.txt" ]; then
     echo ""
     mkdir -p ./db
     echo "$DB_PASSWORD" > ./db/password.txt
+    chown root:root password.txt
     chmod 600 ./db/password.txt
     echo "Password file created at ./db/password.txt"
 fi
