@@ -27,6 +27,7 @@ help(){
     echo "If --store option is not included, all data is deleted from the database afterwards."
     echo ""
     echo "NOTE: The Foremost audit file must be named 'audit.txt'."
+    echo "WARNING: To use the --flush option on Linux, make sure the output folder has the right permissions before starting the script."
     echo ""
     echo "Usage: $0 [OPTIONS] -i <path_to_input> -o <path_to_output>"
     echo ""
