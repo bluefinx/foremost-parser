@@ -1,24 +1,24 @@
 Package app.crud
 ================
 
-app.crud.duplicate
-------------------
+Module app.crud.duplicate
+-------------------------
 
 .. automodule:: app.crud.duplicate
    :members:
    :show-inheritance:
    :undoc-members:
 
-app.crud.file
--------------
+Module app.crud.file
+--------------------
 
 .. automodule:: app.crud.file
    :members:
    :show-inheritance:
    :undoc-members:
 
-app.crud.image
----------------
+Module app.crud.image
+---------------------
 
 .. automodule:: app.crud.image
    :members:

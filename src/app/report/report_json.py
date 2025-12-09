@@ -22,7 +22,7 @@ from pathlib import Path
 from app.report.image_extensions_data import ImageExtensionsData
 from app.report.image_overview_data import ImageOverviewData
 
-
+# generate the json files and store the data in them
 def generate_json_report(image_overview_data: ImageOverviewData, image_extensions_data: List[ImageExtensionsData], report_path: Path):
     """
     Generates JSON report files for a Foremost scan.

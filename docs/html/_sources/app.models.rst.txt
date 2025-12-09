@@ -1,32 +1,32 @@
 Package app.models
 ==================
 
-app.models.base
----------------
+Module app.models.base
+----------------------
 
 .. automodule:: app.models.base
    :members:
    :show-inheritance:
    :undoc-members:
 
-app.models.duplicate
---------------------
+Module app.models.duplicate
+---------------------------
 
 .. automodule:: app.models.duplicate
    :members:
    :show-inheritance:
    :undoc-members:
 
-app.models.file
----------------
+Module app.models.file
+----------------------
 
 .. automodule:: app.models.file
    :members:
    :show-inheritance:
    :undoc-members:
 
-app.models.image
-----------------
+Module app.models.image
+-----------------------
 
 .. automodule:: app.models.image
    :members:

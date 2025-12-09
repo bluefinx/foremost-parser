@@ -5,13 +5,13 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Package app.crud &#8212; Foremost Parser v1.0.0 documentation</title>
+    <title>Package app.crud &#8212; Foremost Parser v.1.0.1 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="_static/basic.css?v=b08954a9" />
     <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=27fed22d" />
-    <script src="_static/documentation_options.js?v=76e2d817"></script>
-    <script src="_static/doctools.js?v=9bcbadda"></script>
-    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/documentation_options.js?v=c8038ab3"></script>
+    <script src="_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Package app.models" href="app.models.html" />
@@ -36,14 +36,9 @@
   <section id="package-app-crud">
 <h1>Package app.crud<a class="headerlink" href="#package-app-crud" title="Link to this heading">¶</a></h1>
 <section id="module-app.crud.duplicate">
-<span id="app-crud-duplicate"></span><h2>app.crud.duplicate<a class="headerlink" href="#module-app.crud.duplicate" title="Link to this heading">¶</a></h2>
+<span id="module-app-crud-duplicate"></span><h2>Module app.crud.duplicate<a class="headerlink" href="#module-app.crud.duplicate" title="Link to this heading">¶</a></h2>
 <p>duplicate.py (CRUD)</p>
 <p>Provides CRUD functions to manage duplicate files in the database.</p>
-<p>This module includes functions to:
-- Detect and insert duplicate groups based on file hashes.
-- Link duplicate groups to images via an association table.
-- Insert and read duplicate members linking individual files to their groups.
-- Query existing duplicate groups for specific images or globally.</p>
 <p>Author: bluefinx
 Copyright (c) 2025 bluefinx
 License: GNU General Public License v3.0</p>
@@ -52,28 +47,25 @@ License: GNU General Public License v3.0</p>
 <span class="sig-prename descclassname"><span class="pre">app.crud.duplicate.</span></span><span class="sig-name descname"><span class="pre">check_duplicate_group_for_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_hash</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.crud.duplicate.check_duplicate_group_for_image" title="Link to this definition">¶</a></dt>
 <dd><p>Checks if a DuplicateGroup exists for a hash and whether it is linked to an image.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>session</strong> (<em>Session</em>) – SQLAlchemy session, must not be None.</p></li>
-<li><p><strong>image_id</strong> (<em>int</em>) – ID of the image.</p></li>
-<li><p><strong>file_hash</strong> (<em>str</em>) – Hash to check.</p></li>
-</ul>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>]</span></p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><ul class="simple">
+</dl>
+<dl class="simple">
+<dt>Args:</dt><dd><p>session (Session): SQLAlchemy session, must not be None.
+image_id (int): ID of the image.
+file_hash (str): Hash to check.</p>
+</dd>
+<dt>Returns:</dt><dd><dl class="simple">
+<dt>tuple[bool, bool]:</dt><dd><ul class="simple">
 <li><p>exists: True if DuplicateGroup exists.</p></li>
 <li><p>linked_to_image: True if group is linked to the image.</p></li>
 </ul>
-</p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>tuple[bool, bool]</p>
+</dl>
 </dd>
-<dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><strong>ValueError</strong> – If session is None.</p></li>
-<li><p><strong>SQLAlchemyError</strong> – Logged to stderr and session rolled back on error.</p></li>
-</ul>
+<dt>Raises:</dt><dd><p>ValueError: If session is None.
+SQLAlchemyError: Logged to stderr and session rolled back on error.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -83,23 +75,18 @@ License: GNU General Public License v3.0</p>
 <span class="sig-prename descclassname"><span class="pre">app.crud.duplicate.</span></span><span class="sig-name descname"><span class="pre">insert_duplicate_group</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">duplicate_group</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">session</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.crud.duplicate.insert_duplicate_group" title="Link to this definition">¶</a></dt>
 <dd><p>Inserts a new DuplicateGroup into the database.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>duplicate_group</strong> (<a class="reference internal" href="app.models.html#app.models.duplicate.DuplicateGroup" title="app.models.duplicate.DuplicateGroup"><em>DuplicateGroup</em></a>) – The DuplicateGroup object to store.</p></li>
-<li><p><strong>session</strong> (<em>Session</em>) – SQLAlchemy session, must not be None.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>1 if insertion succeeded, -1 if an error occurred.</p>
-</dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>int</p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span></p>
 </dd>
-<dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><strong>ValueError</strong> – If session is None.</p></li>
-<li><p><strong>SQLAlchemyError</strong> – Logged to stderr and session is rolled back if insertion fails.</p></li>
-</ul>
+</dl>
+<dl class="simple">
+<dt>Args:</dt><dd><p>duplicate_group (DuplicateGroup): The DuplicateGroup object to store.
+session (Session): SQLAlchemy session, must not be None.</p>
+</dd>
+<dt>Returns:</dt><dd><p>int: 1 if insertion succeeded, -1 if an error occurred.</p>
+</dd>
+<dt>Raises:</dt><dd><p>ValueError: If session is None.
+SQLAlchemyError: Logged to stderr and session is rolled back if insertion fails.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -109,25 +96,20 @@ License: GNU General Public License v3.0</p>
 <span class="sig-prename descclassname"><span class="pre">app.crud.duplicate.</span></span><span class="sig-name descname"><span class="pre">insert_duplicate_member</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_hash</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">session</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.crud.duplicate.insert_duplicate_member" title="Link to this definition">¶</a></dt>
 <dd><p>Inserts a DuplicateMember linking a File to a DuplicateGroup.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>file_hash</strong> (<em>str</em>) – Hash identifying the DuplicateGroup.</p></li>
-<li><p><strong>image_id</strong> (<em>int</em>) – ID of the Image the file belongs to.</p></li>
-<li><p><strong>file_id</strong> (<em>int</em>) – ID of the File to link.</p></li>
-<li><p><strong>session</strong> (<em>Session</em>) – SQLAlchemy session, must not be None.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>1 if insertion succeeded, 0 if input invalid or group not found, -1 on DB error.</p>
-</dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>int</p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span></p>
 </dd>
-<dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><strong>ValueError</strong> – If session is None.</p></li>
-<li><p><strong>SQLAlchemyError</strong> – Logged to stderr and session is rolled back on failure.</p></li>
-</ul>
+</dl>
+<dl class="simple">
+<dt>Args:</dt><dd><p>file_hash (str): Hash identifying the DuplicateGroup.
+image_id (int): ID of the Image the file belongs to.
+file_id (int): ID of the File to link.
+session (Session): SQLAlchemy session, must not be None.</p>
+</dd>
+<dt>Returns:</dt><dd><p>int: 1 if insertion succeeded, 0 if input invalid or group not found, -1 on DB error.</p>
+</dd>
+<dt>Raises:</dt><dd><p>ValueError: If session is None.
+SQLAlchemyError: Logged to stderr and session is rolled back on failure.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -137,24 +119,19 @@ License: GNU General Public License v3.0</p>
 <span class="sig-prename descclassname"><span class="pre">app.crud.duplicate.</span></span><span class="sig-name descname"><span class="pre">link_duplicate_group_to_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_hash</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">session</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.crud.duplicate.link_duplicate_group_to_image" title="Link to this definition">¶</a></dt>
 <dd><p>Links an existing DuplicateGroup to a specific Image.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>file_hash</strong> (<em>str</em>) – The hash identifying the DuplicateGroup.</p></li>
-<li><p><strong>image_id</strong> (<em>int</em>) – The ID of the Image to link.</p></li>
-<li><p><strong>session</strong> (<em>Session</em>) – SQLAlchemy session, must not be None.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>1 if linking succeeded, 0 if the group or image is invalid, -1 on DB error.</p>
-</dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>int</p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span></p>
 </dd>
-<dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><strong>ValueError</strong> – If session is None.</p></li>
-<li><p><strong>SQLAlchemyError</strong> – Logged to stderr and session is rolled back on failure.</p></li>
-</ul>
+</dl>
+<dl class="simple">
+<dt>Args:</dt><dd><p>file_hash (str): The hash identifying the DuplicateGroup.
+image_id (int): The ID of the Image to link.
+session (Session): SQLAlchemy session, must not be None.</p>
+</dd>
+<dt>Returns:</dt><dd><p>int: 1 if linking succeeded, 0 if the group or image is invalid, -1 on DB error.</p>
+</dd>
+<dt>Raises:</dt><dd><p>ValueError: If session is None.
+SQLAlchemyError: Logged to stderr and session is rolled back on failure.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -164,23 +141,18 @@ License: GNU General Public License v3.0</p>
 <span class="sig-prename descclassname"><span class="pre">app.crud.duplicate.</span></span><span class="sig-name descname"><span class="pre">read_duplicate_group_by_file_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">session</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.crud.duplicate.read_duplicate_group_by_file_id" title="Link to this definition">¶</a></dt>
 <dd><p>Retrieves the DuplicateGroup for a given file ID.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>file_id</strong> (<em>int</em>) – ID of the file to check.</p></li>
-<li><p><strong>session</strong> (<em>Session</em>) – SQLAlchemy session, must not be None.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The DuplicateGroup if found; None otherwise.</p>
-</dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Optional[<a class="reference internal" href="app.models.html#app.models.duplicate.DuplicateGroup" title="app.models.duplicate.DuplicateGroup">DuplicateGroup</a>]</p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="app.models.html#app.models.duplicate.DuplicateGroup" title="app.models.duplicate.DuplicateGroup"><code class="xref py py-class docutils literal notranslate"><span class="pre">DuplicateGroup</span></code></a> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
 </dd>
-<dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><strong>ValueError</strong> – If session is None.</p></li>
-<li><p><strong>SQLAlchemyError</strong> – Logged to stderr if query fails.</p></li>
-</ul>
+</dl>
+<dl class="simple">
+<dt>Args:</dt><dd><p>file_id (int): ID of the file to check.
+session (Session): SQLAlchemy session, must not be None.</p>
+</dd>
+<dt>Returns:</dt><dd><p>Optional[DuplicateGroup]: The DuplicateGroup if found; None otherwise.</p>
+</dd>
+<dt>Raises:</dt><dd><p>ValueError: If session is None.
+SQLAlchemyError: Logged to stderr if query fails.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -190,24 +162,19 @@ License: GNU General Public License v3.0</p>
 <span class="sig-prename descclassname"><span class="pre">app.crud.duplicate.</span></span><span class="sig-name descname"><span class="pre">read_duplicate_group_for_image_and_hash</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_hash</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.crud.duplicate.read_duplicate_group_for_image_and_hash" title="Link to this definition">¶</a></dt>
 <dd><p>Retrieves the DuplicateGroup for a file hash linked to a specific image.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>session</strong> (<em>Session</em>) – SQLAlchemy session, must not be None.</p></li>
-<li><p><strong>file_hash</strong> (<em>str</em>) – SHA-256 hash of the file.</p></li>
-<li><p><strong>image_id</strong> (<em>int</em>) – ID of the image the group should be linked to.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The DuplicateGroup if found; None otherwise.</p>
-</dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Optional[<a class="reference internal" href="app.models.html#app.models.duplicate.DuplicateGroup" title="app.models.duplicate.DuplicateGroup">DuplicateGroup</a>]</p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="app.models.html#app.models.duplicate.DuplicateGroup" title="app.models.duplicate.DuplicateGroup"><code class="xref py py-class docutils literal notranslate"><span class="pre">DuplicateGroup</span></code></a> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
 </dd>
-<dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><strong>ValueError</strong> – If session is None.</p></li>
-<li><p><strong>SQLAlchemyError</strong> – Logged to stderr if query fails.</p></li>
-</ul>
+</dl>
+<dl class="simple">
+<dt>Args:</dt><dd><p>session (Session): SQLAlchemy session, must not be None.
+file_hash (str): SHA-256 hash of the file.
+image_id (int): ID of the image the group should be linked to.</p>
+</dd>
+<dt>Returns:</dt><dd><p>Optional[DuplicateGroup]: The DuplicateGroup if found; None otherwise.</p>
+</dd>
+<dt>Raises:</dt><dd><p>ValueError: If session is None.
+SQLAlchemyError: Logged to stderr if query fails.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -217,20 +184,17 @@ License: GNU General Public License v3.0</p>
 <span class="sig-prename descclassname"><span class="pre">app.crud.duplicate.</span></span><span class="sig-name descname"><span class="pre">read_duplicate_groups</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.crud.duplicate.read_duplicate_groups" title="Link to this definition">¶</a></dt>
 <dd><p>Retrieves all DuplicateGroups from the database.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>session</strong> (<em>Session</em>) – SQLAlchemy session, must not be None.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>List of DuplicateGroup objects; empty list if error occurs.</p>
-</dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>list[<a class="reference internal" href="app.models.html#app.models.duplicate.DuplicateGroup" title="app.models.duplicate.DuplicateGroup">DuplicateGroup</a>]</p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<a class="reference internal" href="app.models.html#app.models.duplicate.DuplicateGroup" title="app.models.duplicate.DuplicateGroup"><code class="xref py py-class docutils literal notranslate"><span class="pre">DuplicateGroup</span></code></a>]</span></p>
 </dd>
-<dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><strong>ValueError</strong> – If session is None.</p></li>
-<li><p><strong>SQLAlchemyError</strong> – Logged to stderr if query fails.</p></li>
-</ul>
+</dl>
+<dl class="simple">
+<dt>Args:</dt><dd><p>session (Session): SQLAlchemy session, must not be None.</p>
+</dd>
+<dt>Returns:</dt><dd><p>list[DuplicateGroup]: List of DuplicateGroup objects; empty list if error occurs.</p>
+</dd>
+<dt>Raises:</dt><dd><p>ValueError: If session is None.
+SQLAlchemyError: Logged to stderr if query fails.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -240,30 +204,25 @@ License: GNU General Public License v3.0</p>
 <span class="sig-prename descclassname"><span class="pre">app.crud.duplicate.</span></span><span class="sig-name descname"><span class="pre">read_duplicate_groups_for_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.crud.duplicate.read_duplicate_groups_for_image" title="Link to this definition">¶</a></dt>
 <dd><p>Retrieves the DuplicateGroups for a specific image.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>session</strong> (<em>Session</em>) – SQLAlchemy session, must not be None.</p></li>
-<li><p><strong>image_id</strong> (<em>int</em>) – ID of the image the group should be linked to.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The DuplicateGroups if found; None otherwise.</p>
-</dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Optional[List[<a class="reference internal" href="app.models.html#app.models.duplicate.DuplicateGroup" title="app.models.duplicate.DuplicateGroup">DuplicateGroup</a>]]</p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<a class="reference internal" href="app.models.html#app.models.duplicate.DuplicateGroup" title="app.models.duplicate.DuplicateGroup"><code class="xref py py-class docutils literal notranslate"><span class="pre">DuplicateGroup</span></code></a>]</span></p>
 </dd>
-<dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><strong>ValueError</strong> – If session is None.</p></li>
-<li><p><strong>SQLAlchemyError</strong> – Logged to stderr if query fails.</p></li>
-</ul>
+</dl>
+<dl class="simple">
+<dt>Args:</dt><dd><p>session (Session): SQLAlchemy session, must not be None.
+image_id (int): ID of the image the group should be linked to.</p>
+</dd>
+<dt>Returns:</dt><dd><p>Optional[List[DuplicateGroup]]: The DuplicateGroups if found; None otherwise.</p>
+</dd>
+<dt>Raises:</dt><dd><p>ValueError: If session is None.
+SQLAlchemyError: Logged to stderr if query fails.</p>
 </dd>
 </dl>
 </dd></dl>
 
 </section>
 <section id="module-app.crud.file">
-<span id="app-crud-file"></span><h2>app.crud.file<a class="headerlink" href="#module-app.crud.file" title="Link to this heading">¶</a></h2>
+<span id="module-app-crud-file"></span><h2>Module app.crud.file<a class="headerlink" href="#module-app.crud.file" title="Link to this heading">¶</a></h2>
 <p>file.py (CRUD)</p>
 <p>Provides functions to insert and read File records in the database.</p>
 <p>Author: bluefinx
@@ -274,23 +233,18 @@ License: GNU General Public License v3.0</p>
 <span class="sig-prename descclassname"><span class="pre">app.crud.file.</span></span><span class="sig-name descname"><span class="pre">insert_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">session</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.crud.file.insert_file" title="Link to this definition">¶</a></dt>
 <dd><p>Stores a single File record in the database.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>file</strong> (<a class="reference internal" href="app.models.html#app.models.file.File" title="app.models.file.File"><em>File</em></a>) – File object to store.</p></li>
-<li><p><strong>session</strong> (<em>Session</em>) – SQLAlchemy session, must not be None.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The ID of the inserted file, or -1 if a database error occurred.</p>
-</dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>int</p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span></p>
 </dd>
-<dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><strong>ValueError</strong> – If session is None.</p></li>
-<li><p><strong>SQLAlchemyError</strong> – Logged to stderr and session rolled back on failure.</p></li>
-</ul>
+</dl>
+<dl class="simple">
+<dt>Args:</dt><dd><p>file (File): File object to store.
+session (Session): SQLAlchemy session, must not be None.</p>
+</dd>
+<dt>Returns:</dt><dd><p>int: The ID of the inserted file, or -1 if a database error occurred.</p>
+</dd>
+<dt>Raises:</dt><dd><p>ValueError: If session is None.
+SQLAlchemyError: Logged to stderr and session rolled back on failure.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -300,23 +254,18 @@ License: GNU General Public License v3.0</p>
 <span class="sig-prename descclassname"><span class="pre">app.crud.file.</span></span><span class="sig-name descname"><span class="pre">insert_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">files</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">session</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.crud.file.insert_files" title="Link to this definition">¶</a></dt>
 <dd><p>Stores multiple File records in bulk and creates corresponding FileHash entries.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>files</strong> (<em>list</em><em>[</em><a class="reference internal" href="app.models.html#app.models.file.File" title="app.models.file.File"><em>File</em></a><em>]</em>) – List of File objects to store.</p></li>
-<li><p><strong>session</strong> (<em>Session</em>) – SQLAlchemy session, must not be None.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>1 if successful, or -1 if a database error occurred.</p>
-</dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>int</p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span></p>
 </dd>
-<dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><strong>ValueError</strong> – If session is None.</p></li>
-<li><p><strong>SQLAlchemyError</strong> – Logged to stderr and session rolled back on failure.</p></li>
-</ul>
+</dl>
+<dl class="simple">
+<dt>Args:</dt><dd><p>files (list[File]): List of File objects to store.
+session (Session): SQLAlchemy session, must not be None.</p>
+</dd>
+<dt>Returns:</dt><dd><p>int: 1 if successful, or -1 if a database error occurred.</p>
+</dd>
+<dt>Raises:</dt><dd><p>ValueError: If session is None.
+SQLAlchemyError: Logged to stderr and session rolled back on failure.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -326,20 +275,17 @@ License: GNU General Public License v3.0</p>
 <span class="sig-prename descclassname"><span class="pre">app.crud.file.</span></span><span class="sig-name descname"><span class="pre">read_file_hashes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.crud.file.read_file_hashes" title="Link to this definition">¶</a></dt>
 <dd><p>Retrieves all FileHash entries from the database.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>session</strong> (<em>Session</em>) – SQLAlchemy session, must not be None.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>List of all FileHash objects, or empty list if an error occurred.</p>
-</dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>List[<a class="reference internal" href="app.models.html#app.models.file.FileHash" title="app.models.file.FileHash">FileHash</a>]</p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<a class="reference internal" href="app.models.html#app.models.file.FileHash" title="app.models.file.FileHash"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileHash</span></code></a>]</span></p>
 </dd>
-<dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><strong>ValueError</strong> – If session is None.</p></li>
-<li><p><strong>SQLAlchemyError</strong> – Logged to stderr if query fails.</p></li>
-</ul>
+</dl>
+<dl class="simple">
+<dt>Args:</dt><dd><p>session (Session): SQLAlchemy session, must not be None.</p>
+</dd>
+<dt>Returns:</dt><dd><p>List[FileHash]: List of all FileHash objects, or empty list if an error occurred.</p>
+</dd>
+<dt>Raises:</dt><dd><p>ValueError: If session is None.
+SQLAlchemyError: Logged to stderr if query fails.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -349,23 +295,18 @@ License: GNU General Public License v3.0</p>
 <span class="sig-prename descclassname"><span class="pre">app.crud.file.</span></span><span class="sig-name descname"><span class="pre">read_file_hashes_for_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">session</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.crud.file.read_file_hashes_for_image" title="Link to this definition">¶</a></dt>
 <dd><p>Retrieves all FileHash entries associated with a specific image.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>image_id</strong> (<em>int</em>) – ID of the image.</p></li>
-<li><p><strong>session</strong> (<em>Session</em>) – SQLAlchemy session, must not be None.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>List of FileHash objects, or empty list if an error occurred.</p>
-</dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>List[<a class="reference internal" href="app.models.html#app.models.file.FileHash" title="app.models.file.FileHash">FileHash</a>]</p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<a class="reference internal" href="app.models.html#app.models.file.FileHash" title="app.models.file.FileHash"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileHash</span></code></a>]</span></p>
 </dd>
-<dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><strong>ValueError</strong> – If session is None.</p></li>
-<li><p><strong>SQLAlchemyError</strong> – Logged to stderr if query fails.</p></li>
-</ul>
+</dl>
+<dl class="simple">
+<dt>Args:</dt><dd><p>image_id (int): ID of the image.
+session (Session): SQLAlchemy session, must not be None.</p>
+</dd>
+<dt>Returns:</dt><dd><p>List[FileHash]: List of FileHash objects, or empty list if an error occurred.</p>
+</dd>
+<dt>Raises:</dt><dd><p>ValueError: If session is None.
+SQLAlchemyError: Logged to stderr if query fails.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -375,23 +316,18 @@ License: GNU General Public License v3.0</p>
 <span class="sig-prename descclassname"><span class="pre">app.crud.file.</span></span><span class="sig-name descname"><span class="pre">read_files_for_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">session</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.crud.file.read_files_for_image" title="Link to this definition">¶</a></dt>
 <dd><p>Retrieves all File records associated with a given image ID.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>image_id</strong> (<em>int</em>) – ID of the image.</p></li>
-<li><p><strong>session</strong> (<em>Session</em>) – SQLAlchemy session, must not be None.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>List of File objects, or None if an error occurred.</p>
-</dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Optional[List[<a class="reference internal" href="app.models.html#app.models.file.File" title="app.models.file.File">File</a>]]</p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<a class="reference internal" href="app.models.html#app.models.file.File" title="app.models.file.File"><code class="xref py py-class docutils literal notranslate"><span class="pre">File</span></code></a>] | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
 </dd>
-<dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><strong>ValueError</strong> – If session is None.</p></li>
-<li><p><strong>SQLAlchemyError</strong> – Logged to stderr if query fails.</p></li>
-</ul>
+</dl>
+<dl class="simple">
+<dt>Args:</dt><dd><p>image_id (int): ID of the image.
+session (Session): SQLAlchemy session, must not be None.</p>
+</dd>
+<dt>Returns:</dt><dd><p>Optional[List[File]]: List of File objects, or None if an error occurred.</p>
+</dd>
+<dt>Raises:</dt><dd><p>ValueError: If session is None.
+SQLAlchemyError: Logged to stderr if query fails.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -404,24 +340,19 @@ License: GNU General Public License v3.0</p>
 the specified image ID where the file extension in the filename does not
 match the actual file type as determined by ExifTool.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>image_id</strong> (<em>int</em>) – The ID of the image to retrieve files for.</p></li>
-<li><p><strong>session</strong> (<em>Session</em>) – An active SQLAlchemy session. Must not be None.</p></li>
-</ul>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<a class="reference internal" href="app.models.html#app.models.file.File" title="app.models.file.File"><code class="xref py py-class docutils literal notranslate"><span class="pre">File</span></code></a>]</span></p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>A list of File objects with extension mismatches. Returns
+</dl>
+<dl class="simple">
+<dt>Args:</dt><dd><p>image_id (int): The ID of the image to retrieve files for.
+session (Session): An active SQLAlchemy session. Must not be None.</p>
+</dd>
+<dt>Returns:</dt><dd><p>List[File]: A list of File objects with extension mismatches. Returns
 an empty list if an error occurs or if no files are found.</p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>List[<a class="reference internal" href="app.models.html#app.models.file.File" title="app.models.file.File">File</a>]</p>
-</dd>
-<dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><strong>ValueError</strong> – If the session is None.</p></li>
-<li><p><strong>SQLAlchemyError</strong> – If a database error occurs during the query.</p></li>
-</ul>
+<dt>Raises:</dt><dd><p>ValueError: If the session is None.
+SQLAlchemyError: If a database error occurs during the query.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -431,27 +362,24 @@ an empty list if an error occurs or if no files are found.</p>
 <span class="sig-prename descclassname"><span class="pre">app.crud.file.</span></span><span class="sig-name descname"><span class="pre">read_files_with_hash</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.crud.file.read_files_with_hash" title="Link to this definition">¶</a></dt>
 <dd><p>Retrieves all files that have a non-null hash.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>session</strong> (<em>Session</em>) – SQLAlchemy session, must not be None.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>List of tuples (file_id, file_hash), or None if an error occurred.</p>
-</dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Optional[List[Tuple[int, str]]]</p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]] | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
 </dd>
-<dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><strong>ValueError</strong> – If session is None.</p></li>
-<li><p><strong>SQLAlchemyError</strong> – Logged to stderr if query fails.</p></li>
-</ul>
+</dl>
+<dl class="simple">
+<dt>Args:</dt><dd><p>session (Session): SQLAlchemy session, must not be None.</p>
+</dd>
+<dt>Returns:</dt><dd><p>Optional[List[Tuple[int, str]]]: List of tuples (file_id, file_hash), or None if an error occurred.</p>
+</dd>
+<dt>Raises:</dt><dd><p>ValueError: If session is None.
+SQLAlchemyError: Logged to stderr if query fails.</p>
 </dd>
 </dl>
 </dd></dl>
 
 </section>
 <section id="module-app.crud.image">
-<span id="app-crud-image"></span><h2>app.crud.image<a class="headerlink" href="#module-app.crud.image" title="Link to this heading">¶</a></h2>
+<span id="module-app-crud-image"></span><h2>Module app.crud.image<a class="headerlink" href="#module-app.crud.image" title="Link to this heading">¶</a></h2>
 <p>image.py (CRUD)</p>
 <p>Provides functions to insert, update, delete and read Image records in the database
 as well as to update per-image file statistics.</p>
@@ -463,23 +391,18 @@ License: GNU General Public License v3.0</p>
 <span class="sig-prename descclassname"><span class="pre">app.crud.image.</span></span><span class="sig-name descname"><span class="pre">delete_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">session</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.crud.image.delete_image" title="Link to this definition">¶</a></dt>
 <dd><p>Deletes an Image along with its associated Files and Duplicate entries via CASCADE.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>image_id</strong> (<em>int</em>) – The ID of the Image object to delete.</p></li>
-<li><p><strong>session</strong> (<em>Session</em>) – SQLAlchemy session, must not be None.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>1 if successful or -1 if a database error occurred.</p>
-</dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>int</p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span></p>
 </dd>
-<dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><strong>ValueError</strong> – If session is None.</p></li>
-<li><p><strong>SQLAlchemyError</strong> – Logged to stderr and session rolled back on failure.</p></li>
-</ul>
+</dl>
+<dl class="simple">
+<dt>Args:</dt><dd><p>image_id (int): The ID of the Image object to delete.
+session (Session): SQLAlchemy session, must not be None.</p>
+</dd>
+<dt>Returns:</dt><dd><p>int: 1 if successful or -1 if a database error occurred.</p>
+</dd>
+<dt>Raises:</dt><dd><p>ValueError: If session is None.
+SQLAlchemyError: Logged to stderr and session rolled back on failure.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -489,23 +412,18 @@ License: GNU General Public License v3.0</p>
 <span class="sig-prename descclassname"><span class="pre">app.crud.image.</span></span><span class="sig-name descname"><span class="pre">insert_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">session</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.crud.image.insert_image" title="Link to this definition">¶</a></dt>
 <dd><p>Stores a single Image record in the database.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>image</strong> (<a class="reference internal" href="app.models.html#app.models.image.Image" title="app.models.image.Image"><em>Image</em></a>) – The Image object to store.</p></li>
-<li><p><strong>session</strong> (<em>Session</em>) – SQLAlchemy session, must not be None.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The ID of the inserted Image or -1 if a database error occurred.</p>
-</dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>int</p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span></p>
 </dd>
-<dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><strong>ValueError</strong> – If session is None.</p></li>
-<li><p><strong>SQLAlchemyError</strong> – Logged to stderr and session rolled back on failure.</p></li>
-</ul>
+</dl>
+<dl class="simple">
+<dt>Args:</dt><dd><p>image (Image): The Image object to store.
+session (Session): SQLAlchemy session, must not be None.</p>
+</dd>
+<dt>Returns:</dt><dd><p>int: The ID of the inserted Image or -1 if a database error occurred.</p>
+</dd>
+<dt>Raises:</dt><dd><p>ValueError: If session is None.
+SQLAlchemyError: Logged to stderr and session rolled back on failure.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -515,23 +433,18 @@ License: GNU General Public License v3.0</p>
 <span class="sig-prename descclassname"><span class="pre">app.crud.image.</span></span><span class="sig-name descname"><span class="pre">read_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">session</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.crud.image.read_image" title="Link to this definition">¶</a></dt>
 <dd><p>Reads a single Image by its ID.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>image_id</strong> (<em>int</em>) – ID of the Image.</p></li>
-<li><p><strong>session</strong> (<em>Session</em>) – SQLAlchemy session, must not be None.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Image object if found, None if not found or a DB error occurred.</p>
-</dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Optional[<a class="reference internal" href="app.models.html#app.models.image.Image" title="app.models.image.Image">Image</a>]</p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="app.models.html#app.models.image.Image" title="app.models.image.Image"><code class="xref py py-class docutils literal notranslate"><span class="pre">Image</span></code></a> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
 </dd>
-<dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><strong>ValueError</strong> – If session is None.</p></li>
-<li><p><strong>SQLAlchemyError</strong> – Logged to stderr if query fails.</p></li>
-</ul>
+</dl>
+<dl class="simple">
+<dt>Args:</dt><dd><p>image_id (int): ID of the Image.
+session (Session): SQLAlchemy session, must not be None.</p>
+</dd>
+<dt>Returns:</dt><dd><p>Optional[Image]: Image object if found, None if not found or a DB error occurred.</p>
+</dd>
+<dt>Raises:</dt><dd><p>ValueError: If session is None.
+SQLAlchemyError: Logged to stderr if query fails.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -541,20 +454,17 @@ License: GNU General Public License v3.0</p>
 <span class="sig-prename descclassname"><span class="pre">app.crud.image.</span></span><span class="sig-name descname"><span class="pre">read_images</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.crud.image.read_images" title="Link to this definition">¶</a></dt>
 <dd><p>Reads all Images from the database.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>session</strong> (<em>Session</em>) – SQLAlchemy session, must not be None.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>List of Image objects or None if a DB error occurred.</p>
-</dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Optional[List[<a class="reference internal" href="app.models.html#app.models.image.Image" title="app.models.image.Image">Image</a>]]</p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<a class="reference internal" href="app.models.html#app.models.image.Image" title="app.models.image.Image"><code class="xref py py-class docutils literal notranslate"><span class="pre">Image</span></code></a>] | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
 </dd>
-<dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><strong>ValueError</strong> – If session is None.</p></li>
-<li><p><strong>SQLAlchemyError</strong> – Logged to stderr if query fails.</p></li>
-</ul>
+</dl>
+<dl class="simple">
+<dt>Args:</dt><dd><p>session (Session): SQLAlchemy session, must not be None.</p>
+</dd>
+<dt>Returns:</dt><dd><p>Optional[List[Image]]: List of Image objects or None if a DB error occurred.</p>
+</dd>
+<dt>Raises:</dt><dd><p>ValueError: If session is None.
+SQLAlchemyError: Logged to stderr if query fails.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -591,9 +501,9 @@ License: GNU General Public License v3.0</p>
 <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="app.html">Package app/</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="app.html#module-app.main">app.main</a></li>
-<li class="toctree-l2"><a class="reference internal" href="app.html#module-app.db">app.db</a></li>
-<li class="toctree-l2 current"><a class="reference internal" href="app.html#subdirectories">Subdirectories</a></li>
+<li class="toctree-l2"><a class="reference internal" href="app.html#module-app.main">Module app.main</a></li>
+<li class="toctree-l2"><a class="reference internal" href="app.html#module-app.db">Module app.db</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="app.html#app-modules">App Modules</a></li>
 </ul>
 </li>
 </ul>
@@ -622,10 +532,10 @@ License: GNU General Public License v3.0</p>
       <div class="clearer"></div>
     </div>
     <div class="footer">
-      &#169;2025, BlueFinX.
+      &#169;2025, bluefinx.
       
       |
-      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.3</a>
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 9.0.4</a>
       &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
       
       |

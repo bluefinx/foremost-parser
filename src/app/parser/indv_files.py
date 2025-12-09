@@ -5,18 +5,15 @@ This module provides functionality to process individual files from a Foremost o
 and store them in a database, along with optional copying of image files to a persistent output
 directory organised by file extension.
 
-Main features:
-- Extracts file metadata using ExifTool, with a Python fallback for problematic files.
-- Creates SQLAlchemy File objects with metadata suitable for database storage.
-- Computes SHA-256 hashes for each file.
-- Copies image files (jpg, jpeg, png, gif, webp, svg) to an output directory structured by extension.
-- Handles batch processing and per-file fallback for reliability.
-- Supports database insertion of File objects while gracefully handling exceptions.
+This module handles:
+    - Reading in all files grouped by extension folders.
+    - Extracting metadata for each file with Exiftool or Python.
+    - Creating a database object for each file.
+    - Computing the file hash for each file and storing image files if configured.
 
-Notes:
-- Only files with extensions jpg, jpeg, png, gif, webp and svg are copied to the output directory and only if the CLI parameter is set.
-- Files are read in 4096-byte chunks for memory-efficient hashing and copying.
-- Relies on helper modules: `magic` and `exiftool`.
+Author: bluefinx
+Copyright (c) 2025 bluefinx
+License: GNU General Public License v3.0
 """
 
 import os

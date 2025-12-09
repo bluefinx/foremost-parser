@@ -5,13 +5,13 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Package app.report &#8212; Foremost Parser v1.0.0 documentation</title>
+    <title>Package app.report &#8212; Foremost Parser v.1.0.1 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="_static/basic.css?v=b08954a9" />
     <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=27fed22d" />
-    <script src="_static/documentation_options.js?v=76e2d817"></script>
-    <script src="_static/doctools.js?v=9bcbadda"></script>
-    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/documentation_options.js?v=c8038ab3"></script>
+    <script src="_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="prev" title="Package app.parser" href="app.parser.html" />
@@ -35,7 +35,7 @@
   <section id="package-app-report">
 <h1>Package app.report<a class="headerlink" href="#package-app-report" title="Link to this heading">¶</a></h1>
 <section id="module-app.report.image_extensions_data">
-<span id="app-report-image-extensions-data"></span><h2>app.report.image_extensions_data<a class="headerlink" href="#module-app.report.image_extensions_data" title="Link to this heading">¶</a></h2>
+<span id="module-app-report-image-extensions-data"></span><h2>Module app.report.image_extensions_data<a class="headerlink" href="#module-app.report.image_extensions_data" title="Link to this heading">¶</a></h2>
 <p>image_extensions_data.py</p>
 <p>Defines the data structure for storing aggregated information about files
 grouped by their file extension. This is used to generate extension-level
@@ -45,57 +45,22 @@ Copyright (c) 2025 bluefinx
 License: GNU General Public License v3.0</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="app.report.image_extensions_data.ImageExtensionsData">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.report.image_extensions_data.</span></span><span class="sig-name descname"><span class="pre">ImageExtensionsData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">extension</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">number_files</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_size_files</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">files</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.report.image_extensions_data.ImageExtensionsData" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">app.report.image_extensions_data.</span></span><span class="sig-name descname"><span class="pre">ImageExtensionsData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">extension</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">number_files</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_size_files</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">files</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.report.image_extensions_data.ImageExtensionsData" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Stores aggregated information about files of a specific file extension.</p>
 <p>This class represents the summary and detailed listing of all files
 with the same extension. It is used in the report to show statistics,
 percentages, and optionally render previews for image files.</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="app.report.image_extensions_data.ImageExtensionsData.extension">
-<span class="sig-name descname"><span class="pre">extension</span></span><a class="headerlink" href="#app.report.image_extensions_data.ImageExtensionsData.extension" title="Link to this definition">¶</a></dt>
-<dd><p>The file extension of the files.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str</p>
+<dl>
+<dt>Attributes:</dt><dd><p>extension (str): The file extension of the files.
+number_files (int): Total number of files with this extension.
+total_size_files (int): Combined size of all files with this extension, in bytes.
+files (List[ImageFilesData]): List of ImageFilesData objects for each file</p>
+<blockquote>
+<div><p>with this extension, including metadata, duplicates and optional image previews.</p>
+</div></blockquote>
 </dd>
 </dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="app.report.image_extensions_data.ImageExtensionsData.number_files">
-<span class="sig-name descname"><span class="pre">number_files</span></span><a class="headerlink" href="#app.report.image_extensions_data.ImageExtensionsData.number_files" title="Link to this definition">¶</a></dt>
-<dd><p>Total number of files with this extension.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>int</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="app.report.image_extensions_data.ImageExtensionsData.total_size_files">
-<span class="sig-name descname"><span class="pre">total_size_files</span></span><a class="headerlink" href="#app.report.image_extensions_data.ImageExtensionsData.total_size_files" title="Link to this definition">¶</a></dt>
-<dd><p>Combined size of all files with this extension, in bytes.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>int</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="app.report.image_extensions_data.ImageExtensionsData.files">
-<span class="sig-name descname"><span class="pre">files</span></span><a class="headerlink" href="#app.report.image_extensions_data.ImageExtensionsData.files" title="Link to this definition">¶</a></dt>
-<dd><p>List of ImageFilesData objects for each file
-with this extension, including metadata, duplicates and optional image previews.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>List[<a class="reference internal" href="#app.report.image_files_data.ImageFilesData" title="app.report.image_files_data.ImageFilesData">ImageFilesData</a>]</p>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="app.report.image_extensions_data.ImageExtensionsData.to_dict">
 <span class="sig-name descname"><span class="pre">to_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#app.report.image_extensions_data.ImageExtensionsData.to_dict" title="Link to this definition">¶</a></dt>
@@ -104,12 +69,13 @@ with this extension, including metadata, duplicates and optional image previews.
 list of underlying ImageFilesData objects. Each file entry is converted using
 its own to_dict() method to ensure complete JSON compatibility.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>A JSON-safe representation of this extension group,
-including aggregated statistics and detailed per-file information.</p>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]</span></p>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>Dict[str, Any]</p>
+</dl>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>Dict[str, Any]: A JSON-safe representation of this extension group,
+including aggregated statistics and detailed per-file information.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -118,7 +84,7 @@ including aggregated statistics and detailed per-file information.</p>
 
 </section>
 <section id="module-app.report.image_files_data">
-<span id="app-report-image-files-data"></span><h2>app.report.image_files_data<a class="headerlink" href="#module-app.report.image_files_data" title="Link to this heading">¶</a></h2>
+<span id="module-app-report-image-files-data"></span><h2>Module app.report.image_files_data<a class="headerlink" href="#module-app.report.image_files_data" title="Link to this heading">¶</a></h2>
 <p>image_files_data.py</p>
 <p>Defines the data structure for storing detailed information about individual files
 extracted from a forensic image. This data is used to generate file-level pages in
@@ -128,188 +94,31 @@ Copyright (c) 2025 bluefinx
 License: GNU General Public License v3.0</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="app.report.image_files_data.ImageFilesData">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.report.image_files_data.</span></span><span class="sig-name descname"><span class="pre">ImageFilesData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_extension</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_extension_mismatch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_report_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_hash</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_hash_algorithm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_mime</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_offset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">foremost_comment</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_exiftool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">duplicate_group_hash</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">duplicate_files</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">additional_metadata</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.report.image_files_data.ImageFilesData" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">app.report.image_files_data.</span></span><span class="sig-name descname"><span class="pre">ImageFilesData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_extension</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_extension_mismatch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_report_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_hash</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_hash_algorithm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_mime</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_offset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">foremost_comment</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_exiftool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">duplicate_group_hash</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">duplicate_files</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">additional_metadata</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.report.image_files_data.ImageFilesData" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Stores detailed information for a single file extracted from a forensic image.</p>
 <p>This class contains all relevant metadata, duplicate information, and optionally
 extracted metadata (e.g., from ExifTool or Python analysis). It is used to
 generate file-level report pages.</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="app.report.image_files_data.ImageFilesData.file_name">
-<span class="sig-name descname"><span class="pre">file_name</span></span><a class="headerlink" href="#app.report.image_files_data.ImageFilesData.file_name" title="Link to this definition">¶</a></dt>
-<dd><p>Name of the file.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str</p>
+<dl class="simple">
+<dt>Attributes:</dt><dd><p>file_name (str): Name of the file.
+file_size (int): Size of the file in bytes.
+file_extension (str): File extension (e.g., ‘jpg’, ‘txt’).
+file_extension_mismatch (bool): Whether the file extension of Foremost and Exiftool match
+file_path (str): Absolute path for image files; can be empty for non-image files.
+file_report_path (str): Relative link to the file’s HTML report page.
+file_hash (str): Hash value of the file.
+file_hash_algorithm (str): Hash algorithm used for this file (e.g., SHA-256).
+file_type (str): Detected type of the file.
+file_mime (str): MIME type of the file.
+file_offset (int): Offset within the image where the file was found (according to Foremost).
+foremost_comment (str): Foremost parser comment for the file.
+is_exiftool (bool): True if metadata was extracted using ExifTool, false for Python extraction.
+duplicate_group_hash (str): Hash of the duplicate group this file belongs to.
+duplicate_files (List[FileEntry]): List of duplicate files with report paths.
+additional_metadata (Union[Dict[str, Any], List[Any]]): Any extra metadata extracted from the file.</p>
 </dd>
 </dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="app.report.image_files_data.ImageFilesData.file_size">
-<span class="sig-name descname"><span class="pre">file_size</span></span><a class="headerlink" href="#app.report.image_files_data.ImageFilesData.file_size" title="Link to this definition">¶</a></dt>
-<dd><p>Size of the file in bytes.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>int</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="app.report.image_files_data.ImageFilesData.file_extension">
-<span class="sig-name descname"><span class="pre">file_extension</span></span><a class="headerlink" href="#app.report.image_files_data.ImageFilesData.file_extension" title="Link to this definition">¶</a></dt>
-<dd><p>File extension (e.g., ‘jpg’, ‘txt’).</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="app.report.image_files_data.ImageFilesData.file_extension_mismatch">
-<span class="sig-name descname"><span class="pre">file_extension_mismatch</span></span><a class="headerlink" href="#app.report.image_files_data.ImageFilesData.file_extension_mismatch" title="Link to this definition">¶</a></dt>
-<dd><p>Whether the file extension of Foremost and Exiftool match</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>bool</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="app.report.image_files_data.ImageFilesData.file_path">
-<span class="sig-name descname"><span class="pre">file_path</span></span><a class="headerlink" href="#app.report.image_files_data.ImageFilesData.file_path" title="Link to this definition">¶</a></dt>
-<dd><p>Absolute path for image files; can be empty for non-image files.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="app.report.image_files_data.ImageFilesData.file_report_path">
-<span class="sig-name descname"><span class="pre">file_report_path</span></span><a class="headerlink" href="#app.report.image_files_data.ImageFilesData.file_report_path" title="Link to this definition">¶</a></dt>
-<dd><p>Relative link to the file’s HTML report page.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="app.report.image_files_data.ImageFilesData.file_hash">
-<span class="sig-name descname"><span class="pre">file_hash</span></span><a class="headerlink" href="#app.report.image_files_data.ImageFilesData.file_hash" title="Link to this definition">¶</a></dt>
-<dd><p>Hash value of the file.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="app.report.image_files_data.ImageFilesData.file_hash_algorithm">
-<span class="sig-name descname"><span class="pre">file_hash_algorithm</span></span><a class="headerlink" href="#app.report.image_files_data.ImageFilesData.file_hash_algorithm" title="Link to this definition">¶</a></dt>
-<dd><p>Hash algorithm used for this file (e.g., SHA-256).</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="app.report.image_files_data.ImageFilesData.file_type">
-<span class="sig-name descname"><span class="pre">file_type</span></span><a class="headerlink" href="#app.report.image_files_data.ImageFilesData.file_type" title="Link to this definition">¶</a></dt>
-<dd><p>Detected type of the file.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="app.report.image_files_data.ImageFilesData.file_mime">
-<span class="sig-name descname"><span class="pre">file_mime</span></span><a class="headerlink" href="#app.report.image_files_data.ImageFilesData.file_mime" title="Link to this definition">¶</a></dt>
-<dd><p>MIME type of the file.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="app.report.image_files_data.ImageFilesData.file_offset">
-<span class="sig-name descname"><span class="pre">file_offset</span></span><a class="headerlink" href="#app.report.image_files_data.ImageFilesData.file_offset" title="Link to this definition">¶</a></dt>
-<dd><p>Offset within the image where the file was found (according to Foremost).</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>int</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="app.report.image_files_data.ImageFilesData.foremost_comment">
-<span class="sig-name descname"><span class="pre">foremost_comment</span></span><a class="headerlink" href="#app.report.image_files_data.ImageFilesData.foremost_comment" title="Link to this definition">¶</a></dt>
-<dd><p>Foremost parser comment for the file.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="app.report.image_files_data.ImageFilesData.is_exiftool">
-<span class="sig-name descname"><span class="pre">is_exiftool</span></span><a class="headerlink" href="#app.report.image_files_data.ImageFilesData.is_exiftool" title="Link to this definition">¶</a></dt>
-<dd><p>True if metadata was extracted using ExifTool, false for Python extraction.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>bool</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="app.report.image_files_data.ImageFilesData.duplicate_group_hash">
-<span class="sig-name descname"><span class="pre">duplicate_group_hash</span></span><a class="headerlink" href="#app.report.image_files_data.ImageFilesData.duplicate_group_hash" title="Link to this definition">¶</a></dt>
-<dd><p>Hash of the duplicate group this file belongs to.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="app.report.image_files_data.ImageFilesData.duplicate_files">
-<span class="sig-name descname"><span class="pre">duplicate_files</span></span><a class="headerlink" href="#app.report.image_files_data.ImageFilesData.duplicate_files" title="Link to this definition">¶</a></dt>
-<dd><p>List of duplicate files with report paths.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>List[<a class="reference internal" href="#app.report.image_overview_data.FileEntry" title="app.report.image_overview_data.FileEntry">FileEntry</a>]</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="app.report.image_files_data.ImageFilesData.additional_metadata">
-<span class="sig-name descname"><span class="pre">additional_metadata</span></span><a class="headerlink" href="#app.report.image_files_data.ImageFilesData.additional_metadata" title="Link to this definition">¶</a></dt>
-<dd><p>Any extra metadata extracted from the file.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Union[Dict[str, Any], List[Any]]</p>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="app.report.image_files_data.ImageFilesData.to_dict">
 <span class="sig-name descname"><span class="pre">to_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#app.report.image_files_data.ImageFilesData.to_dict" title="Link to this definition">¶</a></dt>
@@ -318,12 +127,13 @@ generate file-level report pages.</p>
 duplicate file entries and additional metadata — are converted into plain
 Python types so they can be safely serialized to JSON.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>A JSON-compatible representation of this object. All
-nested FileEntry objects are converted via their own to_dict() method.</p>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]</span></p>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>Dict[str, Any]</p>
+</dl>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>Dict[str, Any]: A JSON-compatible representation of this object. All
+nested FileEntry objects are converted via their own to_dict() method.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -332,7 +142,7 @@ nested FileEntry objects are converted via their own to_dict() method.</p>
 
 </section>
 <section id="module-app.report.image_overview_data">
-<span id="app-report-image-overview-data"></span><h2>app.report.image_overview_data<a class="headerlink" href="#module-app.report.image_overview_data" title="Link to this heading">¶</a></h2>
+<span id="module-app-report-image-overview-data"></span><h2>Module app.report.image_overview_data<a class="headerlink" href="#module-app.report.image_overview_data" title="Link to this heading">¶</a></h2>
 <p>image_overview_data.py</p>
 <p>Defines data structures for storing image analysis results to be rendered
 into a report. Includes overview metadata, file-level details and
@@ -342,55 +152,28 @@ Copyright (c) 2025 bluefinx
 License: GNU General Public License v3.0</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="app.report.image_overview_data.DuplicateGroupData">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.report.image_overview_data.</span></span><span class="sig-name descname"><span class="pre">DuplicateGroupData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">duplicate_hash</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_count</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linked_images</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.report.image_overview_data.DuplicateGroupData" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">app.report.image_overview_data.</span></span><span class="sig-name descname"><span class="pre">DuplicateGroupData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">duplicate_hash</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_count</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linked_images</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.report.image_overview_data.DuplicateGroupData" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Represents a group of duplicate files across one or more images.</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="app.report.image_overview_data.DuplicateGroupData.duplicate_hash">
-<span class="sig-name descname"><span class="pre">duplicate_hash</span></span><a class="headerlink" href="#app.report.image_overview_data.DuplicateGroupData.duplicate_hash" title="Link to this definition">¶</a></dt>
-<dd><p>The hash of the duplicates.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str</p>
+<dl class="simple">
+<dt>Attributes:</dt><dd><p>duplicate_hash (str): The hash of the duplicates.
+file_count (int): Total number of files in this duplicate group.
+linked_images (List[ImageEntry]): List of images with their associated duplicate files.</p>
 </dd>
 </dl>
-</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.report.image_overview_data.DuplicateGroupData.duplicate_hash">
+<span class="sig-name descname"><span class="pre">duplicate_hash</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><a class="headerlink" href="#app.report.image_overview_data.DuplicateGroupData.duplicate_hash" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="app.report.image_overview_data.DuplicateGroupData.file_count">
-<span class="sig-name descname"><span class="pre">file_count</span></span><a class="headerlink" href="#app.report.image_overview_data.DuplicateGroupData.file_count" title="Link to this definition">¶</a></dt>
-<dd><p>Total number of files in this duplicate group.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>int</p>
-</dd>
-</dl>
-</dd></dl>
+<span class="sig-name descname"><span class="pre">file_count</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><a class="headerlink" href="#app.report.image_overview_data.DuplicateGroupData.file_count" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="app.report.image_overview_data.DuplicateGroupData.linked_images">
-<span class="sig-name descname"><span class="pre">linked_images</span></span><a class="headerlink" href="#app.report.image_overview_data.DuplicateGroupData.linked_images" title="Link to this definition">¶</a></dt>
-<dd><p>List of images with their associated duplicate files.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>List[<a class="reference internal" href="#app.report.image_overview_data.ImageEntry" title="app.report.image_overview_data.ImageEntry">ImageEntry</a>]</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="id0">
-<span class="sig-name descname"><span class="pre">duplicate_hash</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></em><a class="headerlink" href="#id0" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="id1">
-<span class="sig-name descname"><span class="pre">file_count</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></em><a class="headerlink" href="#id1" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="id2">
-<span class="sig-name descname"><span class="pre">linked_images</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code><span class="pre">[</span><a class="reference internal" href="#app.report.image_overview_data.ImageEntry" title="app.report.image_overview_data.ImageEntry"><code class="xref py py-class docutils literal notranslate"><span class="pre">ImageEntry</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#id2" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">linked_images</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#app.report.image_overview_data.ImageEntry" title="app.report.image_overview_data.ImageEntry"><span class="pre">ImageEntry</span></a><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#app.report.image_overview_data.DuplicateGroupData.linked_images" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -398,11 +181,12 @@ License: GNU General Public License v3.0</p>
 <span class="sig-name descname"><span class="pre">to_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#app.report.image_overview_data.DuplicateGroupData.to_dict" title="Link to this definition">¶</a></dt>
 <dd><p>Convert the duplicate group into a JSON-serializable dict.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Serialized duplicate group data.</p>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>]]</span></p>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>Dict[str, Union[str, int, List[Dict]]]</p>
+</dl>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>Dict[str, Union[str, int, List[Dict]]]: Serialized duplicate group data.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -411,71 +195,34 @@ License: GNU General Public License v3.0</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="app.report.image_overview_data.ExtensionEntry">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.report.image_overview_data.</span></span><span class="sig-name descname"><span class="pre">ExtensionEntry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">extension</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">number_files</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">number_duplicate_groups</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">number_duplicate_files</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.report.image_overview_data.ExtensionEntry" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">app.report.image_overview_data.</span></span><span class="sig-name descname"><span class="pre">ExtensionEntry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">extension</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">number_files</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">number_duplicate_groups</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">number_duplicate_files</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.report.image_overview_data.ExtensionEntry" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Represents aggregated statistics for a specific file extension.</p>
+<dl class="simple">
+<dt>Attributes:</dt><dd><p>extension (str): The file extension (e.g., ‘jpg’, ‘dll’).
+number_files (int): Total number of files with this extension.
+number_duplicate_groups (int): Number of duplicate groups that contain files with this extension.
+number_duplicate_files (int): Total number of files that are members of duplicate groups for this extension.</p>
+</dd>
+</dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="app.report.image_overview_data.ExtensionEntry.extension">
-<span class="sig-name descname"><span class="pre">extension</span></span><a class="headerlink" href="#app.report.image_overview_data.ExtensionEntry.extension" title="Link to this definition">¶</a></dt>
-<dd><p>The file extension (e.g., ‘jpg’, ‘dll’).</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="app.report.image_overview_data.ExtensionEntry.number_files">
-<span class="sig-name descname"><span class="pre">number_files</span></span><a class="headerlink" href="#app.report.image_overview_data.ExtensionEntry.number_files" title="Link to this definition">¶</a></dt>
-<dd><p>Total number of files with this extension.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>int</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="app.report.image_overview_data.ExtensionEntry.number_duplicate_groups">
-<span class="sig-name descname"><span class="pre">number_duplicate_groups</span></span><a class="headerlink" href="#app.report.image_overview_data.ExtensionEntry.number_duplicate_groups" title="Link to this definition">¶</a></dt>
-<dd><p>Number of duplicate groups that contain files with this extension.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>int</p>
-</dd>
-</dl>
-</dd></dl>
+<span class="sig-name descname"><span class="pre">extension</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><a class="headerlink" href="#app.report.image_overview_data.ExtensionEntry.extension" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="app.report.image_overview_data.ExtensionEntry.number_duplicate_files">
-<span class="sig-name descname"><span class="pre">number_duplicate_files</span></span><a class="headerlink" href="#app.report.image_overview_data.ExtensionEntry.number_duplicate_files" title="Link to this definition">¶</a></dt>
-<dd><p>Total number of files that are members of duplicate groups for this extension.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>int</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="id3">
-<span class="sig-name descname"><span class="pre">extension</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></em><a class="headerlink" href="#id3" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">number_duplicate_files</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><a class="headerlink" href="#app.report.image_overview_data.ExtensionEntry.number_duplicate_files" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id4">
-<span class="sig-name descname"><span class="pre">number_duplicate_files</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></em><a class="headerlink" href="#id4" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="app.report.image_overview_data.ExtensionEntry.number_duplicate_groups">
+<span class="sig-name descname"><span class="pre">number_duplicate_groups</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><a class="headerlink" href="#app.report.image_overview_data.ExtensionEntry.number_duplicate_groups" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id5">
-<span class="sig-name descname"><span class="pre">number_duplicate_groups</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></em><a class="headerlink" href="#id5" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="id6">
-<span class="sig-name descname"><span class="pre">number_files</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></em><a class="headerlink" href="#id6" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="app.report.image_overview_data.ExtensionEntry.number_files">
+<span class="sig-name descname"><span class="pre">number_files</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><a class="headerlink" href="#app.report.image_overview_data.ExtensionEntry.number_files" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -483,16 +230,16 @@ License: GNU General Public License v3.0</p>
 <span class="sig-name descname"><span class="pre">to_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#app.report.image_overview_data.ExtensionEntry.to_dict" title="Link to this definition">¶</a></dt>
 <dd><p>Convert the ExtensionEntry instance into a dictionary.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p><dl class="simple">
-<dt>A dictionary representation of the ExtensionEntry, with keys</dt><dd><p>’extension’, ‘number_files’, ‘number_duplicate_groups’, and
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>]]</span></p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Returns:</dt><dd><dl class="simple">
+<dt>dict: A dictionary representation of the ExtensionEntry, with keys</dt><dd><p>‘extension’, ‘number_files’, ‘number_duplicate_groups’, and
 ‘number_duplicate_files’.</p>
 </dd>
 </dl>
-</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>dict</p>
 </dd>
 </dl>
 </dd></dl>
@@ -501,71 +248,34 @@ License: GNU General Public License v3.0</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="app.report.image_overview_data.FileEntry">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.report.image_overview_data.</span></span><span class="sig-name descname"><span class="pre">FileEntry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_extension</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">report_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.report.image_overview_data.FileEntry" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">app.report.image_overview_data.</span></span><span class="sig-name descname"><span class="pre">FileEntry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_extension</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">report_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.report.image_overview_data.FileEntry" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Represents a single file entry within an image or duplicate group.</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="app.report.image_overview_data.FileEntry.file_name">
-<span class="sig-name descname"><span class="pre">file_name</span></span><a class="headerlink" href="#app.report.image_overview_data.FileEntry.file_name" title="Link to this definition">¶</a></dt>
-<dd><p>The name of the file.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str</p>
+<dl class="simple">
+<dt>Attributes:</dt><dd><p>file_name (str): The name of the file.
+file_extension (str): The file extension (e.g., ‘jpg’, ‘txt’).
+file_size (int): The size of the file.
+report_path (str): The report path for the file (detail page).</p>
 </dd>
 </dl>
-</dd></dl>
-
 <dl class="py attribute">
 <dt class="sig sig-object py" id="app.report.image_overview_data.FileEntry.file_extension">
-<span class="sig-name descname"><span class="pre">file_extension</span></span><a class="headerlink" href="#app.report.image_overview_data.FileEntry.file_extension" title="Link to this definition">¶</a></dt>
-<dd><p>The file extension (e.g., ‘jpg’, ‘txt’).</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str</p>
-</dd>
-</dl>
-</dd></dl>
+<span class="sig-name descname"><span class="pre">file_extension</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><a class="headerlink" href="#app.report.image_overview_data.FileEntry.file_extension" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.report.image_overview_data.FileEntry.file_name">
+<span class="sig-name descname"><span class="pre">file_name</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><a class="headerlink" href="#app.report.image_overview_data.FileEntry.file_name" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="app.report.image_overview_data.FileEntry.file_size">
-<span class="sig-name descname"><span class="pre">file_size</span></span><a class="headerlink" href="#app.report.image_overview_data.FileEntry.file_size" title="Link to this definition">¶</a></dt>
-<dd><p>The size of the file.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>int</p>
-</dd>
-</dl>
-</dd></dl>
+<span class="sig-name descname"><span class="pre">file_size</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><a class="headerlink" href="#app.report.image_overview_data.FileEntry.file_size" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="app.report.image_overview_data.FileEntry.report_path">
-<span class="sig-name descname"><span class="pre">report_path</span></span><a class="headerlink" href="#app.report.image_overview_data.FileEntry.report_path" title="Link to this definition">¶</a></dt>
-<dd><p>The report path for the file (detail page).</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="id7">
-<span class="sig-name descname"><span class="pre">file_extension</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></em><a class="headerlink" href="#id7" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="id8">
-<span class="sig-name descname"><span class="pre">file_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></em><a class="headerlink" href="#id8" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="id9">
-<span class="sig-name descname"><span class="pre">file_size</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></em><a class="headerlink" href="#id9" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="id10">
-<span class="sig-name descname"><span class="pre">report_path</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></em><a class="headerlink" href="#id10" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">report_path</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><a class="headerlink" href="#app.report.image_overview_data.FileEntry.report_path" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -573,11 +283,12 @@ License: GNU General Public License v3.0</p>
 <span class="sig-name descname"><span class="pre">to_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#app.report.image_overview_data.FileEntry.to_dict" title="Link to this definition">¶</a></dt>
 <dd><p>Convert the FileEntry object into a JSON-serializable dict.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>A dictionary containing file metadata.</p>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>]]</span></p>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>Dict[str, str]</p>
+</dl>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>Dict[str, str]: A dictionary containing file metadata.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -586,39 +297,22 @@ License: GNU General Public License v3.0</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="app.report.image_overview_data.ImageEntry">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.report.image_overview_data.</span></span><span class="sig-name descname"><span class="pre">ImageEntry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_files</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.report.image_overview_data.ImageEntry" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">app.report.image_overview_data.</span></span><span class="sig-name descname"><span class="pre">ImageEntry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_files</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.report.image_overview_data.ImageEntry" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Represents an image and its associated files within a duplicate group.</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="app.report.image_overview_data.ImageEntry.image_name">
-<span class="sig-name descname"><span class="pre">image_name</span></span><a class="headerlink" href="#app.report.image_overview_data.ImageEntry.image_name" title="Link to this definition">¶</a></dt>
-<dd><p>The name of the image.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str</p>
+<dl class="simple">
+<dt>Attributes:</dt><dd><p>image_name (str): The name of the image.
+image_files (List[FileEntry]): List of files belonging to this image.</p>
 </dd>
 </dl>
-</dd></dl>
-
 <dl class="py attribute">
 <dt class="sig sig-object py" id="app.report.image_overview_data.ImageEntry.image_files">
-<span class="sig-name descname"><span class="pre">image_files</span></span><a class="headerlink" href="#app.report.image_overview_data.ImageEntry.image_files" title="Link to this definition">¶</a></dt>
-<dd><p>List of files belonging to this image.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>List[<a class="reference internal" href="#app.report.image_overview_data.FileEntry" title="app.report.image_overview_data.FileEntry">FileEntry</a>]</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="id11">
-<span class="sig-name descname"><span class="pre">image_files</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code><span class="pre">[</span><a class="reference internal" href="#app.report.image_overview_data.FileEntry" title="app.report.image_overview_data.FileEntry"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileEntry</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#id11" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">image_files</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#app.report.image_overview_data.FileEntry" title="app.report.image_overview_data.FileEntry"><span class="pre">FileEntry</span></a><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#app.report.image_overview_data.ImageEntry.image_files" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id12">
-<span class="sig-name descname"><span class="pre">image_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></em><a class="headerlink" href="#id12" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="app.report.image_overview_data.ImageEntry.image_name">
+<span class="sig-name descname"><span class="pre">image_name</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><a class="headerlink" href="#app.report.image_overview_data.ImageEntry.image_name" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -626,11 +320,12 @@ License: GNU General Public License v3.0</p>
 <span class="sig-name descname"><span class="pre">to_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#app.report.image_overview_data.ImageEntry.to_dict" title="Link to this definition">¶</a></dt>
 <dd><p>Convert the ImageEntry object into a JSON-serializable dict.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Serialized image entry.</p>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>]]</span></p>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>Dict[str, Union[str, List[Dict]]]</p>
+</dl>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>Dict[str, Union[str, List[Dict]]]: Serialized image entry.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -639,288 +334,46 @@ License: GNU General Public License v3.0</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="app.report.image_overview_data.ImageOverviewData">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.report.image_overview_data.</span></span><span class="sig-name descname"><span class="pre">ImageOverviewData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser_start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parser_end</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parser_parameters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">foremost_invocation</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">foremost_start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">foremost_end</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">foremost_version</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exiftool_version</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hash_algorithm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">original_output_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_number_files_parsed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_number_files_foremost</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">foremost_parsed_extra</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_size_files</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">number_extensions_parsed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extension_distribution</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">top_ten_files</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">files_extension_mismatch_count</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">files_extension_mismatch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">number_duplicate_groups</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">number_duplicate_files</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">top_ten_duplicate_groups</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.report.image_overview_data.ImageOverviewData" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">app.report.image_overview_data.</span></span><span class="sig-name descname"><span class="pre">ImageOverviewData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser_start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parser_end</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parser_parameters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">foremost_invocation</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">foremost_start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">foremost_end</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">foremost_version</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exiftool_version</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hash_algorithm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">original_output_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_number_files_parsed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_number_files_foremost</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">foremost_parsed_extra</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_size_files</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">number_extensions_parsed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extension_distribution</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">top_ten_files</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">files_extension_mismatch_count</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">files_extension_mismatch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">number_duplicate_groups</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">number_duplicate_files</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">top_ten_duplicate_groups</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.report.image_overview_data.ImageOverviewData" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Aggregated overview data for a forensic image analysis report.</p>
 <p>Stores metadata, statistics, duplicate information, and logs for a single image.</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="app.report.image_overview_data.ImageOverviewData.parser_start">
-<span class="sig-name descname"><span class="pre">parser_start</span></span><a class="headerlink" href="#app.report.image_overview_data.ImageOverviewData.parser_start" title="Link to this definition">¶</a></dt>
-<dd><p>Start timestamp of the parser execution.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str</p>
+<dl class="simple">
+<dt>Attributes:</dt><dd><p>parser_start (str): Start timestamp of the parser execution.
+parser_end (str): End timestamp of the parser execution.
+parser_parameters (Dict[str, Union[str, bool]]): Python parameters passed to the parser.
+foremost_invocation (str): Foremost invocation command.
+foremost_start (str): Start timestamp of the Foremost scan.
+foremost_end (str): End timestamp of the Foremost scan.
+foremost_version (str): Version of Foremost used.
+exiftool_version (str): Version of ExifTool used.
+hash_algorithm (str): Hash algorithm used for duplicate detection (e.g., SHA-256).
+original_output_dir (str): Original Foremost output directory.
+image_name (str): Name of the forensic image.
+image_size (int): Size of the image in bytes.
+total_number_files_parsed (int): Total number of files parsed from the image.
+total_number_files_foremost (int): Total number of files found by Foremost.
+total_size_files (int): Total size of all parsed files in bytes.
+number_extensions_parsed (int): Number of unique file extensions parsed.
+extension_distribution (Dict[str, ExtensionEntry]): Mapping of file extensions to file counts.
+top_ten_files (List[FileEntry]): List of the top 10 largest files.
+files_extension_mismatch_count (int): Number of files with mismatched file extensions.
+files_extension_mismatch (List[FileEntry]): List of files with mismatched file extensions.
+number_duplicate_groups (int): Total number of duplicate groups detected.
+number_duplicate_files (int): Total number of duplicate files detected.
+top_ten_duplicate_groups (List[DuplicateGroupData]): List of top ten duplicate groups with linked images and files.
+logs (List[str]): List of error or warning messages encountered during processing.</p>
 </dd>
 </dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="app.report.image_overview_data.ImageOverviewData.parser_end">
-<span class="sig-name descname"><span class="pre">parser_end</span></span><a class="headerlink" href="#app.report.image_overview_data.ImageOverviewData.parser_end" title="Link to this definition">¶</a></dt>
-<dd><p>End timestamp of the parser execution.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="app.report.image_overview_data.ImageOverviewData.parser_parameters">
-<span class="sig-name descname"><span class="pre">parser_parameters</span></span><a class="headerlink" href="#app.report.image_overview_data.ImageOverviewData.parser_parameters" title="Link to this definition">¶</a></dt>
-<dd><p>Python parameters passed to the parser.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Dict[str, Union[str, bool]]</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="app.report.image_overview_data.ImageOverviewData.foremost_invocation">
-<span class="sig-name descname"><span class="pre">foremost_invocation</span></span><a class="headerlink" href="#app.report.image_overview_data.ImageOverviewData.foremost_invocation" title="Link to this definition">¶</a></dt>
-<dd><p>Foremost invocation command.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="app.report.image_overview_data.ImageOverviewData.foremost_start">
-<span class="sig-name descname"><span class="pre">foremost_start</span></span><a class="headerlink" href="#app.report.image_overview_data.ImageOverviewData.foremost_start" title="Link to this definition">¶</a></dt>
-<dd><p>Start timestamp of the Foremost scan.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="app.report.image_overview_data.ImageOverviewData.foremost_end">
-<span class="sig-name descname"><span class="pre">foremost_end</span></span><a class="headerlink" href="#app.report.image_overview_data.ImageOverviewData.foremost_end" title="Link to this definition">¶</a></dt>
-<dd><p>End timestamp of the Foremost scan.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="app.report.image_overview_data.ImageOverviewData.foremost_version">
-<span class="sig-name descname"><span class="pre">foremost_version</span></span><a class="headerlink" href="#app.report.image_overview_data.ImageOverviewData.foremost_version" title="Link to this definition">¶</a></dt>
-<dd><p>Version of Foremost used.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="app.report.image_overview_data.ImageOverviewData.exiftool_version">
-<span class="sig-name descname"><span class="pre">exiftool_version</span></span><a class="headerlink" href="#app.report.image_overview_data.ImageOverviewData.exiftool_version" title="Link to this definition">¶</a></dt>
-<dd><p>Version of ExifTool used.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="app.report.image_overview_data.ImageOverviewData.hash_algorithm">
-<span class="sig-name descname"><span class="pre">hash_algorithm</span></span><a class="headerlink" href="#app.report.image_overview_data.ImageOverviewData.hash_algorithm" title="Link to this definition">¶</a></dt>
-<dd><p>Hash algorithm used for duplicate detection (e.g., SHA-256).</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="app.report.image_overview_data.ImageOverviewData.original_output_dir">
-<span class="sig-name descname"><span class="pre">original_output_dir</span></span><a class="headerlink" href="#app.report.image_overview_data.ImageOverviewData.original_output_dir" title="Link to this definition">¶</a></dt>
-<dd><p>Original Foremost output directory.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="app.report.image_overview_data.ImageOverviewData.image_name">
-<span class="sig-name descname"><span class="pre">image_name</span></span><a class="headerlink" href="#app.report.image_overview_data.ImageOverviewData.image_name" title="Link to this definition">¶</a></dt>
-<dd><p>Name of the forensic image.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="app.report.image_overview_data.ImageOverviewData.image_size">
-<span class="sig-name descname"><span class="pre">image_size</span></span><a class="headerlink" href="#app.report.image_overview_data.ImageOverviewData.image_size" title="Link to this definition">¶</a></dt>
-<dd><p>Size of the image in bytes.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>int</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="app.report.image_overview_data.ImageOverviewData.total_number_files_parsed">
-<span class="sig-name descname"><span class="pre">total_number_files_parsed</span></span><a class="headerlink" href="#app.report.image_overview_data.ImageOverviewData.total_number_files_parsed" title="Link to this definition">¶</a></dt>
-<dd><p>Total number of files parsed from the image.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>int</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="app.report.image_overview_data.ImageOverviewData.total_number_files_foremost">
-<span class="sig-name descname"><span class="pre">total_number_files_foremost</span></span><a class="headerlink" href="#app.report.image_overview_data.ImageOverviewData.total_number_files_foremost" title="Link to this definition">¶</a></dt>
-<dd><p>Total number of files found by Foremost.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>int</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="app.report.image_overview_data.ImageOverviewData.total_size_files">
-<span class="sig-name descname"><span class="pre">total_size_files</span></span><a class="headerlink" href="#app.report.image_overview_data.ImageOverviewData.total_size_files" title="Link to this definition">¶</a></dt>
-<dd><p>Total size of all parsed files in bytes.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>int</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="app.report.image_overview_data.ImageOverviewData.number_extensions_parsed">
-<span class="sig-name descname"><span class="pre">number_extensions_parsed</span></span><a class="headerlink" href="#app.report.image_overview_data.ImageOverviewData.number_extensions_parsed" title="Link to this definition">¶</a></dt>
-<dd><p>Number of unique file extensions parsed.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>int</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="app.report.image_overview_data.ImageOverviewData.extension_distribution">
-<span class="sig-name descname"><span class="pre">extension_distribution</span></span><a class="headerlink" href="#app.report.image_overview_data.ImageOverviewData.extension_distribution" title="Link to this definition">¶</a></dt>
-<dd><p>Mapping of file extensions to file counts.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Dict[str, <a class="reference internal" href="#app.report.image_overview_data.ExtensionEntry" title="app.report.image_overview_data.ExtensionEntry">ExtensionEntry</a>]</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="app.report.image_overview_data.ImageOverviewData.top_ten_files">
-<span class="sig-name descname"><span class="pre">top_ten_files</span></span><a class="headerlink" href="#app.report.image_overview_data.ImageOverviewData.top_ten_files" title="Link to this definition">¶</a></dt>
-<dd><p>List of the top 10 largest files.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>List[<a class="reference internal" href="#app.report.image_overview_data.FileEntry" title="app.report.image_overview_data.FileEntry">FileEntry</a>]</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="app.report.image_overview_data.ImageOverviewData.files_extension_mismatch_count">
-<span class="sig-name descname"><span class="pre">files_extension_mismatch_count</span></span><a class="headerlink" href="#app.report.image_overview_data.ImageOverviewData.files_extension_mismatch_count" title="Link to this definition">¶</a></dt>
-<dd><p>Number of files with mismatched file extensions.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>int</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="app.report.image_overview_data.ImageOverviewData.files_extension_mismatch">
-<span class="sig-name descname"><span class="pre">files_extension_mismatch</span></span><a class="headerlink" href="#app.report.image_overview_data.ImageOverviewData.files_extension_mismatch" title="Link to this definition">¶</a></dt>
-<dd><p>List of files with mismatched file extensions.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>List[<a class="reference internal" href="#app.report.image_overview_data.FileEntry" title="app.report.image_overview_data.FileEntry">FileEntry</a>]</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="app.report.image_overview_data.ImageOverviewData.number_duplicate_groups">
-<span class="sig-name descname"><span class="pre">number_duplicate_groups</span></span><a class="headerlink" href="#app.report.image_overview_data.ImageOverviewData.number_duplicate_groups" title="Link to this definition">¶</a></dt>
-<dd><p>Total number of duplicate groups detected.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>int</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="app.report.image_overview_data.ImageOverviewData.number_duplicate_files">
-<span class="sig-name descname"><span class="pre">number_duplicate_files</span></span><a class="headerlink" href="#app.report.image_overview_data.ImageOverviewData.number_duplicate_files" title="Link to this definition">¶</a></dt>
-<dd><p>Total number of duplicate files detected.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>int</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="app.report.image_overview_data.ImageOverviewData.top_ten_duplicate_groups">
-<span class="sig-name descname"><span class="pre">top_ten_duplicate_groups</span></span><a class="headerlink" href="#app.report.image_overview_data.ImageOverviewData.top_ten_duplicate_groups" title="Link to this definition">¶</a></dt>
-<dd><p>List of top ten duplicate groups with linked images and files.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>List[<a class="reference internal" href="#app.report.image_overview_data.DuplicateGroupData" title="app.report.image_overview_data.DuplicateGroupData">DuplicateGroupData</a>]</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="app.report.image_overview_data.ImageOverviewData.logs">
-<span class="sig-name descname"><span class="pre">logs</span></span><a class="headerlink" href="#app.report.image_overview_data.ImageOverviewData.logs" title="Link to this definition">¶</a></dt>
-<dd><p>List of error or warning messages encountered during processing.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>List[str]</p>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="app.report.image_overview_data.ImageOverviewData.to_dict">
 <span class="sig-name descname"><span class="pre">to_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#app.report.image_overview_data.ImageOverviewData.to_dict" title="Link to this definition">¶</a></dt>
 <dd><p>Convert the entire ImageOverviewData structure into a JSON-serializable form.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p><dl class="simple">
-<dt>Nested dictionary containing all overview metadata,</dt><dd><p>file statistics, duplicate group data, and log entries.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><dl class="simple">
+<dt>Dict: Nested dictionary containing all overview metadata,</dt><dd><p>file statistics, duplicate group data, and log entries.</p>
 </dd>
 </dl>
-</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>Dict</p>
 </dd>
 </dl>
 </dd></dl>
@@ -929,7 +382,7 @@ License: GNU General Public License v3.0</p>
 
 </section>
 <section id="module-app.report.report_data">
-<span id="app-report-report-data"></span><h2>app.report.report_data<a class="headerlink" href="#module-app.report.report_data" title="Link to this heading">¶</a></h2>
+<span id="module-app-report-report-data"></span><h2>Module app.report.report_data<a class="headerlink" href="#module-app.report.report_data" title="Link to this heading">¶</a></h2>
 <p>report_data.py</p>
 <p>Contains functions to generate structured data for Foremost outputs.
 Includes overview data, file-extension-level aggregation and file-level
@@ -939,39 +392,22 @@ Copyright (c) 2025 bluefinx
 License: GNU General Public License v3.0</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="app.report.report_data.ReportFormat">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.report.report_data.</span></span><span class="sig-name descname"><span class="pre">ReportFormat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.report.report_data.ReportFormat" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">app.report.report_data.</span></span><span class="sig-name descname"><span class="pre">ReportFormat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.report.report_data.ReportFormat" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
 <p>Enumeration of supported report formats.</p>
+<dl class="simple">
+<dt>Attributes:</dt><dd><p>HTML (str): Standard HTML report.
+JSON (str): JSON formatted report.</p>
+</dd>
+</dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="app.report.report_data.ReportFormat.HTML">
-<span class="sig-name descname"><span class="pre">HTML</span></span><a class="headerlink" href="#app.report.report_data.ReportFormat.HTML" title="Link to this definition">¶</a></dt>
-<dd><p>Standard HTML report.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="app.report.report_data.ReportFormat.JSON">
-<span class="sig-name descname"><span class="pre">JSON</span></span><a class="headerlink" href="#app.report.report_data.ReportFormat.JSON" title="Link to this definition">¶</a></dt>
-<dd><p>JSON formatted report.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="id13">
-<span class="sig-name descname"><span class="pre">HTML</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'html'</span></em><a class="headerlink" href="#id13" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">HTML</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'html'</span></span><a class="headerlink" href="#app.report.report_data.ReportFormat.HTML" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id14">
-<span class="sig-name descname"><span class="pre">JSON</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'json'</span></em><a class="headerlink" href="#id14" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="app.report.report_data.ReportFormat.JSON">
+<span class="sig-name descname"><span class="pre">JSON</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'json'</span></span><a class="headerlink" href="#app.report.report_data.ReportFormat.JSON" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -981,24 +417,21 @@ License: GNU General Public License v3.0</p>
 <span class="sig-prename descclassname"><span class="pre">app.report.report_data.</span></span><span class="sig-name descname"><span class="pre">generate_file_report_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_extension</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">report</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.report.report_data.generate_file_report_path" title="Link to this definition">¶</a></dt>
 <dd><p>Generate a relative file path for inclusion in the HTML report.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>output_path</strong> (<em>Path</em>) – Base output directory of the report.</p></li>
-<li><p><strong>image_name</strong> (<em>str</em>) – Name of the forensic image.</p></li>
-<li><p><strong>file_extension</strong> (<em>str</em>) – Extension of the file.</p></li>
-<li><p><strong>file_name</strong> (<em>str</em>) – Name of the file.</p></li>
-<li><p><strong>report</strong> (<em>str</em>) – Report format.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><dl class="simple">
-<dt>Relative path to the file in the report or empty string if</dt><dd><p>any argument is invalid.</p>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span></p>
 </dd>
 </dl>
-</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>output_path (Path): Base output directory of the report.
+image_name (str): Name of the forensic image.
+file_extension (str): Extension of the file.
+file_name (str): Name of the file.
+report (str): Report format.</p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str</p>
+<dt>Returns:</dt><dd><dl class="simple">
+<dt>str: Relative path to the file in the report or empty string if</dt><dd><p>any argument is invalid.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -1010,20 +443,18 @@ License: GNU General Public License v3.0</p>
 <p>Each entry contains aggregated statistics and detailed file listings
 for one extension.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>image_overview_data</strong> (<a class="reference internal" href="#app.report.image_overview_data.ImageOverviewData" title="app.report.image_overview_data.ImageOverviewData"><em>ImageOverviewData</em></a>) – Previously generated overview data.</p></li>
-<li><p><strong>image</strong> (<a class="reference internal" href="app.models.html#app.models.image.Image" title="app.models.image.Image"><em>Image</em></a>) – SQLAlchemy Image object with files.</p></li>
-<li><p><strong>output_path</strong> (<em>Path</em>) – Base output path for report file links.</p></li>
-<li><p><strong>report</strong> (<em>str</em>) – Report format.</p></li>
-<li><p><strong>session</strong> (<em>Session</em>) – SQLAlchemy session for queries.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Aggregated per-extension report data.</p>
-</dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>List[<a class="reference internal" href="#app.report.image_extensions_data.ImageExtensionsData" title="app.report.image_extensions_data.ImageExtensionsData">ImageExtensionsData</a>]</p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<a class="reference internal" href="#app.report.image_extensions_data.ImageExtensionsData" title="app.report.image_extensions_data.ImageExtensionsData"><code class="xref py py-class docutils literal notranslate"><span class="pre">ImageExtensionsData</span></code></a>]</span></p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Args:</dt><dd><p>image_overview_data (ImageOverviewData): Previously generated overview data.
+image (Image): SQLAlchemy Image object with files.
+output_path (Path): Base output path for report file links.
+report (str): Report format.
+session (Session): SQLAlchemy session for queries.</p>
+</dd>
+<dt>Returns:</dt><dd><p>List[ImageExtensionsData]: Aggregated per-extension report data.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1035,26 +466,24 @@ for one extension.</p>
 <p>This includes parser execution info, image metadata, file statistics,
 extension distributions, duplicate groups and placeholder for logs.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>input_path</strong> (<em>Path</em>) – Path to input image files.</p></li>
-<li><p><strong>host_input_path</strong> (<em>str</em>) – Path to host input Foremost directory.</p></li>
-<li><p><strong>output_path</strong> (<em>Path</em>) – Output directory for the report.</p></li>
-<li><p><strong>host_output_path</strong> (<em>str</em>) – Output directory for the host output report directory.</p></li>
-<li><p><strong>report</strong> (<em>str</em>) – Report format.</p></li>
-<li><p><strong>with_images</strong> (<em>bool</em>) – Whether to include image previews.</p></li>
-<li><p><strong>cross_image</strong> (<em>bool</em>) – Whether cross-image duplicate detection is enabled.</p></li>
-<li><p><strong>parsing_start</strong> (<em>str</em>) – Timestamp when parsing started.</p></li>
-<li><p><strong>image</strong> (<a class="reference internal" href="app.models.html#app.models.image.Image" title="app.models.image.Image"><em>Image</em></a>) – SQLAlchemy Image object with files and metadata.</p></li>
-<li><p><strong>audit_table</strong> (<em>dict</em>) – the audit_table dict after all parsed files were dropped.</p></li>
-<li><p><strong>session</strong> (<em>Session</em>) – SQLAlchemy session for queries.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Structured overview data for the image.</p>
-</dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="#app.report.image_overview_data.ImageOverviewData" title="app.report.image_overview_data.ImageOverviewData">ImageOverviewData</a></p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#app.report.image_overview_data.ImageOverviewData" title="app.report.image_overview_data.ImageOverviewData"><code class="xref py py-class docutils literal notranslate"><span class="pre">ImageOverviewData</span></code></a></span></p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Args:</dt><dd><p>input_path (Path): Path to input image files.
+host_input_path (str): Path to host input Foremost directory.
+output_path (Path): Output directory for the report.
+host_output_path (str): Output directory for the host output report directory.
+report (str): Report format.
+with_images (bool): Whether to include image previews.
+cross_image (bool): Whether cross-image duplicate detection is enabled.
+parsing_start (str): Timestamp when parsing started.
+image (Image): SQLAlchemy Image object with files and metadata.
+audit_table (dict): the audit_table dict after all parsed files were dropped.
+session (Session): SQLAlchemy session for queries.</p>
+</dd>
+<dt>Returns:</dt><dd><p>ImageOverviewData: Structured overview data for the image.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1065,33 +494,28 @@ extension distributions, duplicate groups and placeholder for logs.</p>
 <dd><p>Orchestrates the generation of image overview and extension-level report data.</p>
 <p>Connects to the database, retrieves image data and computes all
 structured data needed to render the HTML report.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>input_path</strong> (<em>Path</em>) – Input image directory.</p></li>
-<li><p><strong>host_input_path</strong> (<em>str</em>) – Path to host input Foremost directory.</p></li>
-<li><p><strong>output_path</strong> (<em>Path</em>) – Output report directory.</p></li>
-<li><p><strong>host_output_path</strong> (<em>str</em>) – Output directory for the host output report directory.</p></li>
-<li><p><strong>report</strong> (<em>str</em>) – Report type (HTML, JSON).</p></li>
-<li><p><strong>with_images</strong> (<em>bool</em>) – Include image previews if True.</p></li>
-<li><p><strong>cross_image</strong> (<em>bool</em>) – Enable cross-image duplicate detection if True.</p></li>
-<li><p><strong>parsing_start</strong> (<em>str</em>) – Timestamp when parsing started.</p></li>
-<li><p><strong>image_id</strong> (<em>int</em>) – ID of the image to generate the report for.</p></li>
-<li><p><strong>audit_table</strong> (<em>dict</em>) – the audit_table dict after all parsed files were dropped.</p></li>
-</ul>
+<dl class="simple">
+<dt>Args:</dt><dd><p>input_path (Path): Input image directory.
+host_input_path (str): Path to host input Foremost directory.
+output_path (Path): Output report directory.
+host_output_path (str): Output directory for the host output report directory.
+report (str): Report type (HTML, JSON).
+with_images (bool): Include image previews if True.
+cross_image (bool): Enable cross-image duplicate detection if True.
+parsing_start (str): Timestamp when parsing started.
+image_id (int): ID of the image to generate the report for.
+audit_table (dict): the audit_table dict after all parsed files were dropped.</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>None</p>
+<dt>Returns:</dt><dd><p>None</p>
 </dd>
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>Exception</strong> – If database connection fails or image cannot be read.</p>
+<dt>Raises:</dt><dd><p>Exception: If database connection fails or image cannot be read.</p>
 </dd>
 </dl>
 </dd></dl>
 
 </section>
 <section id="module-app.report.report_json">
-<span id="app-report-report-json"></span><h2>app.report.report_json<a class="headerlink" href="#module-app.report.report_json" title="Link to this heading">¶</a></h2>
+<span id="module-app-report-report-json"></span><h2>Module app.report.report_json<a class="headerlink" href="#module-app.report.report_json" title="Link to this heading">¶</a></h2>
 <p>report_json.py</p>
 <p>Provides functionality to generate a JSON report for Foremost outputs.</p>
 <p>This module takes structured image overview and per-extension data and writes
@@ -1112,19 +536,19 @@ and writes:</p>
 <li><p>One JSON file per extension with detailed file information</p></li>
 </ol>
 </div></blockquote>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>image_overview_data</strong> (<a class="reference internal" href="#app.report.image_overview_data.ImageOverviewData" title="app.report.image_overview_data.ImageOverviewData"><em>ImageOverviewData</em></a>) – Aggregated overview data
-for the image, including metadata, statistics, duplicates and logs.</p></li>
-<li><p><strong>image_extensions_data</strong> (<em>List</em><em>[</em><a class="reference internal" href="#app.report.image_extensions_data.ImageExtensionsData" title="app.report.image_extensions_data.ImageExtensionsData"><em>ImageExtensionsData</em></a><em>]</em>) – List of per-extension
-detailed data, including files and metadata.</p></li>
-<li><p><strong>report_path</strong> (<em>Path</em>) – Directory where JSON files will be created.</p></li>
-</ul>
+<dl>
+<dt>Args:</dt><dd><dl class="simple">
+<dt>image_overview_data (ImageOverviewData): Aggregated overview data</dt><dd><p>for the image, including metadata, statistics, duplicates and logs.</p>
 </dd>
-<dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>Exception</strong> – Any exception raised during file creation or JSON dumping
-    is caught and logged to stderr.</p>
+<dt>image_extensions_data (List[ImageExtensionsData]): List of per-extension</dt><dd><p>detailed data, including files and metadata.</p>
+</dd>
+</dl>
+<p>report_path (Path): Directory where JSON files will be created.</p>
+</dd>
+<dt>Raises:</dt><dd><dl class="simple">
+<dt>Exception: Any exception raised during file creation or JSON dumping</dt><dd><p>is caught and logged to stderr.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
@@ -1161,9 +585,9 @@ detailed data, including files and metadata.</p></li>
 <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="app.html">Package app/</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="app.html#module-app.main">app.main</a></li>
-<li class="toctree-l2"><a class="reference internal" href="app.html#module-app.db">app.db</a></li>
-<li class="toctree-l2 current"><a class="reference internal" href="app.html#subdirectories">Subdirectories</a></li>
+<li class="toctree-l2"><a class="reference internal" href="app.html#module-app.main">Module app.main</a></li>
+<li class="toctree-l2"><a class="reference internal" href="app.html#module-app.db">Module app.db</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="app.html#app-modules">App Modules</a></li>
 </ul>
 </li>
 </ul>
@@ -1191,10 +615,10 @@ detailed data, including files and metadata.</p></li>
       <div class="clearer"></div>
     </div>
     <div class="footer">
-      &#169;2025, BlueFinX.
+      &#169;2025, bluefinx.
       
       |
-      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.3</a>
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 9.0.4</a>
       &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
       
       |

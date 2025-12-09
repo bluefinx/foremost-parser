@@ -3,6 +3,10 @@ file.py
 
 Defines the ORM model for storing individual files extracted by Foremost.
 
+This module provides two main classes:
+    1. File: Represents a file.
+    2. FileHash: Represents an easy to retrieve association of a file, its hash und its image.
+
 Each file is associated with a forensic image and contains metadata such as size,
 hash, timestamps, MIME type and additional JSON metadata. Validation
 ensures that string fields do not exceed their maximum length.
@@ -132,6 +136,7 @@ class File(Base):
             return value[:255]
         return value
 
+# database table file_hash
 class FileHash(Base):
     """
     Represents a minimal hash entry for a carved file, used for efficient

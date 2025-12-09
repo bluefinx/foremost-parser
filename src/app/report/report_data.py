@@ -11,7 +11,7 @@ License: GNU General Public License v3.0
 """
 
 # -----------------------------------------------------------------------------
-# REPORT CONTENT STRUCTURE
+# REPORT CONTENT STRUCTURE (Planned for HTML report)
 # -----------------------------------------------------------------------------
 #
 # 1. IMAGE OVERVIEW PAGE

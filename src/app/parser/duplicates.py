@@ -5,11 +5,11 @@ Provides functions to detect duplicate files based on their SHA-256 hashes
 and store the duplicate relationships in the database.
 
 The module handles:
-- Intra-image duplicate detection: compares files within the same image.
-- Cross-image duplicate detection (planned): compares files across all images.
-- Creation of DuplicateGroup entries for each hash shared by multiple files.
-- Linking DuplicateGroups to images via an association table.
-- Creation of DuplicateMember entries for each file in a group.
+    - Intra-image duplicate detection: compares files within the same image.
+    - Cross-image duplicate detection (planned): compares files across all images.
+    - Creation of DuplicateGroup entries for each hash shared by multiple files.
+    - Linking DuplicateGroups to images via an association table.
+    - Creation of DuplicateMember entries for each file in a group.
 
 Author: bluefinx
 Copyright (c) 2025 bluefinx

@@ -3,11 +3,6 @@ db.py
 
 Handles database initialisation and connections for Foremost-Parser.
 
-Functions:
-    create_database_url(): Create the database URL for connection.
-    create_database(): Creates the database if it does not exist.
-    connect_database(): Connects to the database and returns a session object.
-
 Author: bluefinx
 Copyright (c) 2025 bluefinx
 License: GNU General Public License v3.0

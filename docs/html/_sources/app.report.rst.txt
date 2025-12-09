@@ -1,40 +1,40 @@
 Package app.report
 ==================
 
-app.report.image\_extensions\_data
-----------------------------------
+Module app.report.image\_extensions\_data
+-----------------------------------------
 
 .. automodule:: app.report.image_extensions_data
    :members:
    :show-inheritance:
    :undoc-members:
 
-app.report.image\_files\_data
------------------------------
+Module app.report.image\_files\_data
+------------------------------------
 
 .. automodule:: app.report.image_files_data
    :members:
    :show-inheritance:
    :undoc-members:
 
-app.report.image\_overview\_data
---------------------------------
+Module app.report.image\_overview\_data
+---------------------------------------
 
 .. automodule:: app.report.image_overview_data
    :members:
    :show-inheritance:
    :undoc-members:
 
-app.report.report\_data
------------------------
+Module app.report.report\_data
+------------------------------
 
 .. automodule:: app.report.report_data
    :members:
    :show-inheritance:
    :undoc-members:
 
-app.report.report\_json
------------------------
+Module app.report.report\_json
+------------------------------
 
 .. automodule:: app.report.report_json
    :members:

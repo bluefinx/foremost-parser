@@ -1,27 +1,27 @@
 Package app/
 ============
 
-app.main
---------
+Module app.main 
+---------------
 
 .. automodule:: app.main
    :members:
    :show-inheritance:
    :undoc-members:
 
-app.db
-------
+Module app.db
+-------------
 
 .. automodule:: app.db
    :members:
    :show-inheritance:
    :undoc-members:
 
-Subdirectories
---------------
+App Modules
+-----------
 
 .. toctree::
-   :maxdepth: 4
+   :maxdepth: 2
 
    app.crud
    app.models

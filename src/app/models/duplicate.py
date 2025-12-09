@@ -4,10 +4,10 @@ duplicate.py
 Defines the ORM models for storing duplicate file groups in the database.
 
 This module provides two main classes:
-1. DuplicateGroup: Represents a group of files that share the same hash,
-   effectively capturing all duplicates across one or multiple images.
-2. DuplicateMember: Association table linking files to their duplicate group,
-   implementing a many-to-many relationship between File and DuplicateGroup.
+    1. DuplicateGroup: Represents a group of files that share the same hash,
+       effectively capturing all duplicates across one or multiple images.
+    2. DuplicateMember: Association table linking files to their duplicate group,
+       implementing a many-to-many relationship between File and DuplicateGroup.
 
 The design avoids storing redundant pairwise duplicates, instead
 grouping duplicates together, which simplifies queries and reporting.

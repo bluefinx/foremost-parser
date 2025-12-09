@@ -3,12 +3,6 @@ duplicate.py (CRUD)
 
 Provides CRUD functions to manage duplicate files in the database.
 
-This module includes functions to:
-- Detect and insert duplicate groups based on file hashes.
-- Link duplicate groups to images via an association table.
-- Insert and read duplicate members linking individual files to their groups.
-- Query existing duplicate groups for specific images or globally.
-
 Author: bluefinx
 Copyright (c) 2025 bluefinx
 License: GNU General Public License v3.0

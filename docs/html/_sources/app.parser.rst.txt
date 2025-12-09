@@ -1,24 +1,24 @@
 Package app.parser
 ==================
 
-app.parser.audit\_file
-----------------------
+Module app.parser.audit\_file
+-----------------------------
 
 .. automodule:: app.parser.audit_file
    :members:
    :show-inheritance:
    :undoc-members:
 
-app.parser.duplicates
----------------------
+Module app.parser.duplicates
+----------------------------
 
 .. automodule:: app.parser.duplicates
    :members:
    :show-inheritance:
    :undoc-members:
 
-app.parser.indv\_files
-----------------------
+Module app.parser.indv\_files
+-----------------------------
 
 .. automodule:: app.parser.indv_files
    :members:

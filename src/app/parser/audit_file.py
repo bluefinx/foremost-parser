@@ -6,10 +6,10 @@ file-level information. The extracted data is stored in the database and
 returned as a structured dictionary for further processing.
 
 This module handles:
-- Reading the audit.txt from a Foremost output directory.
-- Extracting metadata (image name, size, timestamps, versions, etc.).
-- Parsing the internal audit table for per-file details.
-- Storing the parsed image entry in the database.
+    - Reading the audit.txt from a Foremost output directory.
+    - Extracting metadata (image name, size, timestamps, versions, etc.).
+    - Parsing the internal audit table for per-file details.
+    - Storing the parsed image entry in the database.
 
 Requirements:
 - The audit file must exist and be named exactly `audit.txt`.
